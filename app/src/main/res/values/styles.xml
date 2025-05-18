@@ -1,0 +1,11 @@
+<resources>
+    <style name="Widget.Theme.TabsGPTtutor.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    </style>
+
+
+    <style name="ElevetedButtonSmallCorners" parent="Widget.Material3.Button">
+        <item name="cornerRadius">5dp</item>
+    </style>
+</resources>

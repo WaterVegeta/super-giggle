@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="Appearance"
+        app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:key="dynamic_colors"
+            android:summary="Matches your app's colors to your wallpaper (Android 12+)"
+            android:title="Use dynamic colors" />
+        <ListPreference app:iconSpaceReserved="false"
+            android:key="theme"
+            android:title="App theme"
+            android:summary="Choose app theme"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:defaultValue="system" />
+    </PreferenceCategory>
+    <CheckBoxPreference app:iconSpaceReserved="false"
+        android:defaultValue="false"
+        android:key="check_box_preference_1"
+        android:title="COCO"
+        android:summary="YES?"/>
+
+</PreferenceScreen>

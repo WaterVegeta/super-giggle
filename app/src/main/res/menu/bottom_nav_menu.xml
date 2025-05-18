@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_schedule"
+        android:icon="@drawable/baseline_event_note_24"
+        android:title="Schedule"
+        />
+    <item
+        android:id="@+id/nav_hwList"
+        android:icon="@drawable/baseline_calendar_view_day_24"
+        android:title="Homework"
+        />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/outline_settings_24"
+        android:title="Settings"
+        />
+</menu>

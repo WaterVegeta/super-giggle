@@ -1,0 +1,13 @@
+<resources>
+    <declare-styleable name="FullscreenAttrs">
+        <attr name="fullscreenBackgroundColor" format="color" />
+        <attr name="fullscreenTextColor" format="color" />
+    </declare-styleable>
+    <attr name="colorSecondaryContainer" format="color"/>
+    <attr name="colorSurfaceContainerLow" format="color"/>
+    <attr name="colorOnSurface" format="color"/>
+    <attr name="colorOnSecondaryContainer" format="color"/>
+    <attr name="colorOnTertiaryContainer" format="color"/>
+    <attr name="colorOnTertiary" format="color"/>
+    <attr name="colorTertiary" format="color"/>
+</resources>

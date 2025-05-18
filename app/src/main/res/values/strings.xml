@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">CRebuilt</string>
+    <string name="monday">Понеділок</string>
+    <string name="tuesday">Вівторок</string>
+    <string name="wednesday">Середа</string>
+    <string name="thursday">Четвер</string>
+    <string name="friday">П\'ятниця</string>
+    <string name="saturday">Субота</string>
+    <string name="sunday">Неділя</string>
+    <string-array name="monday1">
+        <item>Укр літ</item>
+        <item>Фізкульт</item>
+        <item>Захист</item>
+        <item>Захист</item>
+        <item>Укр мова</item>
+        <item>Хімія</item>
+        <item>Англ</item>
+    </string-array>
+    <string-array name="monday2">
+        <item>Укр літ</item>
+        <item>Фізкульт</item>
+        <item>Захист</item>
+        <item>Захист</item>
+        <item>Укр мова</item>
+        <item>Геогр</item>
+        <item>Англ</item>
+    </string-array>
+
+    <string-array name="tues">
+        <item>Інформ</item>
+        <item>Всес істор</item>
+        <item>Геом</item>
+        <item>Хімія</item>
+        <item>Франц</item>
+        <item>Англ</item>
+        <item>Біол</item>
+        <item>Громад осв</item>
+    </string-array>
+
+    <string-array name="wend">
+        <item>Фізкульт</item>
+        <item>Істор Укр</item>
+        <item>Алгебра</item>
+        <item>Біол</item>
+        <item>Франц</item>
+        <item>Англ</item>
+        <item>Громад осв</item>
+    </string-array>
+
+    <string-array name="thurs">
+        <item>Геогр</item>
+        <item>Мистецтво</item>
+        <item>Геом</item>
+        <item>Укр мова</item>
+        <item>Фізика</item>
+        <item>Англ</item>
+        <item>Заруб</item>
+        <item>Укр літ</item>
+    </string-array>
+
+
+    <string-array name="frid">
+        <item>Алгебра</item>
+        <item>Істор Укр</item>
+        <item>Фізкульт</item>
+        <item>Укр мова</item>
+        <item>Фізика</item>
+        <item>Англ</item>
+    </string-array>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
