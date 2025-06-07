@@ -17,11 +17,122 @@
             android:entries="@array/theme_entries"
             android:entryValues="@array/theme_values"
             android:defaultValue="system" />
+        <CheckBoxPreference app:iconSpaceReserved="false"
+            android:defaultValue="false"
+            android:key="check_box_preference_1"
+            android:title="COCO"
+            android:summary="YES?"/>
+        <Preference
+            app:iconSpaceReserved="false"
+            android:key="change_act"
+            android:title="Configure schedule"
+            android:summary="sos"
+            app:allowDividerAbove="true"
+            />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="animation"
+            app:title="Animation"
+            android:summary="configure animations"
+            app:allowDividerAbove="true"
+            />
     </PreferenceCategory>
-    <CheckBoxPreference app:iconSpaceReserved="false"
-        android:defaultValue="false"
-        android:key="check_box_preference_1"
-        android:title="COCO"
-        android:summary="YES?"/>
+
+    <PreferenceScreen app:isPreferenceVisible="false"
+        app:key="change_schedule_screen">
+
+        <PreferenceCategory
+            android:title="Change Schedule"
+            app:iconSpaceReserved="false">
+
+            <Preference
+                app:iconSpaceReserved="false"
+                android:key="change_add_lesson"
+                android:title="Add/change lesson"
+                android:summary="sos"
+                app:allowDividerAbove="true"
+                />
+
+            <Preference
+                app:iconSpaceReserved="false"
+                android:key="change_add_time"
+                android:title="Add/change time"
+                android:summary="sos"
+                app:allowDividerAbove="true"
+                />
+
+            <Preference
+                app:iconSpaceReserved="false"
+                android:key="change_schedule"
+                android:title="Change schedule"
+                android:summary="sos"
+                app:allowDividerAbove="true"
+                />
+            <Preference
+                app:iconSpaceReserved="false"
+                app:key="pref_delete_db"
+                app:title="delete db"/>
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <PreferenceScreen app:isPreferenceVisible="false"
+        app:key="delete_db">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="delete_lesson_list"
+            app:title="Delete lesson list"
+            app:allowDividerBelow="true"
+            />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="delete_time_list"
+            app:title="Delete time list"
+            app:allowDividerBelow="true"
+            app:allowDividerAbove="true"
+            />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="delete_schedule"
+            app:title="Delete schedule"
+            app:allowDividerBelow="true"
+            app:allowDividerAbove="true"
+            />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="delete_homework"
+            app:title="Delete homework"
+            app:allowDividerBelow="true"
+            app:allowDividerAbove="true"
+            />
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="delete_temp_schedule"
+            app:title="Delete temporal schedule"
+            android:summary="dawd"
+            app:allowDividerAbove="true"
+            app:allowDividerBelow="true"
+            />
+
+    </PreferenceScreen>
+
+    <PreferenceScreen app:isPreferenceVisible="false"
+        app:key="animation_screen">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="animation_schedule"
+            app:summary="Change animation of schedule enter"
+            app:title="Schedule animation"/>
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="animation_homework"
+            app:summary="Change animation of homework enter"
+            app:title="Homework animation"/>
+
+    </PreferenceScreen>
 
 </PreferenceScreen>

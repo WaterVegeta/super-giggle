@@ -1,21 +1,27 @@
 package com.example.tabsgpttutor.homwrklist
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tabsgpttutor.Homework
+import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.R
+import com.example.tabsgpttutor.TouchAnimation
+import com.example.tabsgpttutor.shcedule.CalendarAdapter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
+import io.realm.kotlin.internal.platform.canWrite
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -33,6 +39,7 @@ class HwListAdapter(
             fun onItemLongClick(itemId: String)
             fun onItemClick(itemId: String)
         }
+
 
     fun toggleSelection(itemId: String) {
 //        if (position >= currentList.size) return
@@ -71,6 +78,7 @@ class HwListAdapter(
         return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_layout, parent, false))
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val currentItem = getItem(position)
         val currentDate = LocalDate.now()
@@ -94,14 +102,35 @@ class HwListAdapter(
             Log.d("ListAdapter", "item clicked at position: $position")
         }
 
+        holder.itemView.setOnTouchListener { v, event ->
+            if (selectedItems.contains(currentItem.id)) {
+                v.scaleX = 1f
+                v.scaleY = 1f
+                return@setOnTouchListener false // Don’t animate
+            }
+            when(event.action){
+                MotionEvent.ACTION_DOWN -> {
+                    if (!selectedItems.isEmpty()){
+                        v.animate().cancel()
+                        TouchAnimation.release(v, 140)
+
+                    }
+                    else{
+                        TouchAnimation.touch(v, 100, 0.9f, 0.9f)
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    TouchAnimation.release(v, 140)
+                }
+            }
+            false
+        }
         holder.itemView.setOnLongClickListener {
             listener.onItemLongClick(currentItem.id)
             Log.d("ListAdapter", "item long clicked at position: $position")
             true
         }
-        holder.btnDone.setOnClickListener {
-            onDone(currentItem)
-        }
+
 
         holder.rvLesson.text = currentItem.lesson
         holder.rvTitle.text = currentItem.note
@@ -115,9 +144,11 @@ class HwListAdapter(
             holder.btnDone.apply {
                 setTextColor(blendColors(surfacecContLow, onSurface, 0.7f))
                 setIconTint(ColorStateList.valueOf(blendColors(surfacecContLow, onSurface, 0.7f)))
+
                 setIconResource(R.drawable.baseline_done_24)
                 text = "виконано"
                 isEnabled = false
+                isClickable = false
 
             }
             holder.rvTitle.setTextColor(blendColors(surfacecContLow, onSurface, 0.7f))
@@ -128,8 +159,10 @@ class HwListAdapter(
                 setTextColor(onSurface)
                 setIconTint(ColorStateList.valueOf(onSurface))
                 setIconResource(R.drawable.outline_close_24)
+                setOnClickListener { onDone(currentItem) }
                 text = "не виконано"
                 isEnabled = true
+                isClickable = true
             }
             holder.rvTitle.setTextColor(onSurface)
         }

@@ -11,7 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tabsgpttutor.Homework
+import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.shcedule.DataClass
 import com.google.android.material.button.MaterialButton

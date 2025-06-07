@@ -8,4 +8,21 @@
     <style name="ElevetedButtonSmallCorners" parent="Widget.Material3.Button">
         <item name="cornerRadius">5dp</item>
     </style>
+
+    <style name="ExpandedTitle" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="CollapsedTitle" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>
+
+<!--<style name="ExpandedTitle" parent="TextAppearance.MaterialComponents.Headline6">-->
+<!--<item name="android:textColor">@color/white</item>-->
+<!--<item name="android:textSize">32sp</item>-->
+<!--<item name="android:letterSpacing">0.1</item>-->
+<!--</style>-->

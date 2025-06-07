@@ -10,7 +10,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.BounceInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -21,17 +29,26 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tabsgpttutor.Homework
+import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.HwViewModel
+import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
+import com.example.tabsgpttutor.data_base.LessonAndTime
+import com.example.tabsgpttutor.data_base.LessonChange
+import com.example.tabsgpttutor.data_base.Schedule
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
@@ -41,6 +58,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.realm.kotlin.Realm
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -103,23 +121,7 @@ class HomewListFragment : Fragment() {
     lateinit var realm: Realm
     lateinit var radioGroup: RadioGroup
     lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-    val listItems = listOf(
-        "Укр літ",
-        "Укр мова",
-        "Хімія",
-        "Англ",
-        "Геогр",
-        "Всес істор",
-        "Геом",
-        "Франц",
-        "Біол",
-        "Громад осв",
-        "Істор Укр",
-        "Заруб",
-        "Алгебра",
-        "Фізика",
-        "Захист"
-    )
+    lateinit var listItems: Set<String>
     var allowedDates = mutableSetOf<Long>()
     lateinit var lastValidDate: LocalDate
     lateinit var spinner: Spinner
@@ -135,9 +137,115 @@ class HomewListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("FragmentCreated", "HwListFragment")
+        realm = MyDynamic.realm
 
         recyclerView = view.findViewById(R.id.recyclerView)
 
+        val animations = viewModel.getAnimations("Homework")!!
+        val layout: CoordinatorLayout = view.findViewById(R.id.main)
+        if (animations.firstAnim){
+            val interp = when(animations.firstInterpolator){
+                "AccelerateInterpolator" -> AccelerateInterpolator()
+                "AccelerateDecelerateInterpolator" -> AccelerateDecelerateInterpolator()
+                "AnticipateInterpolator" -> AnticipateInterpolator()
+                "AnticipateOvershootInterpolator" -> AnticipateOvershootInterpolator()
+                "BounceInterpolator" -> BounceInterpolator()
+                "DecelerateInterpolator" -> DecelerateInterpolator()
+                "FastOutSlowInInterpolator" -> FastOutSlowInInterpolator()
+                "FastOutLinearInInterpolator" -> FastOutLinearInInterpolator()
+                "LinearOutSlowInInterpolator" -> LinearOutSlowInInterpolator()
+                "LinearInterpolator" -> LinearInterpolator()
+                "OvershootInterpolator" -> OvershootInterpolator()
+                else -> LinearInterpolator()
+            }
+
+            layout.post {
+                layout.scaleX = animations.firstScaleX
+                layout.scaleY = animations.firstScaleY
+                layout.alpha = animations.firstAlpha
+                layout.pivotY = layout.height.toFloat() * animations.pivotY
+                layout.pivotX = layout.width * animations.pivotX
+                layout.translationX = animations.firstTranslationX
+                layout.translationY = animations.firstTranslationY
+                layout.animate().apply {
+                    if (animations.secondAnim){
+                        alpha(animations.secondAlpha)
+                        scaleX(animations.secondScaleX)
+                        scaleY(animations.secondScaleY)
+                        translationX(animations.secondTranslationX)
+                        translationY(animations.secondTranslationY)
+                        setDuration(animations.firstDuration)
+                        setInterpolator(interp)
+                        withEndAction {
+                            val interp2 = when(animations.secondInterpolator){
+                                "AccelerateInterpolator" -> AccelerateInterpolator()
+                                "AccelerateDecelerateInterpolator" -> AccelerateDecelerateInterpolator()
+                                "AnticipateInterpolator" -> AnticipateInterpolator()
+                                "AnticipateOvershootInterpolator" -> AnticipateOvershootInterpolator()
+                                "BounceInterpolator" -> BounceInterpolator()
+                                "DecelerateInterpolator" -> DecelerateInterpolator()
+                                "FastOutSlowInInterpolator" -> FastOutSlowInInterpolator()
+                                "FastOutLinearInInterpolator" -> FastOutLinearInInterpolator()
+                                "LinearOutSlowInInterpolator" -> LinearOutSlowInInterpolator()
+                                "LinearInterpolator" -> LinearInterpolator()
+                                "OvershootInterpolator" -> OvershootInterpolator()
+                                else -> LinearInterpolator()
+                            }
+                            layout.animate().apply {
+                                alpha(1f)
+                                scaleX(1f)
+                                scaleY(1f)
+                                translationX(0f)
+                                translationY(0f)
+                                setDuration(animations.secondDuration)
+                                setInterpolator(interp2)
+                            }
+                        }
+
+                    } else{
+                        alpha(1f)
+                        scaleX(1f)
+                        scaleY(1f)
+                        translationX(0f)
+                        translationY(0f)
+                        setDuration(animations.firstDuration)
+                        setInterpolator(interp)
+
+                    }
+                }
+
+            }
+
+        }
+//        layout.post {
+////            layout.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+//            layout.translationY = 300f
+////            layout.translationX = -110f
+//            layout.scaleX = 0.3f
+//            layout.scaleY = 0.1f
+//            layout.alpha = 0.7f
+//            layout.pivotY = layout.height.toFloat()
+//            layout.pivotX = layout.width / 2f
+//            layout.animate().apply {
+//                alpha(1f)
+//                scaleX(0.8f)
+//                scaleY(0.2f)
+//                translationY(0f)
+//                translationX(0f)
+//                setDuration(150)
+//                setInterpolator(AccelerateInterpolator())
+//                withEndAction {
+//                    layout.animate().apply {
+//                        scaleY(1f)
+//                        scaleX(1f)
+//                        setDuration(300)
+//                        setInterpolator(DecelerateInterpolator())
+//                    }
+//                }
+//            }
+//
+//        }
         adapter = HwListAdapter(object : HwListAdapter.OnItemClickListener{
             override fun onItemLongClick(itemId: String) {
                 if (actionMode == null){
@@ -164,6 +272,7 @@ class HomewListFragment : Fragment() {
         }
 
         addFAB = view.findViewById<FloatingActionButton>(R.id.bottomSheetButton)
+        listItems = viewModel.lessons
 
 
 
@@ -202,7 +311,7 @@ class HomewListFragment : Fragment() {
 
         val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_pop_in)
 
-//        recyclerView.startAnimation(anim)
+        recyclerView.startAnimation(anim)
 
 
     }
@@ -220,7 +329,7 @@ class HomewListFragment : Fragment() {
         val saveBtn = dialogView.findViewById<Button>(R.id.btnClose)
         editText.requestFocus()
 
-        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listItems)
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listItems.toList())
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = spinnerAdapter
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -234,27 +343,25 @@ class HomewListFragment : Fragment() {
 
                 for (i in 1..7) {
                     val date = LocalDate.now().plusDays(i.toLong())
-                    val dayOfWeek = date.dayOfWeek
-                    val weekNumber = ceil(date.dayOfYear / 7.0).toInt()
-                    val isEvenWeek = weekNumber % 2 == 0
+                    val dayOfWeekName = date.dayOfWeek.name
 
-                    val lessons = when (dayOfWeek) {
-                        DayOfWeek.MONDAY -> if (isEvenWeek) resources.getStringArray(R.array.monday1) else resources.getStringArray(
-                            R.array.monday2
-                        )
+                    val schedule = realm.query<Schedule>("dayOfWeek == $0", dayOfWeekName).first().find()
 
-                        DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
-                        DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
-                        DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
-                        DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
-                        else -> continue
+                    if (schedule != null) {
+                        val isEvenWeek = ceil(date.dayOfYear / 7.0).toInt() % 2 == 0
+
+                        val found = schedule.lessonAndTime.any { lesson ->
+                            val subjectFromDb =
+                                if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty()) lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
+                            subjectFromDb == selectedLesson
+                        }
+                        if (found){
+                            lastValidDate = date
+                            chipBtn.text = lastValidDate.format(formatter)
+                            break
+                        }
                     }
 
-                    if (lessons.contains(selectedLesson)){
-                        lastValidDate = date
-                        chipBtn.text = lastValidDate.format(formatter)
-                        break
-                    }
 
                 }
 
@@ -320,25 +427,22 @@ class HomewListFragment : Fragment() {
         allowedDates.clear()
         for (i in -30..60) {
             val date = today.plusDays(i.toLong())
-            val dayOfWeek = date.dayOfWeek
-            val weekNumber = ceil(date.dayOfYear / 7.0).toInt()
-            val isEvenWeek = weekNumber % 2 == 0
+            val dayOfWeekName = date.dayOfWeek.name
 
-            val lessons = when (dayOfWeek) {
-                DayOfWeek.MONDAY -> if (isEvenWeek) resources.getStringArray(R.array.monday1) else resources.getStringArray(
-                    R.array.monday2
-                )
+            val schedule = realm.query<Schedule>("dayOfWeek == $0", dayOfWeekName).first().find()
 
-                DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
-                DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
-                DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
-                DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
-                else -> continue
-            }
+            if (schedule != null) {
+                val isEvenWeek = ceil(date.dayOfYear / 7.0).toInt() % 2 == 0
 
-            if (lessons.contains(spinner.selectedItem.toString())) {
-                val millis = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                allowedDates.add(millis)
+                val found = schedule.lessonAndTime.any { lesson ->
+                    val subjectFromDb =
+                        if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty()) lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
+                    subjectFromDb == spinner.selectedItem.toString()
+                }
+                if (found){
+                    val millis = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    allowedDates.add(millis)
+                }
             }
         }
     }
@@ -433,7 +537,7 @@ class HomewListFragment : Fragment() {
         val editText = dialogView.findViewById<TextInputEditText>(R.id.titleEditText)
         val saveBtn = dialogView.findViewById<Button>(R.id.btnClose)
 
-        val spinAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listItems)
+        val spinAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listItems.toList())
         spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = spinAdapter
         chipBtn.text = lastValidDate.format(formatter)
@@ -493,6 +597,17 @@ class HomewListFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         actionMode?.finish()
+        Log.d("FragmentPaused", "HwListFragment")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("FragmentDestroyed", "HwListFragment")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("FragmentDestroyedView", "HwListFragment")
     }
 
 

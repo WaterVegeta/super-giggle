@@ -1,70 +1,84 @@
 package com.example.tabsgpttutor.shcedule
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.view.animation.OvershootInterpolator
 import android.widget.TextView
-import androidx.annotation.ColorRes
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.blue
-import androidx.core.graphics.green
-import androidx.core.graphics.red
-import androidx.core.graphics.toColor
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tabsgpttutor.R
 import com.google.android.material.button.MaterialButton
-import androidx.core.graphics.toColorInt
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import com.example.tabsgpttutor.TouchAnimation
 import com.google.android.material.color.MaterialColors
-import com.google.android.material.theme.overlay.MaterialThemeOverlay
 
 class CalendarAdapter(
-    private val context: Context,
-    private var dataList: ArrayList<DataClass>,
     private val onItemLongClick: (DataClass, Int) -> Unit,
     private val onDone: (DataClass, Int) -> Unit
-) : RecyclerView.Adapter<CalendarAdapter.ViewHolder>() {
-
-     var animatedPositions: MutableList<Int> = mutableListOf()
-    private var lastAnimatedIndex: Int? = null
-
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val lessonText: TextView = itemView.findViewById(R.id.lessonText)
-        val timeText: TextView = itemView.findViewById(R.id.timeText)
-        val homeworkText: TextView = itemView.findViewById(R.id.homeworkText)
-//        val homeIdText: TextView = itemView.findViewById(R.id.homeIdTV)
-        val cardView: CardView = itemView.findViewById(R.id.cardView)
-        val btnDone: MaterialButton = itemView.findViewById(R.id.isItDoneBtn)
-
-        init {
-            itemView.setOnLongClickListener {
-                animateSelection(cardView)
-                itemView.postDelayed({
-                    onItemLongClick(dataList[adapterPosition], adapterPosition)
-                }, 100)
-                true
-            }
-        }
-    }
-
+) : ListAdapter<DataClass, CalendarAdapter.ViewHolder>(ScheduleDiffUtill()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_lesson, parent, false)
         return ViewHolder(view)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val lessonText: TextView = itemView.findViewById(R.id.lessonText)
+        val timeText: TextView = itemView.findViewById(R.id.timeText)
+        val homeworkText: TextView = itemView.findViewById(R.id.homeworkText)
+        //        val homeIdText: TextView = itemView.findViewById(R.id.homeIdTV)
+        val cardView: CardView = itemView.findViewById(R.id.cardView)
+
+        val btnDone: MaterialButton = itemView.findViewById(R.id.isItDoneBtn)
+        init {
+            itemView.setOnLongClickListener {
+//                animateSelection(cardView)
+//                onItemLongClick(getItem(position), position)
+                TouchAnimation.release(cardView, 140)
+                itemView.postDelayed({
+                    onItemLongClick(getItem(position), position)
+                }, 100)
+                false
+            }
+//            itemView.setOnClickListener {
+//                animateSelection(cardView)
+//                true
+//            }
+            itemView.setOnTouchListener { v, event ->
+                when(event.action){
+                    MotionEvent.ACTION_DOWN -> TouchAnimation
+                        .touch(cardView, 100, 0.9f, 0.9f)
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> TouchAnimation
+                        .release(cardView, 140)
+                }
+                false
+            }
+        }
+
+    }
+
+    class ScheduleDiffUtill : DiffUtil.ItemCallback<DataClass>() {
+        override fun areItemsTheSame(oldItem: DataClass, newItem: DataClass): Boolean {
+            // Use hwId if it's more stable than UUID
+            return oldItem.hwId == newItem.hwId
+        }
+        override fun areContentsTheSame(oldItem: DataClass, newItem: DataClass): Boolean {
+            return oldItem.contentEquals(newItem)
+        }
+
+    }
+
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var item = dataList[position]
+        var item = getItem(position)
         holder.lessonText.text = item.subject
         holder.timeText.text = item.time
 
@@ -78,6 +92,9 @@ class CalendarAdapter(
 
             }
             holder.btnDone.visibility = View.VISIBLE
+            holder.btnDone.setOnClickListener {
+                onDone(item, position)
+            }
             if (item.done == true) {
                 holder.btnDone.apply {
                     setTextColor(blendColors(secondaryCont, onSecondaryCont, 0.7f))
@@ -85,6 +102,7 @@ class CalendarAdapter(
                     setIconResource(R.drawable.baseline_done_24)
                     text = "виконано"
                     isEnabled = false
+                    isClickable = false
 
                 }
                 holder.homeworkText.setTextColor(blendColors(secondaryCont, onSecondaryCont, 0.7f))
@@ -97,6 +115,7 @@ class CalendarAdapter(
                     setIconResource(R.drawable.outline_close_24)
                     text = "не виконано"
                     isEnabled = true
+                    isClickable = true
                 }
                 holder.homeworkText.setTextColor(onSecondaryCont)
             }
@@ -108,47 +127,23 @@ class CalendarAdapter(
 
         when(position){
             0 ->{
-                if (dataList.size > 1){
-                    holder.cardView.setBackgroundResource(R.drawable.ripple_top)
+                if (currentList.size > 1){
+                    holder.cardView.setBackgroundResource(R.drawable.top_corners)
                 }else{
                     holder.cardView.setBackgroundResource(R.drawable.all_corners)
                 }
 
             }
-            dataList.size-1 -> holder.cardView.setBackgroundResource(R.drawable.ripple_bottom)
-            else -> holder.cardView.setBackgroundResource(R.drawable.ripple_default)
+            currentList.size-1 -> holder.cardView.setBackgroundResource(R.drawable.bottom_corners)
+            else -> holder.cardView.setBackgroundResource(R.drawable.no_corners)
 
         }
 
-        holder.btnDone.setOnClickListener {
-            onDone(item, position)
-        }
+
 
     }
 
-    override fun getItemCount() = dataList.size
 
-    fun updateItem(updatedItem: DataClass, itemPosition: Int) {
-        dataList[itemPosition] = updatedItem
-        notifyItemChanged(itemPosition)
-        Log.d("RVnewItem", "updatedItem: ${updatedItem}, updatedID: ${updatedItem.id}, index: $itemPosition")
-
-    }
-    private fun animateSelection(view: View) {
-        view.animate()
-            .scaleX(0.9f)
-            .scaleY(0.9f)
-            .setDuration(100) // Slower animation
-            .withEndAction {
-                view.animate()
-                    .setInterpolator(DecelerateInterpolator())
-                    .scaleX(1f)
-                    .scaleY(1f)
-                    .setDuration(140) // Slower back
-                    .start()
-            }
-            .start()
-    }
     fun blendColors(color1: Int, color2: Int, ratio: Float): Int {
         val inverseRatio = 1f - ratio
         val r = Color.red(color1) * ratio + Color.red(color2) * inverseRatio

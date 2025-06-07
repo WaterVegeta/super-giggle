@@ -1,28 +1,25 @@
-package com.example.tabsgpttutor
+package com.example.tabsgpttutor.settings
 
-import android.graphics.Color
+import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceFragment
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.view.animation.OvershootInterpolator
-import android.widget.TextView
-import android.widget.Toast
+import android.util.Log
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
-
+import com.example.tabsgpttutor.R
+import com.example.tabsgpttutor.ThemeHelper
+import com.example.tabsgpttutor.animation_pref.AnimationActivity
+import com.example.tabsgpttutor.schedule_change.ChangeScheduleAct
+import java.util.prefs.Preferences
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("FragmentCreated", "SettingsFragment")
 
     }
 
@@ -48,12 +45,37 @@ class SettingsFragment : PreferenceFragmentCompat() {
             requireActivity().recreate()
             true
         }
+
+        findPreference<Preference>("change_act")?.setOnPreferenceClickListener {
+            Log.d("Preferences", "ScheduleChange was clicked")
+            val intent = Intent(requireContext(), ChangeScheduleAct::class.java)
+            startActivity(intent)
+            true // Return true if the click is handled.
+        }
+        findPreference<Preference>("animation")?.setOnPreferenceClickListener {
+            Log.d("Preferences", "ScheduleChange was clicked")
+            val intent = Intent(requireContext(), AnimationActivity::class.java)
+            startActivity(intent)
+            true // Return true if the click is handled.
+        }
+
     }
 
     override fun onResume() {
         super.onResume()
         // Update the displayed value when returning to settings
         findPreference<ListPreference>("theme")?.value = ThemeHelper.getCurrentTheme()
+        Log.d("FragmentResumed", "SettingsFragment")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("FragmentDestroyed", "SettingsFragment")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("FragmentDestroyedView", "SettingsFragment")
     }
 
 

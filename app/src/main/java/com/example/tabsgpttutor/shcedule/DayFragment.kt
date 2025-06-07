@@ -6,25 +6,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tabsgpttutor.shcedule.CalendarAdapter
-import com.example.tabsgpttutor.shcedule.DataClass
-import com.example.tabsgpttutor.Homework
+import com.example.tabsgpttutor.HwViewModel
+import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.shcedule.ScheduleFrag
+import com.example.tabsgpttutor.homwrklist.CustomHwListAnim
 import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.query
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.ceil
 
-class DayFragment(private val homeworkToEdit: Homework? = null) : Fragment() {
+class DayFragment() : Fragment() {
 
     companion object {
         fun newInstance(date: LocalDate): DayFragment {
@@ -36,32 +43,53 @@ class DayFragment(private val homeworkToEdit: Homework? = null) : Fragment() {
         }
 
     }
-    lateinit var realm: Realm
-    lateinit var dataList: ArrayList<DataClass>
 
-    private lateinit var lessonList: Array<String>
-    private lateinit var timeList: Array<String>
+    private val viewModel: HwViewModel by viewModels()
     lateinit var recyclerView: RecyclerView
-    lateinit var adapter: CalendarAdapter
+    lateinit var rvAdapter: CalendarAdapter
     lateinit var dateTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d("FragmentCreated", "DayFragment")
         val view = inflater.inflate(R.layout.fragment_day, container, false)
         recyclerView = view.findViewById(R.id.recyclerView)
         dateTextView = view.findViewById<TextView>(R.id.dateTitle)
         val weekDateText = view.findViewById<TextView>(R.id.weekView)
+        val constraints: ConstraintLayout = view.findViewById(R.id.constFragmentDay)
 
         val items = listOf(
             weekDateText,
-            dateTextView
+            dateTextView,
+            recyclerView
         )
 
         val baseDelay = 100L
         val duration = 350L
-        val interpolator = OvershootInterpolator(1.1f) // Gentle pop
+        val interpolator = OvershootInterpolator()
+//        constraints.post {
+//            constraints.translationY = 1100f
+////            translationX = -360f
+//            constraints.scaleX = 0.6f
+//            constraints.scaleY = 0.6f
+//            constraints.alpha = 0f
+//            constraints.pivotY = constraints.height.toFloat()
+//            constraints.pivotX = constraints.width / 2f
+//            constraints.animate().apply {
+//                alpha(1f)
+//                scaleX(1f)
+//                scaleY(1f)
+//                translationY(0f)
+////                translationX(0f)
+//                setDuration(500)
+//                setInterpolator(FastOutSlowInInterpolator())
+//            }
+//
+//        }
+
+         // Gentle pop
 
         for ((index, item) in items.withIndex()) {
             item.alpha = 0f
@@ -78,16 +106,14 @@ class DayFragment(private val homeworkToEdit: Homework? = null) : Fragment() {
                 .start()
         }
 
+
+
+
         val date = LocalDate.parse(requireArguments().getString("date"))
         val formatter = DateTimeFormatter.ofPattern("dd MM yyy")
-        val formate = date.format(formatter)
-        dateTextView.text = formate.toString()
+        dateTextView.text = date.format(formatter).toString()
 
-        val dayOfWeek = date.dayOfWeek
-
-        realm = MyDynamic.Companion.realm
-
-        val weekDate = when(dayOfWeek){
+        weekDateText.text = when(date.dayOfWeek){
             DayOfWeek.MONDAY -> resources.getString(R.string.monday)
             DayOfWeek.TUESDAY -> resources.getString(R.string.tuesday)
             DayOfWeek.WEDNESDAY -> resources.getString(R.string.wednesday)
@@ -96,45 +122,17 @@ class DayFragment(private val homeworkToEdit: Homework? = null) : Fragment() {
             DayOfWeek.SATURDAY -> resources.getString(R.string.saturday)
             DayOfWeek.SUNDAY -> resources.getString(R.string.sunday)
         }
-        weekDateText.text = weekDate
 
-        val week = ceil(date.dayOfYear / 7.0)
 
-        timeList = resources.getStringArray(R.array.six)
-
-        lessonList = when (dayOfWeek) {
-            DayOfWeek.MONDAY -> if (week % 2 == 0.0) resources.getStringArray(R.array.monday1)
-            else resources.getStringArray(R.array.monday2)
-            DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
-            DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
-            DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
-            DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
-            else -> arrayOf("")
-        }
-
-        dataList = arrayListOf<DataClass>()
-        getData(date, lessonList)
+        getData(date)
 
         setupRecyclerViewScroll()
 
         return view
     }
 
-    fun getData(date: LocalDate, lessons: Array<String>){
-        for (i in lessons.indices) {
-            val subject = lessons[i]
-            val time = timeList[i]
-            val allHomework = realm.query<Homework>("lesson == $0 AND date == $1", subject, date.toString()
-            ).first().find()
-            val homeworks = allHomework?.note
-            val homeworksId = allHomework?.id
-            val hwDone = allHomework?.done
-            Log.d("Homework", "subject: $subject hE: $homeworks heId: $homeworksId")
-            dataList.add(DataClass(subject, time, homeworks, homeworksId.toString(), hwDone))
-        }
-        adapter = CalendarAdapter(
-            context = requireContext(),
-            dataList,
+    fun getData(date: LocalDate){
+        rvAdapter = CalendarAdapter(
             onItemLongClick = { clickedLesson, position ->
                 (parentFragment as ScheduleFrag).nextSubjectDate(clickedLesson.subject, date, position)
             },
@@ -143,43 +141,24 @@ class DayFragment(private val homeworkToEdit: Homework? = null) : Fragment() {
                     clickedLesson.homework.toString(), clickedLesson.subject, position)
             }
         )
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
-        Log.d("DayFragment", "Data List Size: ${dataList.size} and list $dataList")
+        viewModel.updateDate(date)
+        recyclerView.apply {
+            adapter = rvAdapter
+            layoutManager = LinearLayoutManager(context)
+            itemAnimator = DefaultItemAnimator().apply {
+                addDuration = 300
+                changeDuration = 500
+            }
+            setHasFixedSize(true)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.scheduleData.collect { data ->
+                    rvAdapter.submitList(data)
+                }
+            }
+        }
     }
-
-    fun refreshData(date: LocalDate, subject: String, thatTime: String, position: Int) {
-        val allNewHomework = realm.query<Homework>("lesson == $0 AND date == $1", subject, date.toString()
-        ).first().find()
-        val newHomework = allNewHomework?.note
-        val newId = allNewHomework?.id
-        val newDone = allNewHomework?.done
-
-        val updatedList = DataClass(
-            subject,
-            thatTime,
-            newHomework,
-            newId.toString(),
-            newDone
-        )
-//        val week = ceil(date.dayOfYear / 7.0)
-//        lessonList = when (date.dayOfWeek) {
-//            DayOfWeek.MONDAY -> if (week % 2 == 0.0) resources.getStringArray(R.array.monday1)
-//            else resources.getStringArray(R.array.monday2)
-//            DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
-//            DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
-//            DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
-//            DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
-//            else -> arrayOf("")
-//        }
-//        dataList.clear()
-//        getData(date, lessonList)
-        adapter.updateItem(updatedList, position)
-        Log.d("fragRecieved", "date: $date, subject: $subject")
-//        Log.d("HOmeworkInfoFrag", "Data refreshing?  $updatedList")
-
-    }
-
     private fun setupRecyclerViewScroll() {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -194,6 +173,32 @@ class DayFragment(private val homeworkToEdit: Homework? = null) : Fragment() {
                 }
             }
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("FragmentDestroyed", "DayFragment")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("FragmentDestroyedView", "DayFragment")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.v("start", "Onstart")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.v("pause", "On pause")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.wtf("resume", " on resume")
+
     }
 
 }

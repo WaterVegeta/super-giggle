@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/homeworkText"
             android:importantForAccessibility="yes"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             android:textColor="?attr/colorOnSecondaryContainer"
         />
 
@@ -41,26 +41,25 @@
             android:textSize="27sp"
             android:id="@+id/timeText"
             android:importantForAccessibility="yes"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="10dp"
             android:textColor="?attr/colorOnSecondaryContainer"
             android:fontFamily="sans-serif-smallcaps"
             android:textStyle="bold"
-
+            android:layout_marginTop="5dp"
 
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/homeworkText" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/homeworkText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="20dp"
+            android:paddingStart="15dp"
             android:text="фцвфц 2136"
             android:textColor="?attr/colorOnSecondaryContainer"
             android:textSize="26sp"
             android:fontFamily="sans-serif-light"
-            android:visibility="invisible"
+            android:visibility="visible"
             android:layout_marginBottom="5dp"
             app:layout_constraintEnd_toStartOf="@id/isItDoneBtn"
             app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +67,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/isItDoneBtn"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Widget.Material3.Button.TextButton.Icon"
             app:icon="@drawable/outline_close_24"

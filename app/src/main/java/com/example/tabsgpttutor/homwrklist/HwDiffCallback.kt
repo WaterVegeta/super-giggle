@@ -1,7 +1,7 @@
 package com.example.tabsgpttutor.homwrklist
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.tabsgpttutor.Homework
+import com.example.tabsgpttutor.data_base.Homework
 
 class HwDiffCallback(private val oldList: List<Homework>,
                      private val newList: List<Homework>

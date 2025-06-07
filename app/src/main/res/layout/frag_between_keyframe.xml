@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+    android:visibility="gone"
+    android:id="@+id/layoutKeyFrame"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_marginTop="10dp"
+            android:layout_marginHorizontal="5dp"
+            app:strokeColor="@android:color/transparent"
+            android:backgroundTint="?attr/colorSurfaceContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_marginTop="5dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Alpha"
+                    android:textSize="18dp"
+                    />
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0 -> invisible \n1 -> fully visible"
+                    android:textSize="16dp"
+                    android:textColor="@android:color/darker_gray"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView android:id="@+id/tvAlphaKey"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="center"
+                        android:text="0.69"
+                        android:textSize="18sp"
+                        android:layout_width="45dp"
+                        android:layout_height="wrap_content"/>
+                    <com.google.android.material.slider.Slider
+                        android:layout_weight="2"
+                        android:id="@+id/sliderAlphaKey"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:value="0.3"
+                        app:labelBehavior="floating"
+                        android:stepSize="0.05"
+                        />
+                </LinearLayout>
+
+                <View
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Scale"
+                    android:textSize="18dp"
+                    />
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="X : Horizontal "
+                    android:textSize="16dp"
+                    android:textColor="@android:color/darker_gray"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView android:id="@+id/tvScaleXKey"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="center"
+                        android:text="0.69"
+                        android:textSize="18sp"
+                        android:layout_width="45dp"
+                        android:layout_height="wrap_content"/>
+                    <com.google.android.material.slider.Slider
+
+                        android:id="@+id/sliderScaleXKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="5dp"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:stepSize="0.05"
+                        />
+                </LinearLayout>
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Y : Vertical "
+                    android:textSize="16dp"
+                    android:textColor="@android:color/darker_gray"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView android:id="@+id/tvScaleYKey"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="center"
+                        android:text="0.69"
+                        android:textSize="18sp"
+                        android:layout_width="45dp"
+                        android:layout_height="wrap_content"/>
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/sliderScaleYKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="5dp"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:stepSize="0.05"
+                        />
+                </LinearLayout>
+
+                <View
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Duration"
+                    android:textSize="18dp"
+                    />
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="duration of animation in miliseconds "
+                    android:textSize="16dp"
+                    android:textColor="@android:color/darker_gray"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView android:id="@+id/tvDurationKey"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="center"
+                        android:text="0.69"
+                        android:textSize="18sp"
+                        android:layout_width="45dp"
+                        android:layout_height="wrap_content"/>
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/sliderDurationKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="5dp"
+                        android:valueFrom="0"
+                        android:valueTo="1000"
+                        android:stepSize="50"
+                        />
+                </LinearLayout>
+
+                <View
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="?android:attr/listDivider" />
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Translation"
+                    android:textSize="18dp"
+                    />
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="X : Horizontal "
+                    android:textSize="16dp"
+                    android:textColor="@android:color/darker_gray"
+                    />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView android:id="@+id/tvTranslationXKey"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="center"
+                        android:text="0.69"
+                        android:textSize="18sp"
+                        android:layout_width="45dp"
+                        android:layout_height="wrap_content"/>
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/sliderTranslationXKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="5dp"
+                        android:valueFrom="0"
+                        android:valueTo="1000"
+                        android:stepSize="50"
+                        />
+                </LinearLayout>
+
+                <TextView android:layout_marginHorizontal="15dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Y : Vertical "
+                    android:textSize="16dp"
+                    android:textColor="@android:color/darker_gray"
+                    />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView android:id="@+id/tvTranslationYKey"
+                        android:layout_marginStart="10dp"
+                        android:layout_gravity="center"
+                        android:text="0.69"
+                        android:textSize="18sp"
+                        android:layout_width="45dp"
+                        android:layout_height="wrap_content"/>
+                    <com.google.android.material.slider.Slider
+
+                        android:id="@+id/sliderTranslationYKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginVertical="5dp"
+                        android:valueFrom="0"
+                        android:valueTo="1000"
+                        android:stepSize="50"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_marginVertical="10dp"
+            android:layout_marginHorizontal="5dp"
+            app:strokeColor="@android:color/transparent"
+            android:backgroundTint="?attr/colorSurfaceContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:textSize="18sp"
+                    android:layout_marginHorizontal="15dp"
+                    android:text="Choose interpolator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <RadioGroup
+                    android:layout_marginHorizontal="5dp"
+                    android:id="@+id/interpolatorGroupKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:buttonTint="@color/red"
+                        android:checked="true"
+                        android:id="@+id/accelerateKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Accelerate"
+                        />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/accelerateDecelerateKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Accelerate decelerate" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/anticipateKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Anticipate" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/anticipateOvershootKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Anticipate overshoot"/>
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/bounceKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Bounce" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/decelerateKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Decelerate" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/fastOutSlowInKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fast out slow in" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/fastOutLinearInKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fast out linear in" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/linearOutSlowInKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Linear out Slow in" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/linearKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Linear" />
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/overshootKey"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Overshoot" />
+                </RadioGroup>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>

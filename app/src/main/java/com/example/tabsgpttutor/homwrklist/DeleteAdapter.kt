@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tabsgpttutor.Homework
+import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.homwrklist.RecyclerAdapter.RecyclerViewHolder
 import com.example.tabsgpttutor.shcedule.CalendarAdapter

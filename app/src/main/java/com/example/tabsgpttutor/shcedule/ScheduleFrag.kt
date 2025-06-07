@@ -1,27 +1,48 @@
 package com.example.tabsgpttutor.shcedule
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.AnticipateOvershootInterpolator
+import android.view.animation.BounceInterpolator
+import android.view.animation.CycleInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import android.view.animation.OvershootInterpolator
+import android.view.animation.PathInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.EditText
 import android.widget.Toast
+import androidx.constraintlayout.motion.widget.MotionInterpolator
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
-import com.example.tabsgpttutor.Homework
+import com.example.tabsgpttutor.HwViewModel
+import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
+import com.example.tabsgpttutor.data_base.Schedule
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -37,8 +58,11 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import kotlin.math.ceil
+import kotlin.properties.Delegates
 
 class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
+
+    private val viewModel: HwViewModel by viewModels()
 
     lateinit var viewPager: ViewPager2
     val OFFSET = 1000
@@ -55,91 +79,116 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
     lateinit var animHide: Animation
     lateinit var firstNoteText: String
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.schedule_frag_layout, container, false)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        Log.d("k value", "k = $k local time ${localTime.hour} ${localTime.minute} local date ${localDate.dayOfWeek}")
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        k = when (localDate.dayOfWeek.toString()) {
+            "MONDAY" -> if (localTime.hour.toInt() >= 15 && localTime.minute.toInt() >= 5) {
+                1
+            } else {
+                0
+            }
+
+            "TUESDAY" -> if (localTime.hour >= 16 && localTime.minute >= 0) {
+                1
+            } else {
+                0
+            }
+
+            "WEDNESDAY" -> if (localTime.hour >= 15 && localTime.minute >= 5) {
+                1
+            } else {
+                0
+            }
+
+            "THURSDAY" -> if (localTime.hour >= 16 && localTime.minute >= 0) {
+                1
+            } else {
+                0
+            }
+
+            "FRIDAY" -> if (localTime.hour >= 14 && localTime.minute >= 10) {
+                3
+            } else {
+                0
+            }
+
+            "SATURDAY" -> {
+                2
+            }
+
+            "SUNDAY" -> {
+                1
+            }
+
+            else -> 0
+
+        }
+
 
         realm = MyDynamic.Companion.realm
 
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = DayPagerAdapter(this)
-        when (localDate.dayOfWeek.toString()) {
-            "MONDAY" -> if (localTime.hour >= 15 && localTime.minute >= 5) {
-                viewPager.setCurrentItem(OFFSET + 1, false)
-                k++
-            } else {
-                viewPager.setCurrentItem(OFFSET, false)
-            }
-
-            "TUESDAY" -> if (localTime.hour >= 16 && localTime.minute >= 0) {
-                viewPager.setCurrentItem(OFFSET + 1, false)
-                k++
-            } else {
-                viewPager.setCurrentItem(OFFSET, false)
-            }
-
-            "WEDNESDAY" -> if (localTime.hour >= 15 && localTime.minute >= 5) {
-                viewPager.setCurrentItem(OFFSET + 1, false)
-                k++
-            } else {
-                viewPager.setCurrentItem(OFFSET, false)
-            }
-
-            "THURSDAY" -> if (localTime.hour >= 16 && localTime.minute >= 0) {
-                viewPager.setCurrentItem(OFFSET + 1, false)
-                k++
-            } else {
-                viewPager.setCurrentItem(OFFSET, false)
-            }
-
-            "FRIDAY" -> if (localTime.hour >= 14 && localTime.minute >= 10) {
-                viewPager.setCurrentItem(OFFSET + 3, false)
-                k++
-                k++
-                k++
-            } else {
-                viewPager.setCurrentItem(OFFSET, false)
-            }
-
-            "SATURDAY" -> {
-                viewPager.setCurrentItem(OFFSET + 2, false)
-                k++
-                k++
-            }
-
-            "SUNDAY" -> {
-                viewPager.setCurrentItem(OFFSET + 1, false)
-                k++
-            }
-
-            else -> viewPager.setCurrentItem(OFFSET, false)
-
-        }
+        viewPager.setCurrentItem(OFFSET + k, false)
+        Log.d("FragmentCreated", "ScheduleFragment, k: $k offset: $OFFSET currentItem: ${viewPager.currentItem}")
 //        viewPager.offscreenPageLimit = 2
 
         calendarFAB = view.findViewById(R.id.calendarFAB)
-        calendarFAB.setOnClickListener {
-            quickDateChange()
+        calendarFAB.setOnTouchListener { v, event ->
+            when(event.action){
+                MotionEvent.ACTION_DOWN -> {
+                    v.animate()
+                        .setInterpolator(DecelerateInterpolator())
+                        .scaleX(0.8f)
+                        .scaleY(0.8f)
+                        .setDuration(100)
+                        .start()
+                }
+                MotionEvent.ACTION_UP -> {
+                    v.animate()
+                        .setInterpolator(OvershootInterpolator())
+                        .setDuration(140)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .withEndAction { quickDateChange() }
+                        .start()
+
+                }
+            }
+            true
         }
+//        calendarFAB.setOnClickListener {
+//            quickDateChange()
+//        }
         homeFAB = view.findViewById(R.id.homeFAB)
         homeFAB.setOnClickListener {
             viewPager.setCurrentItem(OFFSET + k, true)
+            homeFAB.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             homeFAB.hide()
 
         }
+        homeFAB.hide()
+//        if (viewPager.currentItem != OFFSET+k){
+//            homeFAB.apply {
+//                startAnimation(animShow)
+//                show()
+//            }
+//        }
         curPosition = OFFSET + k
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 updateHomeButton(position)
+                Log.d("ViewPagerChange", "position: $position current: ${viewPager.currentItem}")
                 if (calendarFAB.isShown == false){
                     calendarFAB.apply {
                         startAnimation(animShow)
@@ -153,9 +202,107 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                 curPosition = position
             }
         })
-
         animShow = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_animation)
-        calendarFAB.startAnimation(animShow)
+//        calendarFAB.startAnimation(animShow)
+
+//        calendarFAB.apply {
+//            translationY = 300f
+//            translationX = -760f
+//            scaleX = 0.6f
+//            scaleY = 0.6f
+//            alpha = 0f
+//            animate().apply {
+//                scaleX(1f)
+//                scaleY(1f)
+//                alpha(1f)
+//                translationY(0f)
+//                translationX(0f)
+//                setDuration(300)
+//                setInterpolator(FastOutSlowInInterpolator())
+//                calendarFAB.startAnimation(animShow)
+//            }
+//        }
+
+
+        val animations = viewModel.getAnimations("Schedule")!!
+        val layout: ConstraintLayout = view.findViewById(R.id.scheduleFragLayout)
+        if (animations.firstAnim){
+            val interp = when(animations.firstInterpolator){
+                "AccelerateInterpolator" -> AccelerateInterpolator()
+                "AccelerateDecelerateInterpolator" -> AccelerateDecelerateInterpolator()
+                "AnticipateInterpolator" -> AnticipateInterpolator()
+                "AnticipateOvershootInterpolator" -> AnticipateOvershootInterpolator()
+                "BounceInterpolator" -> BounceInterpolator()
+                "DecelerateInterpolator" -> DecelerateInterpolator()
+                "FastOutSlowInInterpolator" -> FastOutSlowInInterpolator()
+                "FastOutLinearInInterpolator" -> FastOutLinearInInterpolator()
+                "LinearOutSlowInInterpolator" -> LinearOutSlowInInterpolator()
+                "LinearInterpolator" -> LinearInterpolator()
+                "OvershootInterpolator" -> OvershootInterpolator()
+                else -> LinearInterpolator()
+            }
+
+            layout.post {
+//            layout.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+//            layout.translationY = 300f
+                layout.scaleX = animations.firstScaleX
+                layout.scaleY = animations.firstScaleY
+                layout.alpha = animations.firstAlpha
+                layout.pivotY = layout.height.toFloat() * animations.pivotY
+                layout.pivotX = layout.width * animations.pivotX
+                layout.translationX = animations.firstTranslationX
+                layout.translationY = animations.firstTranslationY
+                layout.animate().apply {
+                    if (animations.secondAnim){
+                        alpha(animations.secondAlpha)
+                        scaleX(animations.secondScaleX)
+                        scaleY(animations.secondScaleY)
+                        translationX(animations.secondTranslationX)
+                        translationY(animations.secondTranslationY)
+                        setDuration(animations.firstDuration)
+                        setInterpolator(interp)
+                        withEndAction {
+                            val interp2 = when(animations.secondInterpolator){
+                                "AccelerateInterpolator" -> AccelerateInterpolator()
+                                "AccelerateDecelerateInterpolator" -> AccelerateDecelerateInterpolator()
+                                "AnticipateInterpolator" -> AnticipateInterpolator()
+                                "AnticipateOvershootInterpolator" -> AnticipateOvershootInterpolator()
+                                "BounceInterpolator" -> BounceInterpolator()
+                                "DecelerateInterpolator" -> DecelerateInterpolator()
+                                "FastOutSlowInInterpolator" -> FastOutSlowInInterpolator()
+                                "FastOutLinearInInterpolator" -> FastOutLinearInInterpolator()
+                                "LinearOutSlowInInterpolator" -> LinearOutSlowInInterpolator()
+                                "LinearInterpolator" -> LinearInterpolator()
+                                "OvershootInterpolator" -> OvershootInterpolator()
+                                else -> LinearInterpolator()
+                            }
+                            layout.animate().apply {
+                                alpha(1f)
+                                scaleX(1f)
+                                scaleY(1f)
+                                translationX(0f)
+                                translationY(0f)
+                                setDuration(animations.secondDuration)
+                                setInterpolator(interp2)
+                            }
+                        }
+
+                    } else{
+                        alpha(1f)
+                        scaleX(1f)
+                        scaleY(1f)
+                        translationX(0f)
+                        translationY(0f)
+                        setDuration(animations.firstDuration)
+                        setInterpolator(interp)
+
+                    }
+                }
+
+            }
+
+        }
+
         animHide = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_anim_hide)
 
 
@@ -199,8 +346,8 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(dialogView)
 
-        var selectedDate = LocalDate.now()
-        dateInput.date = selectedDate.plusDays((viewPager.currentItem - OFFSET).toLong())
+        var selectedDate = LocalDate.now().plusDays(k.toLong())
+        dateInput.date = selectedDate.plusDays((viewPager.currentItem - OFFSET - k).toLong())
             .atStartOfDay(ZoneId.systemDefault())
             .toInstant().toEpochMilli()
 
@@ -209,11 +356,12 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         }
 
         changeButton.setOnClickListener {
-            val today = LocalDate.now()
-            val targetPosition = OFFSET + (selectedDate.toEpochDay() - today.toEpochDay()).toInt()
+            val today = LocalDate.now().plusDays(k.toLong())
+            val targetPosition = OFFSET + k + (selectedDate.toEpochDay() - today.toEpochDay()).toInt()
             viewPager.setCurrentItem(targetPosition, true)
             bottomSheetDialog.dismiss()
             updateHomeButton(targetPosition)
+
         }
         bottomSheetDialog.show()
     }
@@ -245,46 +393,72 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                     findLatest(homework)?.done = true
                 }
             }
-            if (refFrag != null) {
-                refFrag.refreshData(fGDate, fGsubject, thatTime, position)
-                Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
-            }
+//            if (refFrag != null) {
+//                refFrag.refreshData(fGDate, fGsubject, thatTime, position)
+//                Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
+//            }
         }
     }
 
     fun nextSubjectDate(subject: String, FGdate: LocalDate, pressedPosition: Int) {
+        Log.d("NextSubf", "subject: $subject date: $FGdate position: $pressedPosition")
         val today = FGdate
-        for (i in 1..60) {
+        for (i in 1..60){
             val date = today.plusDays(i.toLong())
-            val dayOfWeek = date.dayOfWeek
-            val weekNumber = ceil(date.dayOfYear / 7.0).toInt()
-            val isEvenWeek = weekNumber % 2 == 0
+            val dayOfWeekName = date.dayOfWeek.name
 
-            val lessons = when (dayOfWeek) {
-                DayOfWeek.MONDAY -> if (isEvenWeek) resources.getStringArray(R.array.monday1) else resources.getStringArray(
-                    R.array.monday2
-                )
+            val schedule = realm.query<Schedule>("dayOfWeek == $0", dayOfWeekName).first().find()
 
-                DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
-                DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
-                DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
-                DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
-                else -> continue
+            if (schedule != null) {
+                val isEvenWeek = ceil(date.dayOfYear / 7.0).toInt() % 2 == 0
+
+                val found = schedule.lessonAndTime.any { lesson ->
+                    val subjectFromDb = if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty()) lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
+                    subjectFromDb == subject
+                }
+
+                if (found) {
+                    showAddHomeworkDialog(
+                        subject = subject,
+                        date,
+                        pressedPosition,
+                        i
+                    )
+                    break
+                }
             }
 
-            if (lessons.contains(subject)) {
-                showAddHomeworkDialog(subject, date, pressedPosition, i, lessons)
-                break
-            }
         }
+//        for (i in 1..60) {
+//            val date = today.plusDays(i.toLong())
+//            val dayOfWeek = date.dayOfWeek
+//            val weekNumber = ceil(date.dayOfYear / 7.0).toInt()
+//            val isEvenWeek = weekNumber % 2 == 0
+//
+//            val lessons = when (dayOfWeek) {
+//                DayOfWeek.MONDAY -> if (isEvenWeek) resources.getStringArray(R.array.monday1) else resources.getStringArray(
+//                    R.array.monday2
+//                )
+//
+//                DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
+//                DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
+//                DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
+//                DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
+//                else -> continue
+//            }
+//
+//            if (lessons.contains(subject)) {
+//                showAddHomeworkDialog(subject, date, pressedPosition, i, lessons)
+//                break
+//            }
+//        }
     }
 
     fun showAddHomeworkDialog(
         subject: String,
         sDate: LocalDate,
         position: Int,
-        toDay: Int,
-        lessons: Array<String>
+        toDay: Int
     ) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_homework, null)
         val input = dialogView.findViewById<TextInputEditText>(R.id.noteInput)
@@ -362,10 +536,10 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                                 ).first().find()?.note
                                 Log.d("HomeworkDatasds", "data: $allHomework")
 
-                                if (refFrag != null) {
-                                    refFrag.refreshData(sDate, subject, thatTime, position)
-                                    Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
-                                }
+//                                if (refFrag != null) {
+//                                    refFrag.refreshData(sDate, subject, thatTime, position)
+//                                    Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
+//                                }
                                 viewPager.setCurrentItem(viewPager.currentItem, true)
                             }
                         }
@@ -435,10 +609,10 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                                 ).first().find()?.note
                                 Log.d("HomeworkDatasds", "data: $allHomework")
 
-                                if (refFrag != null) {
-                                    refFrag.refreshData(currentDay, subject, thatTime, position)
-                                    Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
-                                }
+//                                if (refFrag != null) {
+//                                    refFrag.refreshData(currentDay, subject, thatTime, position)
+//                                    Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
+//                                }
                             }
                         }
                     }
@@ -447,6 +621,16 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         }
         bottomSheetDialog.show()
         toggleGroup.check(R.id.addNewButton)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("FragmentDestroyed", "ScheduleFragment")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("FragmentDestroyedView", "ScheduleFragment")
     }
 
 }

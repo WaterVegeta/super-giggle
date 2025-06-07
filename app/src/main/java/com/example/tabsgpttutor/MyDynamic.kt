@@ -3,6 +3,14 @@ package com.example.tabsgpttutor
 import android.app.Activity
 import android.app.Application
 import androidx.preference.PreferenceManager
+import com.example.tabsgpttutor.data_base.AnimationSettings
+import com.example.tabsgpttutor.data_base.Homework
+import com.example.tabsgpttutor.data_base.LessonAndTime
+import com.example.tabsgpttutor.data_base.LessonChange
+import com.example.tabsgpttutor.data_base.Schedule
+import com.example.tabsgpttutor.data_base.TempLessonAndTime
+import com.example.tabsgpttutor.data_base.TempSchedule
+import com.example.tabsgpttutor.data_base.TimeChange
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.utilities.DynamicColor
 import io.realm.kotlin.Realm
@@ -28,14 +36,16 @@ class MyDynamic: Application() {
 //        DynamicColors.applyToActivitiesIfAvailable(this)
         val migration = AutomaticSchemaMigration { context ->
             val oldVersion = context.oldRealm.schemaVersion()
-            if (oldVersion < 2L) {
                 // Realm automatically adds the 'done' field to schema
                 // No need to do anything here!
-            }
         }
         val config = RealmConfiguration.Builder(
-            schema = setOf(Homework::class)
-        ).schemaVersion(2) // 🔁 Bump this each time the schema changes
+            schema = setOf(
+                Homework::class, LessonChange::class,
+                TimeChange::class, Schedule::class,
+                LessonAndTime::class, TempSchedule::class,
+                TempLessonAndTime::class, AnimationSettings::class)
+        ).schemaVersion(15) // last one is 15
             .migration(migration)
             .compactOnLaunch()
             .build()

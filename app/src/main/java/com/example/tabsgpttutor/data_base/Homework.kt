@@ -1,6 +1,5 @@
-package com.example.tabsgpttutor
+package com.example.tabsgpttutor.data_base
 
-import io.realm.kotlin.schema.RealmClass
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.util.UUID
