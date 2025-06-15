@@ -16,53 +16,85 @@
         android:layout_height="match_parent"
         android:padding="8dp">
 
-
-        <TextView android:id="@+id/lessonView"
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="25dp"
-            android:text="lesson"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginHorizontal="5dp"/>
-
-        <TextView android:id="@+id/titleView"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="dz"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="30dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="-12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/radioButton"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+
+                    android:id="@+id/titleView"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="7dp"
+
+                    android:text="dz"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="30sp"
+                    app:layout_constraintEnd_toStartOf="@id/lessonView"
+                    app:layout_constraintStart_toEndOf="@id/radioButton"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/imageRv"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_weight="0"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/lessonView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginHorizontal="5dp"
+                    android:text="lesson"
+                    android:textSize="25dp" />
+
+                <TextView
+                    android:id="@+id/dueDateView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginHorizontal="5dp"
+                    android:text="Date"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:checked="false"
+            android:button="@drawable/btn_selector"
+            android:id="@+id/radioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/lessonView"
-            android:layout_marginHorizontal="7dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             />
-        <TextView android:id="@+id/dueDateView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:text="Date"
-            app:layout_constraintTop_toBottomOf="@id/lessonView"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginHorizontal="5dp"/>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/isItDoneBtn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            style="@style/Widget.Material3.Button.TextButton.Icon"
-            app:icon="@drawable/outline_close_24"
-            app:iconGravity="end"
-            app:iconSize="19dp"
-            app:iconTint="?attr/colorOnSurface"
-            android:text="не виконано"
-            android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/titleView"
-            app:layout_constraintStart_toStartOf="parent"
-            android:visibility="visible"
-            android:textAlignment="viewStart"
-            android:textColor="?attr/colorOnSurface"/>
+
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </androidx.cardview.widget.CardView>

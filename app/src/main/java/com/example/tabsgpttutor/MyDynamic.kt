@@ -1,22 +1,19 @@
 package com.example.tabsgpttutor
 
-import android.app.Activity
 import android.app.Application
 import androidx.preference.PreferenceManager
 import com.example.tabsgpttutor.data_base.AnimationSettings
 import com.example.tabsgpttutor.data_base.Homework
-import com.example.tabsgpttutor.data_base.LessonAndTime
+import com.example.tabsgpttutor.data_base.ImageItem
+import com.example.tabsgpttutor.data_base.shedule.LessonAndTime
 import com.example.tabsgpttutor.data_base.LessonChange
-import com.example.tabsgpttutor.data_base.Schedule
-import com.example.tabsgpttutor.data_base.TempLessonAndTime
-import com.example.tabsgpttutor.data_base.TempSchedule
+import com.example.tabsgpttutor.data_base.shedule.Schedule
+import com.example.tabsgpttutor.data_base.temp_schedule.TempLessonAndTime
+import com.example.tabsgpttutor.data_base.temp_schedule.TempSchedule
 import com.example.tabsgpttutor.data_base.TimeChange
-import com.google.android.material.color.DynamicColors
-import com.google.android.material.color.utilities.DynamicColor
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import io.realm.kotlin.migration.AutomaticSchemaMigration
-import io.realm.kotlin.migration.RealmMigration
 
 
 class MyDynamic: Application() {
@@ -44,8 +41,9 @@ class MyDynamic: Application() {
                 Homework::class, LessonChange::class,
                 TimeChange::class, Schedule::class,
                 LessonAndTime::class, TempSchedule::class,
-                TempLessonAndTime::class, AnimationSettings::class)
-        ).schemaVersion(15) // last one is 15
+                TempLessonAndTime::class, AnimationSettings::class,
+                ImageItem::class)
+        ).schemaVersion(16) // last one is 16
             .migration(migration)
             .compactOnLaunch()
             .build()

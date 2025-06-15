@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:errorEnabled="true"
+        app:errorEnabled="false"
         app:errorIconDrawable="@drawable/outline_error_24"
         android:hint="Homework please"
         app:endIconMode="clear_text">
@@ -44,6 +44,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
+        android:layout_marginTop="5dp"
         android:id="@+id/toggleGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

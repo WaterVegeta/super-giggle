@@ -93,7 +93,7 @@ class DynamicWidProvider: AppWidgetProvider() {
                 }
 
                 val formatter = DateTimeFormatter.ofPattern("dd MM yyy")
-                val formate = date.format(formatter)
+                val formate = date.plusDays(k.toLong()).format(formatter)
 
                 views.setTextViewText(R.id.dateText, formate.toString())
                 views.setTextViewText(R.id.weekText, weekDate)

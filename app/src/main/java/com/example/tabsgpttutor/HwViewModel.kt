@@ -5,21 +5,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tabsgpttutor.data_base.AnimationSettings
 import com.example.tabsgpttutor.data_base.Homework
-import com.example.tabsgpttutor.data_base.LessonAndTime
-import com.example.tabsgpttutor.data_base.Schedule
+import com.example.tabsgpttutor.data_base.shedule.LessonAndTime
+import com.example.tabsgpttutor.data_base.shedule.Schedule
 import com.example.tabsgpttutor.shcedule.DataClass
 import java.time.LocalDate
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.notifications.InitialResults
+import io.realm.kotlin.notifications.ResultsChange
+import io.realm.kotlin.notifications.UpdatedResults
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
@@ -34,7 +40,12 @@ class HwViewModel: ViewModel() {
 
     var animationRecieved : AnimationSettings? = null
 
+    private val _uniqueLessons = MutableStateFlow<List<String>>(emptyList())
+    val uniqueLessons: StateFlow<List<String>> = _uniqueLessons.asStateFlow()
 
+    init {
+        observeLessons()
+    }
     fun changeValue(value: AnimationSettings){
         animationRecieved = value
     }
@@ -44,6 +55,24 @@ class HwViewModel: ViewModel() {
 
     val lessons = realm.query<LessonAndTime>().find().map { it.lessonScheduleOnOdd + it.lessonSchedeleOnEven }.toSet()
 
+    val wdwa = realm.query<Schedule>().find().let {
+        for (i in it){
+            i.lessonAndTime.flatMap {
+                listOf(it.lessonScheduleOnOdd, it.lessonSchedeleOnEven)
+            }.filter { it.isNotBlank() }.toSet()
+        }
+    }
+    val stateLessons = realm.query<LessonAndTime>().asFlow()
+        .map { results ->
+            results.list.flatMap {
+                listOf(it.lessonScheduleOnOdd, it.lessonSchedeleOnEven)
+            }.filter { it.isNotBlank() }.toSet()
+        }
+//    val onEvenList = stateLessons.map { it.list.map { it.lessonSchedeleOnEven }.toSet() }
+//    val onOdd = stateLessons.map { it.list.map { it.lessonScheduleOnOdd }.toSet() }
+//    val combinedLesson = onOdd.combine(onEvenList) {odd, even ->
+//        (odd + even).toSet()
+//    }
 //    val homework: StateFlow<List<Homework>> = _homework
     val homework = realm.query<Homework>("date >= $0", LocalDate.now().toString())
     .sort("date", Sort.ASCENDING)
@@ -93,7 +122,9 @@ class HwViewModel: ViewModel() {
                     "9"->"09"
                     else -> lesson.lessonEndMinute
                 }
-                val time = "${lesson.lessonStart} - ${lesson.lessonEndHour}:${endMinute}"
+                val time = if (lesson.lessonStart.isNotEmpty() && lesson.lessonEndHour.isNotEmpty() &&
+                    lesson.lessonEndMinute.isNotEmpty())"${lesson.lessonStart} - ${lesson.lessonEndHour}:${endMinute}"
+                else ""
 
                 realm.query<Homework>("lesson == $0 AND date == $1", subject, date.toString())
                     .first()
@@ -165,6 +196,32 @@ class HwViewModel: ViewModel() {
 //        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
 
+    private fun observeLessons() {
+        viewModelScope.launch {
+            realm.query(Schedule::class)
+                .asFlow()
+                .collect { change: ResultsChange<Schedule> ->
+                    val schedules = when (change) {
+                        is InitialResults -> change.list
+                        is UpdatedResults -> change.list
+                        else -> emptyList()
+                    }
+
+                    val allLessons = schedules.flatMap { schedule ->
+                        schedule.lessonAndTime.flatMap { lesson ->
+                            listOf(
+                                lesson.lessonScheduleOnOdd,
+                                lesson.lessonSchedeleOnEven
+                            )
+                        }
+                    }.filter { it.isNotBlank() }
+                        .toSet()
+                        .sorted()
+
+                    _uniqueLessons.value = allLessons
+                }
+        }
+    }
 
     fun dwadwa(){
         viewModelScope.launch {
@@ -186,10 +243,14 @@ class HwViewModel: ViewModel() {
             }
         }
     }
-    fun doneHw(hw: Homework){
+    fun doneHw(hw: Homework, bool: Boolean?){
         viewModelScope.launch {
             realm.write {
-                findLatest(hw)?.done = true
+                if (bool != null){
+                    findLatest(hw)?.done = hw.done
+                }else{
+                    findLatest(hw)?.done = !hw.done
+                }
             }
         }
     }

@@ -5,14 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,16 +17,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tabsgpttutor.HwViewModel
-import com.example.tabsgpttutor.data_base.Homework
-import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.homwrklist.CustomHwListAnim
-import io.realm.kotlin.Realm
+import com.example.tabsgpttutor.shcedule.adapters.CalendarAdapter
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlin.math.ceil
 
 class DayFragment() : Fragment() {
 
@@ -134,11 +127,17 @@ class DayFragment() : Fragment() {
     fun getData(date: LocalDate){
         rvAdapter = CalendarAdapter(
             onItemLongClick = { clickedLesson, position ->
-                (parentFragment as ScheduleFrag).nextSubjectDate(clickedLesson.subject, date, position)
+                (parentFragment as ScheduleFrag).nextSubjectDate(
+                    clickedLesson.subject,
+                    date,
+                    position
+                )
             },
             onDone = { clickedLesson, position ->
-                (parentFragment as ScheduleFrag).doneHw(date,
-                    clickedLesson.homework.toString(), clickedLesson.subject, position)
+                (parentFragment as ScheduleFrag).doneHw(
+                    date,
+                    clickedLesson.homework.toString(), clickedLesson.subject, position
+                )
             }
         )
         viewModel.updateDate(date)

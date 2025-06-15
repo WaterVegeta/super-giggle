@@ -2,22 +2,17 @@ package com.example.tabsgpttutor
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.tabsgpttutor.data_base.AnimationSettings
-import com.example.tabsgpttutor.data_base.LessonAndTime
+import com.example.tabsgpttutor.data_base.shedule.LessonAndTime
 import com.example.tabsgpttutor.data_base.LessonChange
-import com.example.tabsgpttutor.data_base.Schedule
-import com.example.tabsgpttutor.data_base.TempLessonAndTime
-import com.example.tabsgpttutor.data_base.TempSchedule
+import com.example.tabsgpttutor.data_base.shedule.Schedule
+import com.example.tabsgpttutor.data_base.temp_schedule.TempLessonAndTime
+import com.example.tabsgpttutor.data_base.temp_schedule.TempSchedule
 import com.example.tabsgpttutor.data_base.TimeChange
-import io.realm.kotlin.Realm
-import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.query.Sort
-import io.realm.kotlin.query.find
-import io.realm.kotlin.types.BaseRealmObject
 import io.realm.kotlin.types.RealmObject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map

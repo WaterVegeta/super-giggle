@@ -40,7 +40,6 @@ android {
 }
 
 dependencies {
-    implementation ("com.kizitonwose.calendar:view:2.3.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation ("androidx.fragment:fragment-ktx:1.6.2")
     implementation ("androidx.preference:preference-ktx:1.2.1")
@@ -59,4 +58,9 @@ dependencies {
 
     implementation ("io.realm.kotlin:library-base:1.16.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
+
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.chrisbanes:PhotoView:2.3.0")
+    implementation ("com.github.MikeOrtiz:TouchImageView:3.0.3")
+//    implementation(libs.touchimageview)
 }

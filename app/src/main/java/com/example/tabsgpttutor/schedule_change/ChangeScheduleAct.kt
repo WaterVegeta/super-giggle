@@ -1,42 +1,21 @@
 package com.example.tabsgpttutor.schedule_change
 
-import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceFragmentCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.SettingsViewModel
-import com.example.tabsgpttutor.data_base.LessonChange
+import com.example.tabsgpttutor.schedule_change.fragments.AddScheduleFragment
+import com.example.tabsgpttutor.schedule_change.fragments.ChangeScheduleFragment
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import io.realm.kotlin.Realm
-import kotlinx.coroutines.launch
-import io.realm.kotlin.ext.query
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class ChangeScheduleAct : AppCompatActivity() {
     private lateinit var collapsingToolbar: CollapsingToolbarLayout

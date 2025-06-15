@@ -14,6 +14,7 @@
         android:paddingBottom="5dp">
 
         <TextView
+            android:textColor="@color/text_white"
             android:layout_alignParentStart="true"
             android:layout_weight="1"
 
@@ -29,6 +30,7 @@
             android:layout_alignParentEnd="true"
             android:textAlignment="textEnd"
             android:layout_weight="1"
+            android:textColor="@color/text_white"
 
             android:textSize="20sp"
             android:layout_width="0dp"

@@ -9,8 +9,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.schedule_change.AddScheduleFragment
-import com.example.tabsgpttutor.schedule_change.ChangeScheduleFragment
 import com.example.tabsgpttutor.schedule_change.IsDataChanged
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -55,14 +53,13 @@ class AnimationActivity : AppCompatActivity() {
         if (currentFragment is AnimationFragment){
             super.onBackPressed()
         }
-        else if (currentFragment is AnimationHwFragment && IsDataChanged.getChanged() ||
-            currentFragment is AnimationScheduleFragment && IsDataChanged.getChanged()){
+        else if (currentFragment is AnimationScheduleFragment && IsDataChanged.getChanged()){
             MaterialAlertDialogBuilder(this)
                 .setTitle("Save the changes")
                 .setPositiveButton("Save") { dialog, _ ->
                     Log.d("saved", "saved")
 //                    viewModel.saveTempToSchedule()
-                    if (currentFragment is AnimationScheduleFragment) currentFragment.saveData()
+                    currentFragment.saveData()
                     loadFragment(AnimationFragment())
                 }
                 .setNegativeButton("Cancel"){ dialog, _ ->

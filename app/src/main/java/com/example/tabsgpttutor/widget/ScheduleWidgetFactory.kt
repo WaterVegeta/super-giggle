@@ -1,16 +1,9 @@
 package com.example.tabsgpttutor.widget
 
 import android.content.Context
-import android.util.Log
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.shcedule.CalendarAdapter
-import com.example.tabsgpttutor.shcedule.DataClass
-import com.example.tabsgpttutor.shcedule.ScheduleFrag
-import io.realm.kotlin.ext.query
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime

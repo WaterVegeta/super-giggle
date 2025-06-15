@@ -1,15 +1,17 @@
 package com.example.tabsgpttutor.shcedule
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import android.view.HapticFeedbackConstants
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
@@ -17,18 +19,14 @@ import android.view.animation.AnimationUtils
 import android.view.animation.AnticipateInterpolator
 import android.view.animation.AnticipateOvershootInterpolator
 import android.view.animation.BounceInterpolator
-import android.view.animation.CycleInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
-import android.view.animation.PathInterpolator
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.CalendarView
-import android.widget.EditText
 import android.widget.Toast
-import androidx.constraintlayout.motion.widget.MotionInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -42,12 +40,14 @@ import com.example.tabsgpttutor.HwViewModel
 import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.data_base.Schedule
+import com.example.tabsgpttutor.data_base.shedule.Schedule
+import com.example.tabsgpttutor.shcedule.adapters.DayPagerAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.realm.kotlin.Realm
@@ -58,7 +58,6 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import kotlin.math.ceil
-import kotlin.properties.Delegates
 
 class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
 
@@ -78,62 +77,41 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
     lateinit var animShow: Animation
     lateinit var animHide: Animation
     lateinit var firstNoteText: String
-
+//    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//        val manager = requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+//        manager.defaultVibrator
+//    } else {
+//        @Suppress("DEPRECATION")
+//        requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+//    }
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
         Log.d("k value", "k = $k local time ${localTime.hour} ${localTime.minute} local date ${localDate.dayOfWeek}")
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "ServiceCast")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        realm = MyDynamic.Companion.realm
 
-        k = when (localDate.dayOfWeek.toString()) {
-            "MONDAY" -> if (localTime.hour.toInt() >= 15 && localTime.minute.toInt() >= 5) {
-                1
-            } else {
-                0
+        val items = realm.query<Schedule>().find()
+        k = 0
+        for (i in items){
+            if (i.dayOfWeek == localDate.dayOfWeek.toString()){
+                i.lessonAndTime.findLast { it.lessonEndHour.isNotEmpty() && it.lessonEndMinute.isNotEmpty() }?.let {
+                    val endMin = it.lessonEndMinute
+                    val endHour = it.lessonEndHour
+                    k = if (localTime.hour.toInt() >= endHour.toInt() && localTime.minute.toInt() >= endMin.toInt()){
+                            1
+                        } else 0
+                }
+                break
+
             }
-
-            "TUESDAY" -> if (localTime.hour >= 16 && localTime.minute >= 0) {
-                1
-            } else {
-                0
-            }
-
-            "WEDNESDAY" -> if (localTime.hour >= 15 && localTime.minute >= 5) {
-                1
-            } else {
-                0
-            }
-
-            "THURSDAY" -> if (localTime.hour >= 16 && localTime.minute >= 0) {
-                1
-            } else {
-                0
-            }
-
-            "FRIDAY" -> if (localTime.hour >= 14 && localTime.minute >= 10) {
-                3
-            } else {
-                0
-            }
-
-            "SATURDAY" -> {
-                2
-            }
-
-            "SUNDAY" -> {
-                1
-            }
-
-            else -> 0
-
         }
 
 
-        realm = MyDynamic.Companion.realm
 
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = DayPagerAdapter(this)
@@ -153,15 +131,32 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                         .start()
                 }
                 MotionEvent.ACTION_UP -> {
-                    v.animate()
-                        .setInterpolator(OvershootInterpolator())
-                        .setDuration(140)
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .withEndAction { quickDateChange() }
-                        .start()
+
+                    val rect = Rect()
+                    v.getGlobalVisibleRect(rect)
+                    if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+                        // Finger lifted inside the FAB
+                        Log.d("FAB", "Touch Up Inside")
+                        v.animate()
+                            .setInterpolator(OvershootInterpolator())
+                            .setDuration(140)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .withEndAction { quickDateChange() }
+                            .start()
+                    } else {
+                        // Finger lifted outside
+                        Log.d("FAB", "Touch Up Outside")
+                        v.animate()
+                            .setInterpolator(OvershootInterpolator())
+                            .setDuration(140)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .start()
+                    }
 
                 }
+
             }
             true
         }
@@ -172,6 +167,11 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         homeFAB.setOnClickListener {
             viewPager.setCurrentItem(OFFSET + k, true)
             homeFAB.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+//            val timings = longArrayOf(0, 100, 80, 200, 60, 300) // pause, vibrate, ...
+//            val amplitudes = intArrayOf(0, 100, 0, 180, 0, 255) // 0 = pause, 255 = max
+//
+//            val effect = VibrationEffect.createWaveform(timings, amplitudes, -1) // -1 = no repeat
+//            vibrator.vibrate(effect)
             homeFAB.hide()
 
         }
@@ -225,7 +225,7 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
 
 
         val animations = viewModel.getAnimations("Schedule")!!
-        val layout: ConstraintLayout = view.findViewById(R.id.scheduleFragLayout)
+        val layout: CoordinatorLayout = view.findViewById(R.id.scheduleFragLayout)
         if (animations.firstAnim){
             val interp = when(animations.firstInterpolator){
                 "AccelerateInterpolator" -> AccelerateInterpolator()
@@ -467,13 +467,10 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         val toggleGroup = dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleGroup)
         input.requestFocus()
 
-//        input.doOnTextChanged {text, start, before, count ->
-//            if (text.isNullOrEmpty()){
-//                txtLayout.error = "Write something"
-//            }else{
-//                txtLayout.error = null
-//            }
-//        }
+        input.doOnTextChanged {text, start, before, count ->
+            txtLayout.error = null
+            txtLayout.isErrorEnabled = false
+        }
 
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(dialogView)
@@ -508,6 +505,7 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                             var noteText = input.text.toString()
                             if (noteText.isEmpty()){
                                 txtLayout.error = "Write homework or leave"
+                                txtLayout.isErrorEnabled = true
                                 return@setOnClickListener
                             }
                             lifecycleScope.launch {
@@ -525,11 +523,31 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                                 }
 
                                 bottomSheetDialog.dismiss()
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Homework added for $sDate",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Snackbar.make(calendarFAB, "Homework added for $sDate", Snackbar.LENGTH_LONG)
+                                    .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+                                    .setActionTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorTertiary))
+                                    .setBackgroundTint(MaterialColors.getColor(calendarFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
+                                    .setTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorOnSurface))
+                                    .setAction("Undo") {
+                                        lifecycleScope.launch {
+                                            realm.write {
+                                                if (isHomewrkExists != null){
+                                                    findLatest(isHomewrkExists)?.note = isHomewrkExists.note
+                                                }
+                                                else{
+                                                    realm.query<Homework>("lesson == $0 AND date == $1 AND note == $2",
+                                                        subject, sDate.toString(), noteText).first().find()
+                                                        ?.let { findLatest(it)?.let { delete(it) } }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .show()
+//                                Toast.makeText(
+//                                    requireContext(),
+//                                    "Homework added for $sDate",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
                                 val allHomework = realm.query<Homework>(
                                     "date == $0 AND lesson == $1",
                                     sDate.toString(), subject
@@ -598,11 +616,31 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                                 }
 
                                 bottomSheetDialog.dismiss()
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Homework added for $currentDay",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Snackbar.make(calendarFAB, "Homework added for $currentDay", Snackbar.LENGTH_INDEFINITE)
+                                    .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+                                    .setActionTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorTertiary))
+                                    .setBackgroundTint(MaterialColors.getColor(calendarFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
+                                    .setTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorOnSurface))
+                                    .setAction("Undo") {
+                                        lifecycleScope.launch {
+                                            realm.write {
+                                                if (isHomewrkExists != null){
+                                                    findLatest(isHomewrkExists)?.note = isHomewrkExists.note
+                                                }
+                                                else{
+                                                    realm.query<Homework>("lesson == $0 AND date == $1 AND note == $2",
+                                                        subject, currentDay.toString(), noteText).first().find()
+                                                        ?.let { findLatest(it)?.let { delete(it) } }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .show()
+//                                Toast.makeText(
+//                                    requireContext(),
+//                                    "Homework added for $currentDay",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
                                 val allHomework = realm.query<Homework>(
                                     "date == $0 AND lesson == $1",
                                     currentDay.toString(), subject

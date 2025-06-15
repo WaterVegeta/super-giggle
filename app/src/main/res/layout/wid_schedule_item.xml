@@ -8,9 +8,11 @@
         android:layout_height="wrap_content"
         android:text="Lesson"
         android:layout_weight="1"
-        android:textSize="24sp"/>
+        android:textSize="24sp"
+        android:textColor="@color/text_white"/>
 
     <TextView android:id="@+id/timeText"
+        android:textColor="@color/text_white"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

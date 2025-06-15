@@ -2,33 +2,41 @@ package com.example.tabsgpttutor.homwrklist
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Paint
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.TouchAnimation
-import com.example.tabsgpttutor.shcedule.CalendarAdapter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
-import io.realm.kotlin.internal.platform.canWrite
+import com.google.android.material.radiobutton.MaterialRadioButton
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import androidx.core.net.toUri
+import androidx.recyclerview.widget.LinearLayoutManager
 
 class HwListAdapter(
     private val listener: OnItemClickListener,
-    private val onDone: (Homework) -> Unit
+    private val onDone: (Homework) -> Unit,
+    val addImage: (Homework) -> Unit
 ) : ListAdapter<Homework, HwListAdapter.ViewHolder>(HwDiffUtill()) {
 
 
@@ -138,34 +146,38 @@ class HwListAdapter(
         holder.rvCardView.setBackgroundResource(
             if (selectedItems.contains(currentItem.id)) R.drawable.selected_hw_card else R.drawable.default_hw_card
         )
-        val surfacecContLow = MaterialColors.getColor(holder.btnDone, R.attr.colorSurfaceContainerLow)
-        val onSurface = MaterialColors.getColor(holder.btnDone, R.attr.colorOnSurface)
+        val surfacecContLow = MaterialColors.getColor(holder.rvTitle, R.attr.colorSurfaceContainerLow)
+        val onSurface = MaterialColors.getColor(holder.rvTitle, R.attr.colorOnSurface)
         if (currentItem.done == true) {
-            holder.btnDone.apply {
-                setTextColor(blendColors(surfacecContLow, onSurface, 0.7f))
-                setIconTint(ColorStateList.valueOf(blendColors(surfacecContLow, onSurface, 0.7f)))
-
-                setIconResource(R.drawable.baseline_done_24)
-                text = "виконано"
-                isEnabled = false
-                isClickable = false
-
-            }
+            holder.radioBtn.isChecked = true
             holder.rvTitle.setTextColor(blendColors(surfacecContLow, onSurface, 0.7f))
+            holder.rvTitle.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
 //                holder.btnDone.setTextColor("#049805".toColorInt())
         }
         else{
-            holder.btnDone.apply {
-                setTextColor(onSurface)
-                setIconTint(ColorStateList.valueOf(onSurface))
-                setIconResource(R.drawable.outline_close_24)
-                setOnClickListener { onDone(currentItem) }
-                text = "не виконано"
-                isEnabled = true
-                isClickable = true
-            }
+            holder.radioBtn.isChecked = false
             holder.rvTitle.setTextColor(onSurface)
+            holder.rvTitle.paintFlags = 0
         }
+        holder.radioBtn.setOnClickListener {
+            onDone(currentItem)
+        }
+        val imageAdapter = ImageAdapter(currentItem.images.toList(), addImage = {
+            addImage(currentItem)
+        },
+            startFullScreen = {uris, startPos ->
+                val intent = Intent(context, FullScreenImage::class.java)
+                intent.putExtra("imageUris", uris)
+                intent.putExtra("startPosition", startPos)
+                intent.putExtra("homework", currentItem.note)
+                intent.putExtra("lesson", currentItem.lesson)
+                context.startActivity(intent)
+            })
+        holder.imageRv.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = imageAdapter
+        }
+
     }
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
@@ -173,7 +185,9 @@ class HwListAdapter(
         val rvTitle: TextView = itemView.findViewById(R.id.titleView)
         val rvDueDate: TextView = itemView.findViewById(R.id.dueDateView)
         val rvCardView: CardView = itemView.findViewById(R.id.cardView)
-        val btnDone: MaterialButton = itemView.findViewById(R.id.isItDoneBtn)
+//        val btnDone: MaterialButton = itemView.findViewById(R.id.isItDoneBtn)
+        val radioBtn: MaterialRadioButton = itemView.findViewById(R.id.radioButton)
+        val imageRv: RecyclerView = itemView.findViewById(R.id.imageRv)
     }
 
     fun getDayOfWeek(dayOfWeek: DayOfWeek, context: Context): String {
@@ -205,7 +219,9 @@ class HwListAdapter(
             return oldItem.date == newItem.date &&
                     oldItem.lesson == newItem.lesson &&
                     oldItem.note == newItem.note &&
-                    oldItem.done == newItem.done
+                    oldItem.done == newItem.done &&
+                    oldItem.images.size == newItem.images.size &&
+                    oldItem.images.zip(newItem.images).all { (a, b) -> a.imageUri == b.imageUri }
         }
 
     }
