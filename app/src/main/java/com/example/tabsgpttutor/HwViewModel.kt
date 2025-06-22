@@ -1,10 +1,15 @@
 package com.example.tabsgpttutor
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.tabsgpttutor.data_base.AnimationSettings
 import com.example.tabsgpttutor.data_base.Homework
+import com.example.tabsgpttutor.data_base.ImageItem
 import com.example.tabsgpttutor.data_base.shedule.LessonAndTime
 import com.example.tabsgpttutor.data_base.shedule.Schedule
 import com.example.tabsgpttutor.shcedule.DataClass
@@ -27,6 +32,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.time.ZoneId
 import kotlin.math.ceil
 
 //import io.realm.kotlin.ext.freeze
@@ -34,11 +42,8 @@ import kotlin.math.ceil
 class HwViewModel: ViewModel() {
     private val realm = MyDynamic.realm
 
-    private val _homework = MutableStateFlow<List<Homework>>(emptyList())
     private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate: StateFlow<LocalDate> = _selectedDate
-
-    var animationRecieved : AnimationSettings? = null
 
     private val _uniqueLessons = MutableStateFlow<List<String>>(emptyList())
     val uniqueLessons: StateFlow<List<String>> = _uniqueLessons.asStateFlow()
@@ -46,45 +51,11 @@ class HwViewModel: ViewModel() {
     init {
         observeLessons()
     }
-    fun changeValue(value: AnimationSettings){
-        animationRecieved = value
-    }
+
     fun updateDate(date: LocalDate) {
         _selectedDate.value = date
     }
 
-    val lessons = realm.query<LessonAndTime>().find().map { it.lessonScheduleOnOdd + it.lessonSchedeleOnEven }.toSet()
-
-    val wdwa = realm.query<Schedule>().find().let {
-        for (i in it){
-            i.lessonAndTime.flatMap {
-                listOf(it.lessonScheduleOnOdd, it.lessonSchedeleOnEven)
-            }.filter { it.isNotBlank() }.toSet()
-        }
-    }
-    val stateLessons = realm.query<LessonAndTime>().asFlow()
-        .map { results ->
-            results.list.flatMap {
-                listOf(it.lessonScheduleOnOdd, it.lessonSchedeleOnEven)
-            }.filter { it.isNotBlank() }.toSet()
-        }
-//    val onEvenList = stateLessons.map { it.list.map { it.lessonSchedeleOnEven }.toSet() }
-//    val onOdd = stateLessons.map { it.list.map { it.lessonScheduleOnOdd }.toSet() }
-//    val combinedLesson = onOdd.combine(onEvenList) {odd, even ->
-//        (odd + even).toSet()
-//    }
-//    val homework: StateFlow<List<Homework>> = _homework
-    val homework = realm.query<Homework>("date >= $0", LocalDate.now().toString())
-    .sort("date", Sort.ASCENDING)
-    .asFlow()
-    .map { results ->
-        results.list.toList()
-    }
-    .stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(),
-        emptyList()
-    )
     val homeworkList = realm.query<Homework>("date >= $0", LocalDate.now().toString())
         .sort("date", Sort.ASCENDING)
         .asFlow()
@@ -96,7 +67,7 @@ class HwViewModel: ViewModel() {
             SharingStarted.WhileSubscribed(),
             emptyList()
      )
-    var sada = Log.d("ViewModel", "model hw: $homeworkList")
+
 
     val scheduleData: StateFlow<List<DataClass>> = selectedDate
         .flatMapLatest { date ->
@@ -223,15 +194,6 @@ class HwViewModel: ViewModel() {
         }
     }
 
-    fun dwadwa(){
-        viewModelScope.launch {
-            realm.write {
-                copyToRealm(AnimationSettings().apply { whatView = "Schedule" })
-                copyToRealm(AnimationSettings().apply { whatView = "Homework" })
-            }
-        }
-    }
-
     fun addHw(date: String, note: String, lesson: String){
         viewModelScope.launch {
             realm.write {
@@ -255,7 +217,7 @@ class HwViewModel: ViewModel() {
         }
     }
 
-    fun deleteHw(ids: List<String>) {
+    fun deleteHw(ids: List<String>, context: Context) {
         viewModelScope.launch {
             realm.write {
                 ids.forEach { id ->
@@ -264,11 +226,31 @@ class HwViewModel: ViewModel() {
                         .first()
                         .find()
                         ?.let {
+                            it.images.forEach {
+                                Log.d("FileName", "name ${it.filePath}")
+                                if (it.filePath != null){
+                                    deleteImage(context, it.filePath)
+                                }
+                            }
                             delete(it)
                             Log.d("ViewModel", "deleted: $it")
                         }
                 }
             }
+        }
+    }
+
+    fun deleteImage(context: Context, path: String?) {
+        try {
+            val file = File(path)
+//            val file = File(context.filesDir, fileName)
+
+            if (file.exists()) {
+                Log.d("file", "file deleted, $file")
+                file.delete()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -374,5 +356,102 @@ class HwViewModel: ViewModel() {
 
     fun getAnimations(whatView: String): AnimationSettings?{
         return realm.query<AnimationSettings>("whatView == $0", whatView).first().find()
+    }
+    fun copyImageToInternalStorage(context: Context, uri: Uri): List<String>? {
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return null
+            val fileName = "image_${System.currentTimeMillis()}.jpg"
+            val file = File(context.filesDir, fileName)
+            val outputStream = FileOutputStream(file)
+
+            inputStream.copyTo(outputStream)
+
+            inputStream.close()
+            outputStream.close()
+
+            return listOf(FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file
+            ).toString(), file.path)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+    fun saveUri(uri: String, selectedHwList: Homework?, path: String?){
+        viewModelScope.launch {
+            realm.write {
+                selectedHwList?.let { hw ->
+                    findLatest(hw)?.images?.add(
+                        ImageItem().apply {
+                            imageUri = uri
+                            if (path != null) filePath = path
+                        }
+                    )
+
+                }
+            }
+        }
+    }
+    fun findNextNice(today: LocalDate, selected: String) : MutableSet<Long>{
+        val schedule = realm.query<Schedule>().find()
+        val dateList : MutableSet<Long> = mutableSetOf()
+        for (i in -30..60) {
+            val date = today.plusDays(i.toLong())
+            val dayOfWeekName = date.dayOfWeek.name
+            val scheduleDay = schedule.find { it.dayOfWeek == dayOfWeekName }
+
+            if (scheduleDay != null) {
+                val isEvenWeek = ceil(date.dayOfYear / 7.0).toInt() % 2 == 0
+
+                val found = scheduleDay.lessonAndTime.any { lesson ->
+                    val subjectFromDb =
+                        if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty()) lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
+                    subjectFromDb == selected
+                }
+                if (found){
+
+                    val millis = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                    dateList.add(millis)
+                }
+            }
+        }
+        return dateList
+    }
+
+    fun findValidDate(selectedLesson: String): LocalDate?{
+        var foundDate: LocalDate? = null
+        for (i in 1..14) {
+            val date = LocalDate.now().plusDays(i.toLong())
+            val dayOfWeekName = date.dayOfWeek.name
+
+            val schedule = realm.query<Schedule>("dayOfWeek == $0", dayOfWeekName).first().find()
+
+            if (schedule != null) {
+                val isEvenWeek = ceil(date.dayOfYear / 7.0).toInt() % 2 == 0
+
+                val found = schedule.lessonAndTime.any { lesson ->
+                    val subjectFromDb =
+                        if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty()) lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
+                    subjectFromDb == selectedLesson
+                }
+                if (found){
+                    foundDate = date
+                    break
+                }
+            }
+        }
+        return foundDate
+    }
+
+    fun deleteCurImage(imageUri: Uri, id: String?){
+        viewModelScope.launch {
+            realm.write {
+                query<ImageItem>("imageUri == $0 AND id == $1", imageUri.toString(), id).first().find()?.let {
+                    delete(it)
+                }
+            }
+        }
     }
 }

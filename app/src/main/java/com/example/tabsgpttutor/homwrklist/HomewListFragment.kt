@@ -2,20 +2,25 @@ package com.example.tabsgpttutor.homwrklist
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
@@ -56,6 +61,7 @@ import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.data_base.ImageItem
 import com.example.tabsgpttutor.data_base.shedule.Schedule
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
@@ -93,8 +99,8 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     lateinit var adapter: HwListAdapter
     lateinit var chipBtn: Chip
     lateinit var addFAB: FloatingActionButton
-    val PICK_IMAGE_REQUEST = 1
-    val TAKE_PHOTO_REQUEST = 2
+    val PICK_PHOTO = 100
+    val TAKE_PHOTO = 101
 
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -137,20 +143,12 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     }
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var allHomeworks: MutableList<Homework>
-    lateinit var realm: Realm
-    lateinit var radioGroup: RadioGroup
-    lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     lateinit var listItems: List<String>
-    var allowedDates = mutableSetOf<Long>()
-    lateinit var lastValidDate: LocalDate
+    var lastValidDate: LocalDate? = null
     lateinit var spinner: Spinner
     val formatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd MMM")
-//    lateinit var galleryLauncher: ActivityResultLauncher<String>
     var selectedHwList: Homework? = null
-    lateinit var currentPhotoUri: Uri
     private var currentPhotoPath: String? = null
-    var photoUri: Uri? = null
 
     val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK){
@@ -159,13 +157,38 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                     uri,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                saveUri(uri.toString())
+                viewModel.saveUri(uri.toString(), selectedHwList, null)
             }
         }
 //            uri?.let {
 //                saveUri(it.toString())
 //
 //            }
+    }
+    val tiramisuLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val context = requireContext()
+            val uris = mutableListOf<Uri>()
+            val data = result.data
+
+            val clipData = data?.clipData
+            val singleUri = data?.data
+
+            if (clipData != null) {
+                for (i in 0 until clipData.itemCount) {
+                    uris.add(clipData.getItemAt(i).uri)
+                }
+            } else if (singleUri != null) {
+                uris.add(singleUri)
+            }
+
+            uris.forEach { uri ->
+                val copiedUri = viewModel.copyImageToInternalStorage(context, uri)
+                copiedUri?.let {
+                    viewModel.saveUri(it[0], selectedHwList, it[1])
+                }
+            }
+        }
     }
 
     private val cameraLauncher = registerForActivityResult(
@@ -182,25 +205,21 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             // Take persistable permission (optional for camera since we control the file)
 
             // Save the URI string to Realm
-            saveUri(uri.toString())
+            viewModel.saveUri(uri.toString(), selectedHwList, currentPhotoPath)
 
         }
     }
+    lateinit var layout: CoordinatorLayout
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("FragmentCreated", "HwListFragment")
-        realm = MyDynamic.realm
-
-//        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//        intent.type = "image/*"
-//        startActivityForResult(intent, 0)
-
 
         recyclerView = view.findViewById(R.id.recyclerView)
+        addFAB = view.findViewById<FloatingActionButton>(R.id.bottomSheetButton)
 
         val animations = viewModel.getAnimations("Homework")!!
-        val layout: CoordinatorLayout = view.findViewById(R.id.main)
+        layout= view.findViewById(R.id.main)
         if (animations.firstAnim){
             val interp = when(animations.firstInterpolator){
                 "AccelerateInterpolator" -> AccelerateInterpolator()
@@ -291,7 +310,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                     updateTitle()
                 }
             }
-        }, {clickedLesson ->
+        }, onDone = {clickedLesson ->
             doneHw(clickedLesson)
         },
             addImage = {hwList ->
@@ -301,85 +320,71 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.homeworkList.collect { adapter.updateData(it) }
+
             }
         }
 
-        addFAB = view.findViewById<FloatingActionButton>(R.id.bottomSheetButton)
+
         lifecycleScope.launch {
             viewModel.uniqueLessons.collect {
                 listItems = it
             }
-
         }
-
-
-
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.setHasFixedSize(true)
-        recyclerView.adapter = this@HomewListFragment.adapter
-
         val animBut = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_animation)
-
-
-        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener(){
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy>0){
-                    addFAB.hide()
-                }
-                else if (dy<0 && addFAB.isShown == false){
-                    addFAB.apply {
-                        startAnimation(animBut)
-                        show()
-                    }
-                }
-            }
-        })
-
-
-
-        addFAB.setOnClickListener {
-            bottomSheetShow()
-        }
-        addFAB.startAnimation(animBut)
-        recyclerView.itemAnimator = CustomHwListAnim().apply {
-            addDuration = 600
-            changeDuration = 300
-        }
-
         val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_pop_in)
 
-        recyclerView.startAnimation(anim)
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            setHasFixedSize(true)
+            adapter = this@HomewListFragment.adapter
+            itemAnimator = CustomHwListAnim().apply {
+                addDuration = 600
+                changeDuration = 300
+            }
+            addOnScrollListener(object: RecyclerView.OnScrollListener(){
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy>0){
+                        addFAB.hide()
+                    }
+                    else if (dy<0 && addFAB.isShown == false){
+                        addFAB.apply {
+                            startAnimation(animBut)
+                            show()
+                        }
+                    }
+                }
+            })
+            startAnimation(anim)
+        }
 
-
+        addFAB.apply {
+            setOnClickListener {
+                bottomSheetShow()
+            }
+            startAnimation(animBut)
+        }
     }
+
+
+
     fun doneHw(clickedLesson: Homework){
         viewModel.doneHw(clickedLesson, null)
         val snackbarText = if(clickedLesson.done) "Marked as undone" else "Done"
         val colorOnSurface = MaterialColors.getColor(addFAB, R.attr.colorOnSurface)
+        val botNav = requireActivity().findViewById<BottomNavigationView>(R.id.navBar)
         Snackbar.make(recyclerView, snackbarText, Snackbar.LENGTH_LONG)
+            .setAnchorView(addFAB)
             .setBackgroundTint(MaterialColors.getColor(addFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
             .setTextColor(colorOnSurface)
-            .setActionTextColor(MaterialColors.getColor(addFAB, R.attr.colorOnTertiary))
+            .setActionTextColor(MaterialColors.getColor(addFAB, R.attr.colorTertiary))
             .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
             .setAction("Undo") {
                 viewModel.doneHw(clickedLesson, clickedLesson.done)
             }
             .show()
     }
-    fun saveUri(uri: String){
 
-        lifecycleScope.launch {
-            realm.write {
-                selectedHwList?.let { hw ->
-                    findLatest(hw)?.images?.add(
-                        ImageItem().apply { imageUri = uri }
-                    )
-
-                }
-            }
-        }
-    }
 
     fun addImage(hwList: Homework){
         val addImageDialog = layoutInflater.inflate(R.layout.bottom_sheet_image, null)
@@ -392,51 +397,63 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         bottomSheetDialog.show()
 
         pickBtn.setOnClickListener {
-//            pickImage(hwList)
-            pickPerm(hwList)
+            pickPerm()
+            selectedHwList = hwList
+            bottomSheetDialog.dismiss()
         }
 
         cameraBtn.setOnClickListener {
-//            takePicture(hwList)
-            cameraPerm(hwList)
+            cameraPerm()
+            selectedHwList = hwList
+            bottomSheetDialog.dismiss()
         }
 
     }
 
-    fun cameraPerm(hwList: Homework){
+    fun cameraPerm(){
         var perm = mutableListOf<String>()
-        if (requireContext().checkSelfPermission(android.Manifest.permission.CAMERA) != PERMISSION_GRANTED){
-            perm.add(android.Manifest.permission.CAMERA)
+        if (requireContext().checkSelfPermission(Manifest.permission.CAMERA) != PERMISSION_GRANTED){
+            perm.add(Manifest.permission.CAMERA)
+            requestPermissions(perm.toTypedArray(), TAKE_PHOTO)
         }
-        if (requireContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED){
-            perm.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        else if (requireContext().checkSelfPermission(Manifest.permission.CAMERA) == PERMISSION_GRANTED &&
-            requireContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED){
-                takePicture(hwList)
+        else if (requireContext().checkSelfPermission(Manifest.permission.CAMERA) == PERMISSION_GRANTED){
+                takePicture()
             }
-        if (perm.isNotEmpty()){
-            requestPermissions(perm.toTypedArray(), 101)
-        }
     }
 
-    fun pickPerm(hwList: Homework){
+    fun pickPerm(){
         var perm = mutableListOf<String>()
-        if (requireContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED){
-            perm.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            if (requireContext().checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) != PERMISSION_GRANTED){
+                perm.add(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+            else pickImage(true)
         }
-        else pickImage(hwList)
+        else{
+            if (requireContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED){
+                perm.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+            else pickImage(false)
+
+        }
         if (perm.isNotEmpty()){
-            requestPermissions( perm.toTypedArray(), 101)
+            requestPermissions( perm.toTypedArray(), PICK_PHOTO)
         }
     }
-    fun pickImage(hwList: Homework){
-        selectedHwList = hwList
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "image/*"
+    fun pickImage(tiramisu: Boolean){
+        if (tiramisu){
+            val pickImages = Intent(MediaStore.ACTION_PICK_IMAGES)
+            pickImages.putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, 69)
+            tiramisuLauncher.launch(pickImages)
         }
-        galleryLauncher.launch(intent)
+        else{
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "image/*"
+            }
+            galleryLauncher.launch(intent)
+
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -445,20 +462,30 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 101){
+        val isTiramisu = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+        if (requestCode == PICK_PHOTO){
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }){
-                Toast.makeText(requireContext(), "Permissions granted", Toast.LENGTH_SHORT).show()
+                pickImage(isTiramisu)
             }
             else {
-                showPermissionDeniedDialog()
+                showPermissionDeniedDialog("photo")
+            }
+        }
+        else if (requestCode == TAKE_PHOTO){
+            if (grantResults.all { it == PERMISSION_GRANTED }){
+                takePicture()
+            }
+            else {
+                showPermissionDeniedDialog("camera")
             }
         }
     }
 
-    private fun showPermissionDeniedDialog() {
+    private fun showPermissionDeniedDialog(action: String) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Permission Denied")
-            .setMessage("Some permissions were denied. The app may not work properly.")
+            .setMessage("Permission for ${action} were denied. The app may not work properly.")
             .setPositiveButton("Go to settings") { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val uri = Uri.fromParts("package", requireContext().packageName, null)
@@ -468,26 +495,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             .setNegativeButton("Cancel", null)
             .show()
     }
-    fun takePicture(hwList: Homework){
-//        if (requireContext().checkSelfPermission(READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED){
-//            requestPermissions(arrayOf(READ_EXTERNAL_STORAGE), TAKE_PHOTO_REQUEST)
-//        }
-        selectedHwList = hwList
-//        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        if (intent.resolveActivity(requireContext().packageManager) != null){
-//            val photoFile = File.createTempFile(
-//                "IMG_${System.currentTimeMillis()}",
-//                ".jpg",
-//                requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-//            )
-//            Log.i("path?", "path: ${photoFile.path}, \n ${photoFile.absolutePath} \n ${photoFile.canonicalPath}")
-//            photoUri = FileProvider.getUriForFile(
-//                requireContext(),
-//                "${requireContext().packageName}.fileprovider",
-//                photoFile
-//            )
-//            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-//            startActivityForResult(intent, TAKE_PHOTO_REQUEST)
+    fun takePicture(){
         val photoFile = File.createTempFile(
             "JPEG_${System.currentTimeMillis()}",
             ".jpg",
@@ -500,20 +508,9 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             photoFile
         )
         cameraLauncher.launch(photoUri)
-//        currentPhotoPath = photoFile.absolutePath
-
-
     }
 
-//    fun checkPermision(): Boolean{
-//        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == ){}
-//        return false
-//    }
-
     fun bottomSheetShow(){
-
-//        val bottomSheet = MyBottomSheet()
-//        bottomSheet.show(childFragmentManager, bottomSheet.tag)
         val dialogView = layoutInflater.inflate(R.layout.hw_list_sheet, null)
         spinner = dialogView.findViewById<Spinner>(R.id.lessonSpinner)
         chipBtn = dialogView.findViewById<Chip>(R.id.dateChip)
@@ -533,37 +530,15 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 id: Long
             ) {
                 val selectedLesson = parent.getItemAtPosition(position).toString()
+                lastValidDate = viewModel.findValidDate(selectedLesson)
+                chipBtn.text = lastValidDate?.format(formatter)
 
-                for (i in 1..7) {
-                    val date = LocalDate.now().plusDays(i.toLong())
-                    val dayOfWeekName = date.dayOfWeek.name
-
-                    val schedule = realm.query<Schedule>("dayOfWeek == $0", dayOfWeekName).first().find()
-
-                    if (schedule != null) {
-                        val isEvenWeek = ceil(date.dayOfYear / 7.0).toInt() % 2 == 0
-
-                        val found = schedule.lessonAndTime.any { lesson ->
-                            val subjectFromDb =
-                                if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty()) lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
-                            subjectFromDb == selectedLesson
-                        }
-                        if (found){
-                            lastValidDate = date
-                            chipBtn.text = lastValidDate.format(formatter)
-                            break
-                        }
-                    }
-
-
-                }
 
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
-                TODO("Not yet implemented")
+                TODO()
             }
-
         }
 
 
@@ -580,8 +555,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             if (spinner.selectedItem == null)
                 return@setOnClickListener
             editText.clearFocus()
-            findNextNice(LocalDate.now())
-            datepickerShow()
+            datepickerShow(LocalDate.now(), spinner.selectedItem.toString())
         }
         saveBtn.setOnClickListener {
             var noteText = editText.text.toString()
@@ -617,37 +591,22 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
         }
         bottomSheetDialog.show()
-    }
+        dialogView.post {
+            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let {
+                val behavior = BottomSheetBehavior.from(it)
 
-
-    fun findNextNice(today: LocalDate){
-        allowedDates.clear()
-        for (i in -30..60) {
-            val date = today.plusDays(i.toLong())
-            val dayOfWeekName = date.dayOfWeek.name
-
-            val schedule = realm.query<Schedule>("dayOfWeek == $0", dayOfWeekName).first().find()
-
-            if (schedule != null) {
-                val isEvenWeek = ceil(date.dayOfYear / 7.0).toInt() % 2 == 0
-
-                val found = schedule.lessonAndTime.any { lesson ->
-                    val subjectFromDb =
-                        if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty()) lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
-                    subjectFromDb == spinner.selectedItem.toString()
-                }
-                if (found){
-
-                    val millis = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    allowedDates.add(millis)
+                if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    it.requestLayout()
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
                 }
             }
         }
     }
 
-    fun datepickerShow(){
-        Log.d("allowed DAtes", "dawioi: $allowedDates \nlast valid : $lastValidDate")
-        val validator = AllowedDatesValidator(allowedDates)
+    fun datepickerShow(date: LocalDate, selected: String){
+        val validator = AllowedDatesValidator(viewModel.findNextNice(date, selected))
         val constraints = CalendarConstraints.Builder()
             .setValidator(validator)
             .build()
@@ -661,7 +620,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         picker.addOnPositiveButtonClickListener { millis ->
             val selectedDate = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
             lastValidDate = selectedDate
-            chipBtn.text = lastValidDate.format(formatter)
+            chipBtn.text = lastValidDate?.format(formatter)
 
         }
     }
@@ -693,11 +652,6 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             layoutManager = LinearLayoutManager(requireContext())
         }
 
-
-
-
-
-
         val alertDialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
@@ -706,7 +660,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         alertDialog.show()
 
         btnDelete.setOnClickListener {
-            viewModel.deleteHw(selectedIds)
+            viewModel.deleteHw(selectedIds, requireContext())
             Log.d("DeleteSelected", "deleted and pressed: $selectedIds")
             alertDialog.dismiss()
             actionMode?.finish()
@@ -714,30 +668,6 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
         btnCancel.setOnClickListener {
             alertDialog.dismiss()
-        }
-    }
-
-    fun createTempUri(ogUri: Uri): Uri{
-        return try {
-            // Create temp file in app cache
-            val cacheFile = File(requireContext().externalCacheDir, "share_${System.currentTimeMillis()}.jpg")
-
-            // Copy content
-            requireContext().contentResolver.openInputStream(ogUri)?.use { input ->
-                FileOutputStream(cacheFile).use { output ->
-                    input.copyTo(output)
-                }
-            }
-
-            // Get FileProvider URI
-            FileProvider.getUriForFile(
-                requireContext(),
-                "${requireContext().packageName}.fileprovider", // Must match manifest
-                cacheFile
-            )
-        } catch (e: Exception) {
-            Log.e("Sharing", "Failed to cache file", e)
-            ogUri // Fallback (may still fail)
         }
     }
 
@@ -830,7 +760,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         val spinAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listItems.toList())
         spinAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = spinAdapter
-        chipBtn.text = lastValidDate.format(formatter)
+        chipBtn.text = lastValidDate?.format(formatter)
 
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(dialogView)
@@ -846,8 +776,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         editText.setText(recivedNote)
 
         chipBtn.setOnClickListener {
-            findNextNice(LocalDate.parse(recivedDate))
-            datepickerShow()
+            datepickerShow(LocalDate.parse(recivedDate), spinner.selectedItem.toString())
         }
 
 

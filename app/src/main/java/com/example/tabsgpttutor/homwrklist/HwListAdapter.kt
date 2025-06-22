@@ -171,6 +171,7 @@ class HwListAdapter(
                 intent.putExtra("startPosition", startPos)
                 intent.putExtra("homework", currentItem.note)
                 intent.putExtra("lesson", currentItem.lesson)
+                intent.putExtra("ids", currentItem.images.map { it.id }.toTypedArray())
                 context.startActivity(intent)
             })
         holder.imageRv.apply {

@@ -14,4 +14,5 @@ class Homework: RealmObject {
     var note: String = ""
     var done: Boolean = false
     var images: RealmList<ImageItem> = realmListOf()
+    var importance : String = ""
 }

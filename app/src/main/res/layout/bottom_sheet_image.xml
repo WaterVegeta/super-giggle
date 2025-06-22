@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="10dp">
+    android:layout_marginTop="10dp"
+    android:padding="5dp">
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pickBtn"
@@ -11,18 +12,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/cameraBtn"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:icon="@drawable/outline_image_search_24"
         app:iconGravity="textTop"
-        app:iconSize="80dp"
+        app:iconSize="120dp"
         app:iconPadding="5dp"
-        app:cornerRadius="8dp"
+        app:cornerRadius="40dp"
         style="@style/Widget.Material3.Button.ElevatedButton"
-        android:text="choose from galery"/>
+        android:text="choose from galery"
+        android:layout_marginEnd="10dp"
+        android:textSize="14sp"/>
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.Material3.Button.TonalButton"
-        app:cornerRadius="8dp"
+        app:cornerRadius="40dp"
         android:id="@+id/cameraBtn"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,8 +34,9 @@
         android:layout_height="match_parent"
         app:icon="@drawable/outline_camera_24"
         app:iconGravity="textTop"
-        app:iconSize="80dp"
+        app:iconSize="120dp"
         app:iconPadding="5dp"
-        android:text="take a picture"/>
+        android:text="take a picture"
+        android:textSize="14sp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

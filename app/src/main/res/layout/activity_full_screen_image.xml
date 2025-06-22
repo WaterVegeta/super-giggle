@@ -29,30 +29,26 @@
             app:subtitle="Lesson"
             app:titleTextColor="@color/text_white"
             app:subtitleTextColor="@color/text_white"
+            app:menu="@menu/full_screen_image"
+            app:navigationIcon="@drawable/baseline_arrow_back_24"
+            app:navigationIconTint="@color/text_white"
             />
 
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardViewImage"
-        android:layout_marginTop="10dp"
+    <TextView
+        android:id="@+id/textImage"
         app:layout_constraintTop_toBottomOf="@id/appBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#80000000"
-        app:cardCornerRadius="10dp">
-
-        <TextView
-            android:id="@+id/textImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3 of 10"
-            android:padding="10dp"
-            android:textColor="@color/text_white"
-            />
-    </androidx.cardview.widget.CardView>
+        android:text="3 of 10"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
+        android:textColor="@color/text_white"
+        android:background="@drawable/corners_flat"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,12 +2,12 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="tabsGPTtutor.app">
+      <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-06-12T15:51:49.848200800Z">
+        <DropdownSelection timestamp="2025-06-17T20:57:56.834244100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RZ8MA2PH2TR" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Bruh\.android\avd\Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>

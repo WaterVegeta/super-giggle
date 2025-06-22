@@ -3,6 +3,9 @@
     <external-files-path
         name="images"
         path="Pictures"/>
+    <files-path
+        name="internal_files"
+        path="." />
     <external-cache-path name="shared_images" path="."/>
     <!-- Fallback for different storage locations -->
     <cache-path name="internal_cache" path="."/>

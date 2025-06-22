@@ -2,6 +2,7 @@ package com.example.tabsgpttutor.shcedule
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.Animation
@@ -42,6 +44,7 @@ import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.data_base.shedule.Schedule
 import com.example.tabsgpttutor.shcedule.adapters.DayPagerAdapter
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.color.MaterialColors
@@ -364,6 +367,18 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
 
         }
         bottomSheetDialog.show()
+        dialogView.post {
+            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let {
+                val behavior = BottomSheetBehavior.from(it)
+
+                if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+                    it.requestLayout()
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+        }
     }
 
     fun updateHomeButton(position: Int) {

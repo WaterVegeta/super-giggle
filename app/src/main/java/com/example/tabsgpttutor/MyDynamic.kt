@@ -43,7 +43,7 @@ class MyDynamic: Application() {
                 LessonAndTime::class, TempSchedule::class,
                 TempLessonAndTime::class, AnimationSettings::class,
                 ImageItem::class)
-        ).schemaVersion(16) // last one is 16
+        ).schemaVersion(19) // last one is 19
             .migration(migration)
             .compactOnLaunch()
             .build()
