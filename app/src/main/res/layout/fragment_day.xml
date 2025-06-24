@@ -7,7 +7,9 @@
     android:layout_height="match_parent"
     android:id="@+id/constFragmentDay">
 
-    <TextView android:padding="16dp"
+    <TextView
+        android:layout_marginTop="7dp"
+        android:layout_marginEnd="10dp"
         android:text="20 04 2220"
         android:id="@+id/dateTitle"
         android:textSize="24sp"
@@ -20,7 +22,8 @@
 
     <TextView
         android:textColor="?attr/colorOnPrimaryContainer"
-        android:padding="16dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginStart="10dp"
         android:id="@+id/weekView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,6 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="4dp"
         android:scrollbars="none"
         app:layout_constraintTop_toBottomOf="@id/dateTitle"
         app:layout_constraintBottom_toBottomOf="parent"

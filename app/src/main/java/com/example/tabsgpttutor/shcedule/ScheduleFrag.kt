@@ -119,6 +119,37 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = DayPagerAdapter(this)
         viewPager.setCurrentItem(OFFSET + k, false)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            viewPager.offscreenPageLimit = 2
+            viewPager.setPageTransformer { page, position ->
+                when{
+                    position < -2 -> { // [-Infinity,-1)
+                        page.alpha = 0f
+                    }
+                    position <= 0 -> { // [-1,0]
+                        page.alpha = 1f
+                        page.translationX = page.width * -position *0.665f
+//                        page.translationY = page.height * -0.33f
+                        page.scaleX = 1 / 3f
+//                        page.scaleY = 1 / 3f
+                    }
+                    position <= 2 -> { // (0,1]
+                        page.alpha = 1f
+                        page.translationX = page.width * -position *0.665f
+//                        page.translationY = page.height * -0.33f
+                        page.scaleX = 1 / 3f
+//                        page.scaleY = 1 / 3f
+                    }
+
+                    position > 2 -> {
+                        page.alpha = 0f
+                    }
+                    else -> { // (1,+Infinity]
+                        page.alpha = 0f
+                    }
+                }
+            }
+        }
         Log.d("FragmentCreated", "ScheduleFragment, k: $k offset: $OFFSET currentItem: ${viewPager.currentItem}")
 //        viewPager.offscreenPageLimit = 2
 
