@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
@@ -56,17 +57,7 @@ class HwViewModel: ViewModel() {
         _selectedDate.value = date
     }
 
-    val homeworkList = realm.query<Homework>("date >= $0", LocalDate.now().toString())
-        .sort("date", Sort.ASCENDING)
-        .asFlow()
-        .map { results ->
-            results.list.toList()
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            emptyList()
-     )
+
 
 
     val scheduleData: StateFlow<List<DataClass>> = selectedDate
@@ -166,6 +157,34 @@ class HwViewModel: ViewModel() {
 //        }
 //        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+
+    private val _query = MutableStateFlow("")
+    val query = _query.asStateFlow()
+
+//    val homeworkList = realm.query<Homework>("date >= $0", LocalDate.now().toString())
+//        .sort("date", Sort.ASCENDING)
+//        .asFlow()
+//        .map { results ->
+//            results.list.toList()
+//        }
+//        .stateIn(
+//            viewModelScope,
+//            SharingStarted.WhileSubscribed(),
+//            emptyList()
+//        )
+    val homeworkList = query
+        .debounce(300)
+        .flatMapLatest { searchText ->
+            realm.query<Homework>("date >= $0 AND note CONTAINS[c] $1", LocalDate.now().toString(), searchText)
+                .sort("date", Sort.ASCENDING)
+                .asFlow()
+                .map { it.list.toList() }
+        }.stateIn(viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList())
+    fun onSearch(text: String){
+        _query.value = text
+    }
 
     private fun observeLessons() {
         viewModelScope.launch {

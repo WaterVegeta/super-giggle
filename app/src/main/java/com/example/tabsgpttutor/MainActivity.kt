@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -102,5 +103,19 @@ class MainActivity : AppCompatActivity() {
     //            .replace(R.id.fmLayout, fragment)
     //            .commit()
     //    }
+
+    override fun onBackPressed() {
+
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+        if (currentFragment == HomewListFragment()){
+            if (!HomewListFragment().toolbar.isGone){
+                HomewListFragment().hideActionMode()
+            }
+            else{
+                super.onBackPressed()
+            }
+        }
+        else super.onBackPressed()
+    }
 }
 

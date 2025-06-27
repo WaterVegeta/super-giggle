@@ -30,6 +30,7 @@ import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
+import android.widget.ActionMenuView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -39,11 +40,14 @@ import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -61,6 +65,7 @@ import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.data_base.ImageItem
 import com.example.tabsgpttutor.data_base.shedule.Schedule
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -71,6 +76,7 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -83,6 +89,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
+import java.security.Key
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -95,16 +102,21 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
     private val viewModel: HwViewModel by viewModels()
 
+    lateinit var searchToolbar: TextInputLayout
+    lateinit var sortFAB: FloatingActionButton
     private var actionMode: ActionMode? = null
     lateinit var adapter: HwListAdapter
     lateinit var chipBtn: Chip
     lateinit var addFAB: FloatingActionButton
     val PICK_PHOTO = 100
     val TAKE_PHOTO = 101
+    lateinit var toolbar: MaterialToolbar
+    lateinit var searchText: TextInputEditText
 
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             addFAB.hide()
+            searchToolbar.isGone = true
             mode?.menuInflater?.inflate(R.menu.contextual_menu, menu)
             return true
         }
@@ -136,6 +148,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
         override fun onDestroyActionMode(mode: ActionMode?) {
             addFAB.show()
+//            searchToolbar.isGone = false
             Log.d("obDestroy", "destroyed")
             adapter.clearSelection()
             actionMode = null
@@ -217,6 +230,8 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
         recyclerView = view.findViewById(R.id.recyclerView)
         addFAB = view.findViewById<FloatingActionButton>(R.id.bottomSheetButton)
+        sortFAB = view.findViewById(R.id.sortFAB)
+        searchToolbar = view.findViewById(R.id.searchToolbar)
 
         val animations = viewModel.getAnimations("Homework")!!
         layout= view.findViewById(R.id.main)
@@ -294,18 +309,50 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             }
 
         }
+        searchText = view.findViewById(R.id.searchText)
+        searchText.doOnTextChanged {text, _, _, _ ->
+            viewModel.onSearch(text.toString())
+        }
 
+        toolbar = view.findViewById<MaterialToolbar>(R.id.actionToolBar)
+        toolbar.navigationIcon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorOnSurface))
+        toolbar.menu.findItem(R.id.action_delete).icon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorError))
+        toolbar.menu.findItem(R.id.action_share).icon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorSecondary))
+        toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_delete -> {
+                    deleteSelectedItems()
+                    true
+                }
+
+                R.id.action_edit -> {
+                    editSelectedItem()
+                    true
+                }
+
+                R.id.action_share -> {
+                    shareItems()
+                    true
+                }
+
+                else -> false
+            }
+        }
+        toolbar.setNavigationOnClickListener {
+            hideActionMode()
+        }
         adapter = HwListAdapter(object : HwListAdapter.OnItemClickListener{
             override fun onItemLongClick(itemId: String) {
-                if (actionMode == null){
-                    actionMode = requireActivity().startActionMode(actionModeCallback)
+                if (!toolbar.isVisible){
+//                    actionMode = requireActivity().startActionMode(actionModeCallback)
+                    showToolBar()
                 }
                 adapter.toggleSelection(itemId)
                 updateTitle()
             }
 
             override fun onItemClick(itemId: String) {
-                if (actionMode != null){
+                if (toolbar.isVisible){
                     adapter.toggleSelection(itemId)
                     updateTitle()
                 }
@@ -364,9 +411,69 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             }
             startAnimation(animBut)
         }
+        sortFAB.setOnClickListener {
+            sortView()
+        }
+    }
+
+    fun showToolBar(){
+        toolbar.isVisible = true
+        toolbar.translationX = recyclerView.width.toFloat()
+        searchToolbar.animate().apply {
+            translationX(-recyclerView.width.toFloat())
+            setDuration(200)
+            setInterpolator(DecelerateInterpolator())
+
+        }
+        toolbar.animate().apply {
+            translationX(0f)
+            setDuration(200)
+            setInterpolator(DecelerateInterpolator())
+            withEndAction { searchToolbar.visibility = View.INVISIBLE }
+
+        }
+
+        addFAB.animate().apply {
+            translationY(500f)
+        }
+    }
+    fun hideActionMode(){
+        searchToolbar.isVisible = true
+
+
+        toolbar.animate().apply {
+            translationX(recyclerView.width.toFloat())
+            setDuration(200)
+            setInterpolator(DecelerateInterpolator())
+
+        }
+        searchToolbar.animate().apply {
+            searchToolbar.translationX = -recyclerView.width.toFloat()
+            translationX(0f)
+            setDuration(200)
+            setInterpolator(DecelerateInterpolator())
+            withEndAction { toolbar.isVisible = false }
+            addFAB.animate().apply {
+                translationY(0f)
+            }
+        }
+
+        adapter.clearSelection()
+//        actionMode?.finish()
+//        searchToolbar.postDelayed({
+//            searchToolbar.isGone = false
+//        }, 470)
+//        actionMode?.hide(2000)
+//        actionMode?.finish()
     }
 
 
+    fun sortView(){
+        val sideView = layoutInflater.inflate(R.layout.side_sheet_layout, null)
+        val sideSheet = SideSheetDialog(requireContext())
+        sideSheet.setContentView(sideView)
+        sideSheet.show()
+    }
 
     fun doneHw(clickedLesson: Homework){
         viewModel.doneHw(clickedLesson, null)
@@ -663,7 +770,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             viewModel.deleteHw(selectedIds, requireContext())
             Log.d("DeleteSelected", "deleted and pressed: $selectedIds")
             alertDialog.dismiss()
-            actionMode?.finish()
+            hideActionMode()
         }
 
         btnCancel.setOnClickListener {
@@ -725,7 +832,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 startActivity(chooserIntent)
             }
             withContext(Dispatchers.Main) {
-                actionMode?.finish()
+                hideActionMode()
             }
         }
     }
@@ -744,7 +851,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 }
             }
             // open edit screen or dialog
-            actionMode?.finish()
+            hideActionMode()
         }
     }
 
@@ -808,15 +915,17 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     private fun updateTitle() {
         val count = adapter.getSelectedIds().size
         if (count != 0){
-            actionMode?.title = "$count selected"
-            actionMode?.menu?.findItem(R.id.action_edit)?.isVisible = (count == 1)
+            toolbar.title = "$count selected"
+            toolbar.menu?.findItem(R.id.action_edit)?.isVisible = (count == 1)
 
-        } else actionMode?.finish()
+        } else {
+            hideActionMode()
+        }
     }
 
     override fun onPause() {
         super.onPause()
-        actionMode?.finish()
+//        hideActionMode()
         Log.d("FragmentPaused", "HwListFragment")
     }
 

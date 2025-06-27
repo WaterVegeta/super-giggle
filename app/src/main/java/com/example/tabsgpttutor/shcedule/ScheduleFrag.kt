@@ -3,6 +3,7 @@ package com.example.tabsgpttutor.shcedule
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
@@ -37,6 +38,7 @@ import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.tabsgpttutor.HwViewModel
 import com.example.tabsgpttutor.data_base.Homework
@@ -60,6 +62,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import kotlin.math.abs
 import kotlin.math.ceil
 
 class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
@@ -119,37 +122,63 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = DayPagerAdapter(this)
         viewPager.setCurrentItem(OFFSET + k, false)
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            viewPager.offscreenPageLimit = 2
-            viewPager.setPageTransformer { page, position ->
-                when{
-                    position < -2 -> { // [-Infinity,-1)
-                        page.alpha = 0f
-                    }
-                    position <= 0 -> { // [-1,0]
-                        page.alpha = 1f
-                        page.translationX = page.width * -position *0.665f
-//                        page.translationY = page.height * -0.33f
-                        page.scaleX = 1 / 3f
-//                        page.scaleY = 1 / 3f
-                    }
-                    position <= 2 -> { // (0,1]
-                        page.alpha = 1f
-                        page.translationX = page.width * -position *0.665f
-//                        page.translationY = page.height * -0.33f
-                        page.scaleX = 1 / 3f
-//                        page.scaleY = 1 / 3f
-                    }
+//        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
+//            val pageOffsetPx = resources.getDimensionPixelOffset(R.dimen.pageOffset)
+//            Log.i("Offsetpawd", "$pageOffsetPx")
+//
+//            viewPager.setPageTransformer { page, position ->
+//                when {
+//                    position < -1 -> { // [-Infinity,-1)
+//                        page.alpha = 0f
+//                    }
+//                    position <= 1 -> { // [-1,1]
+//                        page.alpha = 1f
+//
+//                        // Counteract the default slide transition
+//                        page.translationX = -position * page.width
+//
+//                        // Set scale to 1 to maintain original size
+//                        page.scaleX = 1f
+//                        page.scaleY = 1f
+//                    }
+//                    else -> { // (1,+Infinity]
+//                        page.alpha = 0f
+//                    }
+//                }
+//            }
+//
+//            // Add padding so pages aren't clipped
+//            viewPager.setPadding(pageOffsetPx, 0, pageOffsetPx, 0)
+//            viewPager.clipToPadding = false
+//            viewPager.clipChildren = false
+//            viewPager.addItemDecoration(object : RecyclerView.ItemDecoration(){
+//                override fun getItemOffsets(
+//                    outRect: Rect,
+//                    view: View,
+//                    parent: RecyclerView,
+//                    state: RecyclerView.State
+//                ) {
+//                    val position = parent.getChildPosition(view)
+//                    when(position){
+//                        0 -> outRect.left = pageMarginPx / 2
+//                        parent.adapter?.itemCount?.minus(1) -> outRect.right = pageMarginPx / 2
+//                        else -> {
+//                            outRect.left = pageMarginPx / 2
+//                            outRect.right = pageMarginPx / 2
+//                        }
+//                    }
+//                }
+//            })
+//        } else {
+//            // For portrait - normal single page behavior
+//            viewPager.setPageTransformer(null)
+//            viewPager.setPadding(0, 0, 0, 0)
+//            viewPager.clipToPadding = true
+//            viewPager.clipChildren = true
+//        }
 
-                    position > 2 -> {
-                        page.alpha = 0f
-                    }
-                    else -> { // (1,+Infinity]
-                        page.alpha = 0f
-                    }
-                }
-            }
-        }
+
         Log.d("FragmentCreated", "ScheduleFragment, k: $k offset: $OFFSET currentItem: ${viewPager.currentItem}")
 //        viewPager.offscreenPageLimit = 2
 
