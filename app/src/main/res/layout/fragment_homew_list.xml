@@ -39,6 +39,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="vertical"
+            android:id="@+id/searchLayout">
+
             <com.google.android.material.textfield.TextInputLayout
 
                 android:layout_marginBottom="5dp"
@@ -62,6 +69,51 @@
                     android:layout_height="wrap_content"
                     />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:visibility="gone"
+                    android:id="@+id/chipGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="13dp">
+                    <com.google.android.material.chip.Chip
+                        android:checked="true"
+                        android:id="@+id/chipDone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="done"/>
+                    <com.google.android.material.chip.Chip
+                        android:checked="true"
+                        android:id="@+id/chipLesson"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="lesson"/>
+                    <com.google.android.material.chip.Chip
+                        android:checked="true"
+                        android:id="@+id/chipDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="date"/>
+                    <com.google.android.material.chip.Chip
+                        android:checked="true"
+                        android:id="@+id/chipImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="image"/>
+                    <com.google.android.material.chip.Chip
+                        android:checked="true"
+                        android:id="@+id/chipSort"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sort"/>
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+        </LinearLayout>
             <com.google.android.material.appbar.MaterialToolbar
                 android:layout_marginBottom="5dp"
                 android:visibility="invisible"
@@ -74,7 +126,7 @@
                 app:navigationIconTint="@color/text_white"
                 />
         <androidx.recyclerview.widget.RecyclerView
-            app:layout_constraintTop_toBottomOf="@id/searchToolbar"
+            app:layout_constraintTop_toBottomOf="@id/searchLayout"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layoutAnimation="@anim/hw_animation"
             android:scrollbars="none"

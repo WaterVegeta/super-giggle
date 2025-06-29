@@ -19,6 +19,8 @@ import io.realm.kotlin.notifications.InitialResults
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.UpdatedResults
 import io.realm.kotlin.query.Sort
+import io.realm.kotlin.query.find
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -159,31 +161,127 @@ class HwViewModel: ViewModel() {
 
 
     private val _query = MutableStateFlow("")
-    val query = _query.asStateFlow()
+    private val query = _query.asStateFlow()
+    val done = MutableStateFlow("All")
+    val date = MutableStateFlow<String?>("date >= $0")
+    val lesson = MutableStateFlow("All")
+    val image = MutableStateFlow("All")
+    val sortField = MutableStateFlow("date")
+    val sortOrder = MutableStateFlow(Sort.ASCENDING)
 
-//    val homeworkList = realm.query<Homework>("date >= $0", LocalDate.now().toString())
-//        .sort("date", Sort.ASCENDING)
-//        .asFlow()
-//        .map { results ->
-//            results.list.toList()
+//    val homeworkDataFlow: Flow<List<Homework>> = date
+//        .flatMapLatest { dateQuery ->
+//            val realmQuery = if (dateQuery != null) {
+//                realm.query<Homework>(dateQuery, LocalDate.now().toString())
+//            } else {
+//                realm.query<Homework>()
+//            }
+//            realmQuery.sort("date", Sort.ASCENDING)
+//                .asFlow()
+//                .map { change ->
+//                    when (change) {
+//                        is InitialResults -> change.list
+//                        is UpdatedResults -> change.list
+//                    }
+//                }
 //        }
-//        .stateIn(
-//            viewModelScope,
-//            SharingStarted.WhileSubscribed(),
-//            emptyList()
-//        )
-    val homeworkList = query
-        .debounce(300)
-        .flatMapLatest { searchText ->
-            realm.query<Homework>("date >= $0 AND note CONTAINS[c] $1", LocalDate.now().toString(), searchText)
-                .sort("date", Sort.ASCENDING)
-                .asFlow()
-                .map { it.list.toList() }
-        }.stateIn(viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList())
+
+    val homeworkDataFlow = combine(
+        date,
+        sortField,
+        sortOrder
+    ) { dateQuery, sortFieldValue, sortOrderValue ->
+
+        Triple(dateQuery, sortFieldValue, sortOrderValue)
+
+    }.flatMapLatest { (dateQuery, sortFieldValue, sortOrderValue) ->
+        val query = if (dateQuery != null) {
+            realm.query<Homework>(dateQuery, LocalDate.now().toString())
+        } else {
+            realm.query<Homework>()
+        }
+
+        query.sort(sortFieldValue, sortOrderValue)
+            .asFlow()
+            .map { change ->
+                when (change) {
+                    is InitialResults -> change.list
+                    is UpdatedResults -> change.list
+                }
+            }
+    }
+
+    val homeworkList: StateFlow<List<Homework>> = combine(
+        homeworkDataFlow,
+        _query.debounce(300),
+        done,
+        lesson,
+        image
+    ) { allData, searchText, doneFilter, lessonFilter, imageFilter ->
+        allData.filter { hw ->
+            val matchesText = hw.note.contains(searchText, true)
+
+            val matchesDone = when (doneFilter) {
+                "Done" -> hw.done == true
+                "Not done" -> hw.done == false
+                else -> true
+            }
+
+            val matchesLesson = if (lessonFilter == "All") true
+            else hw.lesson == lessonFilter
+
+            val matchesImage = when (imageFilter) {
+                "With image" -> hw.images.isNotEmpty()
+                "Without image" -> hw.images.isEmpty()
+                else -> true
+            }
+
+            matchesText && matchesDone && matchesLesson && matchesImage
+        }
+
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
+//
+//    val homeworkList = query
+//        .debounce(300)
+//        .flatMapLatest { searchText ->
+//            realm.query<Homework>("date >= $0 AND note CONTAINS[c] $1", LocalDate.now().toString(), searchText)
+//                .sort("date", Sort.ASCENDING)
+//                .asFlow()
+//                .map { it.list.toList() }
+//        }.stateIn(viewModelScope,
+//            SharingStarted.WhileSubscribed(5000),
+//            emptyList())
     fun onSearch(text: String){
         _query.value = text
+    }
+    fun changeDone(text: String){
+        done.value = text
+    }
+    fun changeLesson(text: String){
+        lesson.value = text
+    }
+    fun changeImage(text: String){
+        image.value = text
+    }
+    fun changeDate(text: String){
+        if (text == "All days"){
+            date.value = null
+        } else if (text == "From today and beyond"){
+            date.value = "date >= $0"
+        }
+        else if (text == "From past to today"){
+            date.value = "date <= $0"
+        }
+    }
+    fun changeSortField(text: String){
+        sortField.value = text
+    }
+    fun changeSortOrder(sort: Sort){
+        sortOrder.value = sort
     }
 
     private fun observeLessons() {

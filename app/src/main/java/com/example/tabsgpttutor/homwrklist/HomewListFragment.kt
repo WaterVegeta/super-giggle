@@ -2,7 +2,6 @@ package com.example.tabsgpttutor.homwrklist
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -17,8 +16,6 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.ActionMode
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -30,23 +27,24 @@ import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
-import android.widget.ActionMenuView
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-
+import android.widget.HorizontalScrollView
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioGroup
+
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.Toolbar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -61,41 +59,35 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.HwViewModel
-import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.data_base.ImageItem
-import com.example.tabsgpttutor.data_base.shedule.Schedule
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import java.security.Key
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.apply
-import kotlin.math.ceil
 
 
 class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
@@ -112,48 +104,12 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     val TAKE_PHOTO = 101
     lateinit var toolbar: MaterialToolbar
     lateinit var searchText: TextInputEditText
-
-    private val actionModeCallback = object : ActionMode.Callback {
-        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            addFAB.hide()
-            searchToolbar.isGone = true
-            mode?.menuInflater?.inflate(R.menu.contextual_menu, menu)
-            return true
-        }
-
-        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            return false
-        }
-
-        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            return when (item?.itemId) {
-                R.id.action_delete -> {
-                    deleteSelectedItems()
-                    mode?.finish()
-                    true
-                }
-                R.id.action_edit -> {
-                    editSelectedItem()
-                    mode?.finish()
-                    true
-                }
-                R.id.action_share ->{
-                    shareItems()
-                    mode?.finish()
-                    true
-                }
-                else -> false
-            }
-        }
-
-        override fun onDestroyActionMode(mode: ActionMode?) {
-            addFAB.show()
-//            searchToolbar.isGone = false
-            Log.d("obDestroy", "destroyed")
-            adapter.clearSelection()
-            actionMode = null
-        }
-    }
+    lateinit var chipGroup : ChipGroup
+    lateinit var chipDone: Chip
+    lateinit var chipLesson: Chip
+    lateinit var chipDate: Chip
+    lateinit var chipImage: Chip
+    lateinit var chipSort: Chip
 
     private lateinit var recyclerView: RecyclerView
     lateinit var listItems: List<String>
@@ -232,6 +188,71 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         addFAB = view.findViewById<FloatingActionButton>(R.id.bottomSheetButton)
         sortFAB = view.findViewById(R.id.sortFAB)
         searchToolbar = view.findViewById(R.id.searchToolbar)
+
+        chipGroup = view.findViewById(R.id.chipGroup)
+        chipDone = view.findViewById(R.id.chipDone)
+        chipLesson = view.findViewById(R.id.chipLesson)
+        chipDate = view.findViewById(R.id.chipDate)
+        chipImage = view.findViewById(R.id.chipImage)
+        chipSort = view.findViewById(R.id.chipSort)
+        val sortChips = listOf(chipDone, chipLesson, chipDate, chipImage, chipSort)
+        for (i in sortChips){
+            when(i){
+                chipDone -> {
+                    if (viewModel.done.value != "All"){
+                        i.text = viewModel.done.value
+                        i.isCheckable = true
+                        i.isChecked = true
+                    }
+                }
+                chipDate -> {
+                    if (viewModel.date.value != "date >= $0"){
+                        i.apply {
+                            text = when(viewModel.date.value){
+                                "date <= $0" -> "From past to today"
+                                null -> "All days"
+                                else -> "From today and beyond"
+                            }
+                            isChecked = true
+                            isCheckable = true
+                        }
+                    }
+                }
+                chipImage -> {
+                    if (viewModel.image.value != "All"){
+                        i.apply {
+                            text = viewModel.image.value
+                            isChecked = true
+                            isCheckable = true
+                        }
+                    }
+                }
+                chipLesson -> {
+                    if (viewModel.lesson.value != "All"){
+                        i.apply {
+                            text = viewModel.lesson.value
+                            isChecked = true
+                            isCheckable = true
+                        }
+                    }
+                }
+                chipSort ->{
+                    if (viewModel.sortField.value != "date"){
+                        i.apply {
+                            text = when(viewModel.sortField.value){
+                                "note" -> "Homework"
+                                else ->  "Lesson"
+                            }
+                            isChecked = true
+                            isCheckable = true
+                        }
+                    }
+                }
+            }
+            i.setOnClickListener {
+                showChipBottom(i.id)
+            }
+        }
 
         val animations = viewModel.getAnimations("Homework")!!
         layout= view.findViewById(R.id.main)
@@ -314,6 +335,9 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             viewModel.onSearch(text.toString())
         }
 
+        searchToolbar.setStartIconOnClickListener {
+            chipGroup.isVisible = !chipGroup.isVisible
+        }
         toolbar = view.findViewById<MaterialToolbar>(R.id.actionToolBar)
         toolbar.navigationIcon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorOnSurface))
         toolbar.menu.findItem(R.id.action_delete).icon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorError))
@@ -416,6 +440,237 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         }
     }
 
+
+    fun showChipBottom(chipId: Int){
+        val dialog = layoutInflater.inflate(R.layout.chip_bottom_sheet, null)
+        val radioAll = dialog.findViewById<MaterialRadioButton>(R.id.radioAll)
+        val radioDone = dialog.findViewById<MaterialRadioButton>(R.id.radioDone)
+        val radioNotDone = dialog.findViewById<MaterialRadioButton>(R.id.radioNotDone)
+        val groupDone = dialog.findViewById<RadioGroup>(R.id.groupDone)
+        val closeBtn = dialog.findViewById<ImageButton>(R.id.closeBtn)
+        val tvChoose = dialog.findViewById<TextView>(R.id.tvChoose)
+
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog.setContentView(dialog)
+
+        closeBtn.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+        when(chipId){
+            R.id.chipDate ->{
+                tvChoose.text = "Date"
+                radioAll.text = "All days"
+                radioDone.text = "From today and beyond"
+                radioNotDone.text = "From past to today"
+
+                when(viewModel.date.value){
+                    "date <= $0" -> radioNotDone.isChecked = true
+                    "date >= $0" -> radioDone.isChecked = true
+                    else -> radioAll.isChecked = true
+                }
+                groupDone.setOnCheckedChangeListener { v, itemId ->
+                    when(itemId){
+                        R.id.radioAll ->{
+                            viewModel.changeDate(radioAll.text.toString())
+                            chipDate.apply {
+                                text = "date"
+                                isCheckable = false
+                                isChecked = false
+                            }
+                            bottomSheetDialog.dismiss()
+                        }
+                        R.id.radioDone ->{
+                            chipDate.apply {
+                                text = radioDone.text
+                                isCheckable = true
+                                isChecked = true
+                            }
+                            viewModel.changeDate(radioDone.text.toString())
+                            bottomSheetDialog.dismiss()
+                        }
+                        R.id.radioNotDone ->{
+                            chipDate.apply {
+                                text = radioNotDone.text
+                                isCheckable = true
+                                isChecked = true
+                            }
+                            viewModel.changeDate(radioNotDone.text.toString())
+                            bottomSheetDialog.dismiss()
+                        }
+                    }
+                }
+                bottomSheetDialog.show()
+            }
+            R.id.chipDone ->{
+
+                when(viewModel.done.value){
+                    radioNotDone.text.toString() -> radioNotDone.isChecked = true
+                    radioDone.text.toString() -> radioDone.isChecked = true
+                    else -> radioAll.isChecked = true
+                }
+                tvChoose.text = "Done"
+                groupDone.setOnCheckedChangeListener { v, itemId ->
+                    when(itemId){
+                        R.id.radioAll ->{
+                            viewModel.changeDone(radioAll.text.toString())
+                            chipDone.apply {
+                                text = "done"
+                                isCheckable = false
+                                isChecked = false
+                            }
+                            bottomSheetDialog.dismiss()
+                        }
+                        R.id.radioDone ->{
+                            chipDone.apply {
+                                text = radioDone.text
+                                isCheckable = true
+                                isChecked = true
+                            }
+                            viewModel.changeDone(radioDone.text.toString())
+                            bottomSheetDialog.dismiss()
+                        }
+                        R.id.radioNotDone ->{
+                            chipDone.apply {
+                                text = radioNotDone.text
+                                isCheckable = true
+                                isChecked = true
+                            }
+                            viewModel.changeDone(radioNotDone.text.toString())
+                            bottomSheetDialog.dismiss()
+                        }
+                    }
+                }
+                bottomSheetDialog.show()
+
+
+            }
+            R.id.chipImage ->{
+                tvChoose.text = "Image"
+                radioDone.text = "With image"
+                radioNotDone.text = "Without image"
+                when(viewModel.image.value){
+                    radioNotDone.text.toString() -> radioNotDone.isChecked = true
+                    radioDone.text.toString() -> radioDone.isChecked = true
+                    else -> radioAll.isChecked = true
+                }
+
+                groupDone.setOnCheckedChangeListener { v, itemId ->
+                    when(itemId){
+                        R.id.radioAll ->{
+                            viewModel.changeImage(radioAll.text.toString())
+                            chipImage.text = "image"
+                            chipImage.isCheckable = false
+                            chipImage.isChecked = false
+                            bottomSheetDialog.dismiss()
+                        }
+                        R.id.radioDone ->{
+                            chipImage.text = "With image"
+                            chipImage.isCheckable = true
+                            chipImage.isChecked = true
+                            viewModel.changeImage(radioDone.text.toString())
+                            bottomSheetDialog.dismiss()
+                        }
+                        R.id.radioNotDone ->{
+                            chipImage.text = "Without image"
+                            chipImage.isCheckable = true
+                            chipImage.isChecked = true
+                            viewModel.changeImage(radioNotDone.text.toString())
+                            bottomSheetDialog.dismiss()
+                        }
+                    }
+                }
+                bottomSheetDialog.show()
+            }
+            R.id.chipLesson ->{
+                tvChoose.text = "Lesson"
+                radioDone.isVisible = false
+                radioNotDone.isVisible = false
+
+                if (viewModel.lesson.value == radioAll.text.toString()){
+                    radioAll.isChecked = true
+                }
+                radioAll.setOnCheckedChangeListener { _, state ->
+                    if (state){
+                        chipLesson.text = "lesson"
+                        chipLesson.isCheckable = false
+                        chipLesson.isChecked = false
+                        viewModel.changeLesson("All")
+                        bottomSheetDialog.dismiss()
+                    }
+                }
+                for (i in listItems){
+                    val radioButton = MaterialRadioButton(requireContext())
+                    radioButton.text = i.toString()
+                    radioButton.layoutParams = RadioGroup.LayoutParams(
+                        RadioGroup.LayoutParams.MATCH_PARENT,
+                        RadioGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    radioButton.textSize = 28f
+                    if (viewModel.lesson.value == i.toString()){
+                        radioButton.isChecked = true
+                    }
+                    radioButton.setOnCheckedChangeListener {button, state ->
+                        if (state){
+                            chipLesson.text = i
+                            viewModel.changeLesson(i)
+                            chipLesson.isCheckable = true
+                            chipLesson.isChecked = true
+                            bottomSheetDialog.dismiss()
+                        }
+                    }
+                    groupDone.addView(radioButton)
+                }
+                bottomSheetDialog.show()
+            }
+            R.id.chipSort ->{
+                val linearLayout = dialog.findViewById<LinearLayout>(R.id.sortLayout)
+                val radioSortDate = dialog.findViewById<MaterialRadioButton>(R.id.radioSortDate)
+                val radioSortHomework = dialog.findViewById<MaterialRadioButton>(R.id.radioSortHomework)
+                val radioSortLesson = dialog.findViewById<MaterialRadioButton>(R.id.radioSortLesson)
+
+                tvChoose.text = "Sort order"
+                linearLayout.isVisible = true
+                radioAll.text = "Ascending"
+                radioDone.text = "Descending"
+                radioNotDone.isVisible = false
+                when(viewModel.sortOrder.value){
+                    Sort.ASCENDING -> radioAll.isChecked = true
+                    Sort.DESCENDING -> radioDone.isChecked = true
+                }
+                for (i in listOf(radioDone, radioAll)){
+                    i.setOnCheckedChangeListener {v, state ->
+                        if (state){
+                            val sortOrder = when(v.text.toString()){
+                                "Descending" -> Sort.DESCENDING
+                                else -> Sort.ASCENDING
+                            }
+                            viewModel.changeSortOrder(sortOrder)
+                        }
+                    }
+                }
+                when(viewModel.sortField.value){
+                    "lesson" -> radioSortLesson.isChecked = true
+                    "note" -> radioSortHomework.isChecked = true
+                    else -> radioSortDate.isChecked = true
+                }
+                val radioList = listOf(radioSortDate, radioSortLesson, radioSortHomework)
+                for (i in radioList){
+                    i.setOnCheckedChangeListener { v, state ->
+                        if (state){
+                            val sortField = when(v.text.toString()){
+                                "Homework" -> "note"
+                                "Lesson" -> "lesson"
+                                else -> "date"
+                            }
+                            viewModel.changeSortField(sortField)
+                        }
+                    }
+                }
+                bottomSheetDialog.show()
+            }
+        }
+
+    }
     fun showToolBar(){
         toolbar.isVisible = true
         toolbar.translationX = recyclerView.width.toFloat()
@@ -429,7 +684,9 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             translationX(0f)
             setDuration(200)
             setInterpolator(DecelerateInterpolator())
-            withEndAction { searchToolbar.visibility = View.INVISIBLE }
+            withEndAction {
+                chipGroup.isVisible = false
+                searchToolbar.visibility = View.INVISIBLE }
 
         }
 
