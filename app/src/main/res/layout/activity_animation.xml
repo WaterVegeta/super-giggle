@@ -5,6 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".animation_pref.AnimationActivity">
+    tools:context=".settings.animation_pref.AnimationActivity">
 
 </androidx.constraintlayout.widget.ConstraintLayout>

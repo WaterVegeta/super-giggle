@@ -5,12 +5,10 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.tabsgpttutor.data_base.AnimationSettings
 import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.data_base.ImageItem
-import com.example.tabsgpttutor.data_base.shedule.LessonAndTime
 import com.example.tabsgpttutor.data_base.shedule.Schedule
 import com.example.tabsgpttutor.shcedule.DataClass
 import java.time.LocalDate
@@ -19,8 +17,7 @@ import io.realm.kotlin.notifications.InitialResults
 import io.realm.kotlin.notifications.ResultsChange
 import io.realm.kotlin.notifications.UpdatedResults
 import io.realm.kotlin.query.Sort
-import io.realm.kotlin.query.find
-import kotlinx.coroutines.flow.Flow
+import io.realm.kotlin.types.RealmObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,12 +25,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -159,32 +154,26 @@ class HwViewModel: ViewModel() {
 //        }
 //        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val ALL = 0
+    val TODAY_BEYOND = 1
+    val PAST_TODAY = 2
+
+    val DONE = 3
+    val NOT_DONE = 4
+
+    val WITH_IMAGE = 5
+    val NO_IMAGE = 6
 
     private val _query = MutableStateFlow("")
     private val query = _query.asStateFlow()
-    val done = MutableStateFlow("All")
-    val date = MutableStateFlow<String?>("date >= $0")
-    val lesson = MutableStateFlow("All")
-    val image = MutableStateFlow("All")
-    val sortField = MutableStateFlow("date")
-    val sortOrder = MutableStateFlow(Sort.ASCENDING)
 
-//    val homeworkDataFlow: Flow<List<Homework>> = date
-//        .flatMapLatest { dateQuery ->
-//            val realmQuery = if (dateQuery != null) {
-//                realm.query<Homework>(dateQuery, LocalDate.now().toString())
-//            } else {
-//                realm.query<Homework>()
-//            }
-//            realmQuery.sort("date", Sort.ASCENDING)
-//                .asFlow()
-//                .map { change ->
-//                    when (change) {
-//                        is InitialResults -> change.list
-//                        is UpdatedResults -> change.list
-//                    }
-//                }
-//        }
+    val done_sort = MutableStateFlow(NOT_DONE)
+    val date = MutableStateFlow(TODAY_BEYOND)
+    val lesson = MutableStateFlow("All")
+    val image = MutableStateFlow(ALL)
+    val sortField = MutableStateFlow("date")
+
+    val sortOrder = MutableStateFlow(Sort.ASCENDING)
 
     val homeworkDataFlow = combine(
         date,
@@ -195,10 +184,11 @@ class HwViewModel: ViewModel() {
         Triple(dateQuery, sortFieldValue, sortOrderValue)
 
     }.flatMapLatest { (dateQuery, sortFieldValue, sortOrderValue) ->
-        val query = if (dateQuery != null) {
-            realm.query<Homework>(dateQuery, LocalDate.now().toString())
-        } else {
-            realm.query<Homework>()
+        val query = when(dateQuery){
+            ALL -> realm.query<Homework>()
+            TODAY_BEYOND -> realm.query<Homework>("date >= $0", LocalDate.now().toString())
+            PAST_TODAY -> realm.query<Homework>("date <= $0", LocalDate.now().toString())
+            else -> {realm.query<Homework>("date >= $0", LocalDate.now().toString())}
         }
 
         query.sort(sortFieldValue, sortOrderValue)
@@ -214,7 +204,7 @@ class HwViewModel: ViewModel() {
     val homeworkList: StateFlow<List<Homework>> = combine(
         homeworkDataFlow,
         _query.debounce(300),
-        done,
+        done_sort,
         lesson,
         image
     ) { allData, searchText, doneFilter, lessonFilter, imageFilter ->
@@ -222,8 +212,8 @@ class HwViewModel: ViewModel() {
             val matchesText = hw.note.contains(searchText, true)
 
             val matchesDone = when (doneFilter) {
-                "Done" -> hw.done == true
-                "Not done" -> hw.done == false
+                DONE -> hw.done == true
+                NOT_DONE -> hw.done == false
                 else -> true
             }
 
@@ -231,8 +221,8 @@ class HwViewModel: ViewModel() {
             else hw.lesson == lessonFilter
 
             val matchesImage = when (imageFilter) {
-                "With image" -> hw.images.isNotEmpty()
-                "Without image" -> hw.images.isEmpty()
+                WITH_IMAGE -> hw.images.isNotEmpty()
+                NO_IMAGE -> hw.images.isEmpty()
                 else -> true
             }
 
@@ -258,24 +248,18 @@ class HwViewModel: ViewModel() {
     fun onSearch(text: String){
         _query.value = text
     }
-    fun changeDone(text: String){
-        done.value = text
+    fun changeDone(text: Int){
+        done_sort.value = text
     }
     fun changeLesson(text: String){
         lesson.value = text
+
     }
-    fun changeImage(text: String){
+    fun changeImage(text: Int){
         image.value = text
     }
-    fun changeDate(text: String){
-        if (text == "All days"){
-            date.value = null
-        } else if (text == "From today and beyond"){
-            date.value = "date >= $0"
-        }
-        else if (text == "From past to today"){
-            date.value = "date <= $0"
-        }
+    fun changeDate(text: Int){
+        date.value = text
     }
     fun changeSortField(text: String){
         sortField.value = text
@@ -322,13 +306,13 @@ class HwViewModel: ViewModel() {
             }
         }
     }
-    fun doneHw(hw: Homework, bool: Boolean?){
+    fun doneHw(hw: Homework?, bool: Boolean?){
         viewModelScope.launch {
             realm.write {
                 if (bool != null){
-                    findLatest(hw)?.done = hw.done
+                    findLatest(hw as Homework)?.done = hw.done
                 }else{
-                    findLatest(hw)?.done = !hw.done
+                    findLatest(hw as Homework)?.done = !hw.done
                 }
             }
         }
@@ -570,5 +554,9 @@ class HwViewModel: ViewModel() {
                 }
             }
         }
+    }
+
+    fun findHwByDateLesson(date: String, lesson: String): Homework?{
+        return realm.query<Homework>("date == $0 AND lesson == $1", date, lesson).first().find()
     }
 }

@@ -19,7 +19,7 @@
         app:iconPadding="5dp"
         app:cornerRadius="40dp"
         style="@style/Widget.Material3.Button.ElevatedButton"
-        android:text="choose from galery"
+        android:text="@string/choose_from_galery"
         android:layout_marginEnd="10dp"
         android:textSize="14sp"/>
 
@@ -36,7 +36,7 @@
         app:iconGravity="textTop"
         app:iconSize="120dp"
         app:iconPadding="5dp"
-        android:text="take a picture"
+        android:text="@string/take_a_picture"
         android:textSize="14sp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

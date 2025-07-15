@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.schedule_change.adapters
+package com.example.tabsgpttutor.settings.schedule_change.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.data_base.LessonChange
-import com.example.tabsgpttutor.schedule_change.adapters.LessonChangeAdapter.LessonDiffUtill
-import com.example.tabsgpttutor.schedule_change.adapters.LessonChangeAdapter.ViewHolder
+import com.example.tabsgpttutor.settings.schedule_change.adapters.LessonChangeAdapter.LessonDiffUtill
+import com.example.tabsgpttutor.settings.schedule_change.adapters.LessonChangeAdapter.ViewHolder
 
 class AddLessonScheduleAdapter(val addLesson: (LessonChange) -> Unit): ListAdapter<LessonChange, ViewHolder>(LessonDiffUtill()) {
     override fun onCreateViewHolder(

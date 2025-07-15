@@ -3,16 +3,16 @@
     <item
         android:id="@+id/nav_schedule"
         android:icon="@drawable/baseline_event_note_24"
-        android:title="Schedule"
+        android:title="@string/schedule"
         />
     <item
         android:id="@+id/nav_hwList"
         android:icon="@drawable/baseline_calendar_view_day_24"
-        android:title="Homework"
+        android:title="@string/homework"
         />
     <item
         android:id="@+id/nav_settings"
         android:icon="@drawable/outline_settings_24"
-        android:title="Settings"
+        android:title="@string/settings"
         />
 </menu>

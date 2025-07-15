@@ -19,20 +19,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TabsGPTtutor"
-        tools:targetApi="31">
+        tools:targetApi="33">
+        <activity android:name=".widget.WidgetSettings"
+            />
         <activity
             android:name=".homwrklist.FullScreenImage"
             android:exported="false" />
         <activity
-            android:name=".animation_pref.AnimationActivity"
+            android:name=".settings.animation_pref.AnimationActivity"
             android:exported="false" />
         <activity
-            android:name=".schedule_change.ChangeScheduleAct"
-            android:exported="false"
-            android:label="@string/title_activity_change_schedule" />
+            android:name=".settings.schedule_change.ChangeScheduleAct"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

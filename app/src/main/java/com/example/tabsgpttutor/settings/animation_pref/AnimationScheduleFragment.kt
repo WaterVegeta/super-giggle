@@ -1,29 +1,17 @@
-package com.example.tabsgpttutor.animation_pref
+package com.example.tabsgpttutor.settings.animation_pref
 
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.AnticipateInterpolator
-import android.view.animation.AnticipateOvershootInterpolator
-import android.view.animation.BounceInterpolator
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
-import android.view.animation.OvershootInterpolator
 import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.example.tabsgpttutor.HwViewModel
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.data_base.AnimationSettings
-import com.example.tabsgpttutor.schedule_change.IsDataChanged
+import com.example.tabsgpttutor.settings.schedule_change.IsDataChanged
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.radiobutton.MaterialRadioButton
 import com.google.android.material.slider.Slider
@@ -151,7 +139,7 @@ class AnimationScheduleFragment(val whatView: String) : Fragment(R.layout.fragme
             else -> ""
         }
         animSwitch.isChecked = animations.firstAnim
-        animSwitch.text = if (animations.firstAnim) "Turned on" else "Turned off"
+        animSwitch.text = if (animations.firstAnim) getString(R.string.turned_on) else getString(R.string.turned_off)
         alphaSlider.value = animations.firstAlpha
         scaleXSlider.value = animations.firstScaleX
         scaleYSlider.value = animations.firstScaleY
@@ -215,7 +203,7 @@ class AnimationScheduleFragment(val whatView: String) : Fragment(R.layout.fragme
         }
 
         animSwitch.setOnCheckedChangeListener { v, state ->
-            v.text = if (state) "Turned on" else "Turned off"
+            v.text = if (state) getString(R.string.turned_on) else getString(R.string.turned_off)
             for (i in sliders){
                 i.isEnabled = v.isChecked
             }

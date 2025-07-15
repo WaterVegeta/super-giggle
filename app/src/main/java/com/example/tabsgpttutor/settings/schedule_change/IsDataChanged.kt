@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.schedule_change
+package com.example.tabsgpttutor.settings.schedule_change
 
 object IsDataChanged {
     var isDataChanged = false

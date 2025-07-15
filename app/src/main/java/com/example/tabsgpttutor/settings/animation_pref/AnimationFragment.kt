@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.animation_pref
+package com.example.tabsgpttutor.settings.animation_pref
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -15,12 +15,12 @@ class AnimationFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>("animation_homework")?.setOnPreferenceClickListener {
 //            Log.d("Preferences", "pref_delete_db")
-            atachFragment(AnimationScheduleFragment("Homework"), "Homework animation")
+            atachFragment(AnimationScheduleFragment("Homework"), getString(R.string.homework_animation))
             true // Return true if the click is handled.
         }
         findPreference<Preference>("animation_schedule")?.setOnPreferenceClickListener {
 //            Log.d("Preferences", "pref_delete_db")
-            atachFragment(AnimationScheduleFragment("Schedule"), "Schedule animation")
+            atachFragment(AnimationScheduleFragment("Schedule"), getString(R.string.schedule_animation))
             true // Return true if the click is handled.
         }
     }

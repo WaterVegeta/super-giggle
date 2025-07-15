@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
     <LinearLayout
-    android:visibility="gone"
+    android:visibility="visible"
     android:id="@+id/layoutKeyFrame"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -25,15 +25,15 @@
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Alpha"
-                    android:textSize="18dp"
+                    android:text="@string/alpha"
+                    android:textSize="18sp"
                     />
 
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="0 -> invisible \n1 -> fully visible"
-                    android:textSize="16dp"
+                    android:text="@string/_0_invisible_n1_fully_visible"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
                     />
 
@@ -70,15 +70,15 @@
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Scale"
-                    android:textSize="18dp"
+                    android:text="@string/scale"
+                    android:textSize="18sp"
                     />
 
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="X : Horizontal "
-                    android:textSize="16dp"
+                    android:text="@string/x_horizontal"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
                     />
 
@@ -107,8 +107,8 @@
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Y : Vertical "
-                    android:textSize="16dp"
+                    android:text="@string/y_vertical"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
                     />
 
@@ -144,15 +144,15 @@
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Duration"
-                    android:textSize="18dp"
+                    android:text="@string/duration"
+                    android:textSize="18sp"
                     />
 
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="duration of animation in miliseconds "
-                    android:textSize="16dp"
+                    android:text="@string/duration_summary"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
                     />
 
@@ -188,15 +188,15 @@
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Translation"
-                    android:textSize="18dp"
+                    android:text="@string/translation"
+                    android:textSize="18sp"
                     />
 
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="X : Horizontal "
-                    android:textSize="16dp"
+                    android:text="@string/x_horizontal"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
                     />
 
@@ -226,8 +226,8 @@
                 <TextView android:layout_marginHorizontal="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Y : Vertical "
-                    android:textSize="16dp"
+                    android:text="@string/y_vertical"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
                     />
                 <LinearLayout
@@ -272,7 +272,7 @@
                 <TextView
                     android:textSize="18sp"
                     android:layout_marginHorizontal="15dp"
-                    android:text="Choose interpolator"
+                    android:text="@string/choose_interpolator"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
@@ -288,58 +288,58 @@
                         android:id="@+id/accelerateKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Accelerate"
+                        android:text="@string/accelerate"
                         />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/accelerateDecelerateKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Accelerate decelerate" />
+                        android:text="@string/accelerate_decelerate" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/anticipateKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Anticipate" />
+                        android:text="@string/anticipate" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/anticipateOvershootKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Anticipate overshoot"/>
+                        android:text="@string/anticipate_overshoot"/>
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/bounceKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Bounce" />
+                        android:text="@string/bounce" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/decelerateKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Decelerate" />
+                        android:text="@string/decelerate" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/fastOutSlowInKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Fast out slow in" />
+                        android:text="@string/fast_out_slow_in" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/fastOutLinearInKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Fast out linear in" />
+                        android:text="@string/fast_out_linear_in" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/linearOutSlowInKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Linear out Slow in" />
+                        android:text="@string/linear_out_slow_in" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/linearKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Linear" />
+                        android:text="@string/linear" />
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/overshootKey"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Overshoot" />
+                        android:text="@string/overshoot" />
                 </RadioGroup>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

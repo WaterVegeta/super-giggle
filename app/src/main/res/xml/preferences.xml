@@ -2,30 +2,26 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="Appearance"
+    <PreferenceCategory android:title="@string/appearance"
         app:iconSpaceReserved="false">
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
             android:defaultValue="true"
             android:key="dynamic_colors"
-            android:summary="Matches your app's colors to your wallpaper (Android 12+)"
-            android:title="Use dynamic colors" />
+            android:summary="@string/dynamic_colors_summary"
+            android:title="@string/use_dynamic_colors" />
         <ListPreference app:iconSpaceReserved="false"
             android:key="theme"
-            android:title="App theme"
-            android:summary="Choose app theme"
+            android:title="@string/app_theme"
+            android:summary="@string/choose_app_theme"
             android:entries="@array/theme_entries"
             android:entryValues="@array/theme_values"
             android:defaultValue="system" />
-        <CheckBoxPreference app:iconSpaceReserved="false"
-            android:defaultValue="false"
-            android:key="check_box_preference_1"
-            android:title="COCO"
-            android:summary="YES?"/>
+
         <Preference
             app:iconSpaceReserved="false"
             android:key="change_act"
-            android:title="Configure schedule"
+            android:title="@string/configure_schedule"
             android:summary="sos"
             app:allowDividerAbove="true"
             />
@@ -33,9 +29,15 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="animation"
-            app:title="Animation"
-            android:summary="configure animations"
+            app:title="@string/animation"
+            android:summary="@string/configure_animations"
             app:allowDividerAbove="true"
+            />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="language"
+            android:title="@string/choose_language"
             />
     </PreferenceCategory>
 
@@ -43,13 +45,13 @@
         app:key="change_schedule_screen">
 
         <PreferenceCategory
-            android:title="Change Schedule"
+            android:title="@string/change_schedule"
             app:iconSpaceReserved="false">
 
             <Preference
                 app:iconSpaceReserved="false"
                 android:key="change_add_lesson"
-                android:title="Add/change lesson"
+                android:title="@string/add_lessons"
                 android:summary="sos"
                 app:allowDividerAbove="true"
                 />
@@ -57,7 +59,7 @@
             <Preference
                 app:iconSpaceReserved="false"
                 android:key="change_add_time"
-                android:title="Add/change time"
+                android:title="@string/add_time"
                 android:summary="sos"
                 app:allowDividerAbove="true"
                 />
@@ -65,14 +67,14 @@
             <Preference
                 app:iconSpaceReserved="false"
                 android:key="change_schedule"
-                android:title="Change schedule"
+                android:title="@string/change_schedule"
                 android:summary="sos"
                 app:allowDividerAbove="true"
                 />
             <Preference
                 app:iconSpaceReserved="false"
                 app:key="pref_delete_db"
-                app:title="delete db"/>
+                app:title="@string/delete_db"/>
         </PreferenceCategory>
     </PreferenceScreen>
 
@@ -82,20 +84,20 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="delete_lesson_list"
-            app:title="Delete lesson list"
+            app:title="@string/delete_lesson_list"
             app:allowDividerBelow="true"
             />
         <Preference
             app:iconSpaceReserved="false"
             app:key="delete_time_list"
-            app:title="Delete time list"
+            app:title="@string/delete_time_list"
             app:allowDividerBelow="true"
             app:allowDividerAbove="true"
             />
         <Preference
             app:iconSpaceReserved="false"
             app:key="delete_schedule"
-            app:title="Delete schedule"
+            app:title="@string/delete_schedule"
             app:allowDividerBelow="true"
             app:allowDividerAbove="true"
             />
@@ -103,14 +105,14 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="delete_homework"
-            app:title="Delete homework"
+            app:title="@string/delete_homework"
             app:allowDividerBelow="true"
             app:allowDividerAbove="true"
             />
         <Preference
             app:iconSpaceReserved="false"
             app:key="delete_temp_schedule"
-            app:title="Delete temporal schedule"
+            app:title="@string/delete_temporal_schedule"
             android:summary="dawd"
             app:allowDividerAbove="true"
             app:allowDividerBelow="true"
@@ -124,14 +126,14 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="animation_schedule"
-            app:summary="Change animation of schedule enter"
-            app:title="Schedule animation"/>
+            app:summary="@string/change_animation_of_schedule_enter"
+            app:title="@string/schedule_animation"/>
 
         <Preference
             app:iconSpaceReserved="false"
             app:key="animation_homework"
-            app:summary="Change animation of homework enter"
-            app:title="Homework animation"/>
+            app:summary="@string/change_animation_of_homework_enter"
+            app:title="@string/homework_animation"/>
 
     </PreferenceScreen>
 

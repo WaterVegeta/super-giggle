@@ -30,8 +30,6 @@
             app:expandedTitleMarginStart="43dp"
             app:expandedTitleMarginBottom="29dp"
             android:textAlignment="viewStart"
-
-
             app:expandedTitleTextAppearance="@style/ExpandedTitle"
 
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
@@ -43,7 +41,7 @@
                 android:id="@+id/toolbar"
                 app:title=""
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="?actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 android:layout_gravity="bottom"/>

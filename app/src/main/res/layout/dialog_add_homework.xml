@@ -25,10 +25,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:errorEnabled="false"
         app:errorIconDrawable="@drawable/outline_error_24"
-        android:hint="Homework please"
+        android:hint="@string/homework_please"
         app:endIconMode="clear_text">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:imeOptions="actionDone"
+            android:inputType="textCapSentences"
             android:id="@+id/noteInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
@@ -37,7 +39,7 @@
     <Button
         style="@style/ElevetedButtonSmallCorners"
         android:id="@+id/addButton"
-        android:text="Save"
+        android:text="@string/save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/toggleGroup"
@@ -57,7 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Edit current day"
+            android:text="@string/add_to_this_day"
             style="@style/Widget.Material3.Button.OutlinedButton" />
 
         <com.google.android.material.button.MaterialButton
@@ -65,7 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Add new homewok"
+            android:text="@string/add_to_the_next_lesson"
             style="@style/Widget.Material3.Button.OutlinedButton" />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

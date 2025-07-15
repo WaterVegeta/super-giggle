@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.schedule_change.adapters
+package com.example.tabsgpttutor.settings.schedule_change.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.data_base.TimeChange
-import com.example.tabsgpttutor.schedule_change.adapters.TimeChangeAdapter.ViewHolder
+import com.example.tabsgpttutor.settings.schedule_change.adapters.TimeChangeAdapter.ViewHolder
 
 class ChooseTimeAdapter(val addTime: (TimeChange) -> Unit): ListAdapter<TimeChange, ViewHolder>(
     TimeChangeAdapter.TimeDiffUtill()
@@ -15,7 +15,7 @@ class ChooseTimeAdapter(val addTime: (TimeChange) -> Unit): ListAdapter<TimeChan
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
-        return TimeChangeAdapter.ViewHolder(
+        return ViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.item_lesson_change, parent, false)
         )
     }

@@ -10,4 +10,6 @@
     android:updatePeriodMillis="1600000"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable|configuration_optional"
+    android:configure="com.example.tabsgpttutor.widget.WidgetSettings"
     />

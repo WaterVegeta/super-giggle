@@ -1,26 +1,22 @@
-package com.example.tabsgpttutor.schedule_change
+package com.example.tabsgpttutor.settings.animation_pref
 
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.SettingsViewModel
-import com.example.tabsgpttutor.schedule_change.fragments.AddScheduleFragment
-import com.example.tabsgpttutor.schedule_change.fragments.ChangeScheduleFragment
+import com.example.tabsgpttutor.settings.schedule_change.IsDataChanged
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ChangeScheduleAct : AppCompatActivity() {
-    private lateinit var collapsingToolbar: CollapsingToolbarLayout
-    private val viewModel: SettingsViewModel by viewModels()
+class AnimationActivity : AppCompatActivity() {
 
+    private lateinit var collapsingToolbar: CollapsingToolbarLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,20 +26,19 @@ class ChangeScheduleAct : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         val appBar = findViewById<AppBarLayout>(R.id.app_bar)
         appBar.post { appBar.setExpanded(false, false) }
 
-        // Setup toolbar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         collapsingToolbar = findViewById(R.id.collapsing_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
         }
-        updateTitle("Configure schedule")
+        updateTitle(getString(R.string.configure_animations))
 
-        loadFragment(ChangeScheduleFragment())
-
+        loadFragment(AnimationFragment())
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -55,28 +50,29 @@ class ChangeScheduleAct : AppCompatActivity() {
     override fun onBackPressed() {
         Log.d("onBackPressed", "onBackPressed")
         val currentFragment = supportFragmentManager.findFragmentById(R.id.settings_container)
-        if (currentFragment is ChangeScheduleFragment){
+        if (currentFragment is AnimationFragment){
             super.onBackPressed()
         }
-        else if (currentFragment is AddScheduleFragment && IsDataChanged.getChanged()){
+        else if (currentFragment is AnimationScheduleFragment && IsDataChanged.getChanged()){
             MaterialAlertDialogBuilder(this)
-                .setTitle("Save the changes")
-                .setPositiveButton("Save") { dialog, _ ->
+                .setTitle(getString(R.string.save_the_changes))
+                .setPositiveButton(getString(R.string.save)) { dialog, _ ->
                     Log.d("saved", "saved")
-                    viewModel.saveTempToSchedule()
-                    loadFragment(ChangeScheduleFragment())
+//                    viewModel.saveTempToSchedule()
+                    currentFragment.saveData()
+                    loadFragment(AnimationFragment())
                 }
-                .setNegativeButton("Cancel"){ dialog, _ ->
+                .setNegativeButton(getString(R.string.cancel)){ dialog, _ ->
                     Log.d("not saved", "not saved")
-                    viewModel.copyScheduleToTemp()
-                    loadFragment(ChangeScheduleFragment())
+                    loadFragment(AnimationFragment())
                 }
                 .create()
                 .show()
+            IsDataChanged.dataNotChanged()
         }
         else{
-            loadFragment(ChangeScheduleFragment())
-            updateTitle("Configure schedule")
+            loadFragment(AnimationFragment())
+            updateTitle(getString(R.string.configure_animations))
         }
     }
 
@@ -94,12 +90,4 @@ class ChangeScheduleAct : AppCompatActivity() {
             .replace(R.id.settings_container, frag)
             .commit()
     }
-
-
-//    override fun onSupportNavigateUp(): Boolean {
-//        onBackPressed()
-//        return true
-//    }
-
-
 }

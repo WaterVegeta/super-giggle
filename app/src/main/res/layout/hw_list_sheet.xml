@@ -18,7 +18,7 @@
             android:id="@+id/dateChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="select date"
+            android:text="@string/select_date"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textLayout"
@@ -34,49 +34,23 @@
             app:layout_constraintEnd_toStartOf="@id/btnClose"
             app:errorEnabled="false"
             app:errorIconDrawable="@drawable/outline_error_24"
-            android:hint="Homework please"
+            android:hint="@string/homework_please"
             app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:imeOptions="actionDone"
+                    android:inputType="textCapSentences"
                     android:id="@+id/titleEditText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
-
-<!--        <EditText android:id="@+id/titleEditText"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            style="@style/ThemeOverlay.Material3.TextInputEditText"-->
-<!--            android:hint="dz?"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toStartOf="@id/btnClose"-->
-<!--            />-->
-
-<!--        <TextView android:id="@+id/allowedDates"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="1029 1938 238 2093"-->
-<!--            android:textSize="19sp"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/lessonSpinner"-->
-<!--            android:layout_marginHorizontal="27dp"-->
-<!--            />-->
-
-<!--        <CalendarView android:id="@+id/calendarView"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/allowedDates"-->
-<!--            />-->
-
-
-
 
         <Button
             style="@style/ElevetedButtonSmallCorners"
             android:id="@+id/btnClose"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save"
+            android:text="@string/save"
             app:layout_constraintTop_toBottomOf="@id/dateChip"
             app:layout_constraintBottom_toBottomOf="parent"/>
 

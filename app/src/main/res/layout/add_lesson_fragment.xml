@@ -5,24 +5,25 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".schedule_change.ChangeScheduleAct">
+    tools:context=".settings.schedule_change.ChangeScheduleAct">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/addLesson"
-        >
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="0dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvLesson"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+            android:layout_height="match_parent" />
     </androidx.core.widget.NestedScrollView>
+
     <Button
         android:id="@+id/addLesson"
-        android:text="Add lesson"
+        android:text="@string/add_lesson"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/ElevetedButtonSmallCorners"

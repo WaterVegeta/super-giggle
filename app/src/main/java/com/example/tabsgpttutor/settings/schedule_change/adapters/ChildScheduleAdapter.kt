@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.schedule_change.adapters
+package com.example.tabsgpttutor.settings.schedule_change.adapters
 
 import android.annotation.SuppressLint
 import android.util.Log

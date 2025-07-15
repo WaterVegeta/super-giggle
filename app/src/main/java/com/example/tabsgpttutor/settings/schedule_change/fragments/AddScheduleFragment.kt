@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.schedule_change.fragments
+package com.example.tabsgpttutor.settings.schedule_change.fragments
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -20,11 +20,11 @@ import com.example.tabsgpttutor.data_base.LessonChange
 import com.example.tabsgpttutor.data_base.temp_schedule.TempLessonAndTime
 import com.example.tabsgpttutor.data_base.temp_schedule.TempSchedule
 import com.example.tabsgpttutor.data_base.TimeChange
-import com.example.tabsgpttutor.schedule_change.IsDataChanged
-import com.example.tabsgpttutor.schedule_change.adapters.AddLessonScheduleAdapter
-import com.example.tabsgpttutor.schedule_change.adapters.ChildScheduleAdapter
-import com.example.tabsgpttutor.schedule_change.adapters.ChooseTimeAdapter
-import com.example.tabsgpttutor.schedule_change.adapters.SchedulePagerAdapter
+import com.example.tabsgpttutor.settings.schedule_change.IsDataChanged
+import com.example.tabsgpttutor.settings.schedule_change.adapters.AddLessonScheduleAdapter
+import com.example.tabsgpttutor.settings.schedule_change.adapters.ChildScheduleAdapter
+import com.example.tabsgpttutor.settings.schedule_change.adapters.ChooseTimeAdapter
+import com.example.tabsgpttutor.settings.schedule_change.adapters.SchedulePagerAdapter
 import kotlinx.coroutines.launch
 
 class AddScheduleFragment: Fragment(R.layout.add_schedule_fragment) {

@@ -9,12 +9,13 @@
 
     <TextView
         android:id="@+id/tvDelete"
-        android:text="Delete those items?"
+        android:text="@string/delete_those_items"
         android:textSize="30sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvDelete"
         android:layout_width="match_parent"
@@ -28,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Widget.Material3.Button.OutlinedButton"
-        android:text="Cancel"
+        android:text="@string/cancel"
         android:layout_marginHorizontal="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnDelete"
@@ -37,7 +38,7 @@
         />
 
     <Button android:id="@+id/btnDelete"
-        android:text="Delete"
+        android:text="@string/delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

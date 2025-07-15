@@ -8,8 +8,6 @@
     android:background="?attr/colorSurface"
     >
 
-
-
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -18,7 +16,8 @@
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/navBar"/>
+        app:layout_constraintBottom_toTopOf="@id/navBar"
+        />
 <!--    <FrameLayout-->
 <!--        android:id="@+id/fmLayout"-->
 <!--        android:layout_width="match_parent"-->
@@ -47,7 +46,6 @@
         app:menu="@menu/bottom_nav_menu"
         app:labelVisibilityMode="selected"
         app:itemIconSize="30dp"
-
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

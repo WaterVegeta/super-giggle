@@ -40,20 +40,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="24sp"
-            android:text="All"/>
+            android:text="@string/all"/>
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:paddingHorizontal="10dp"
             android:id="@+id/radioDone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Done"
+            android:text="@string/done"
             android:textSize="24sp"/>
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:paddingHorizontal="10dp"
             android:id="@+id/radioNotDone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Not done"
+            android:text="@string/not_done"
             android:textSize="24sp"/>
     </RadioGroup>
 
@@ -70,7 +70,7 @@
             android:textStyle="bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sort by field"
+            android:text="@string/sort_by_field"
             android:textSize="22sp"/>
         <RadioGroup
             android:layout_marginTop="10dp"
@@ -83,7 +83,7 @@
                 android:id="@+id/radioSortDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Date"
+                android:text="@string/date"
                 />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -92,7 +92,7 @@
                 android:id="@+id/radioSortHomework"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Homework"
+                android:text="@string/homework_sort"
                 />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -101,9 +101,9 @@
                 android:id="@+id/radioSortLesson"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Lesson"
+                android:text="@string/lesson_sort"
                 />
-.        </RadioGroup>
+        </RadioGroup>
     </LinearLayout>
 
 

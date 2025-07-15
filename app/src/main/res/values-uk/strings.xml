@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--    <string name="app_name">Потужність</string>-->
+
+    <string name="monday">Понеділок</string>
+    <string name="tuesday">Вівторок</string>
+    <string name="wednesday">Середа</string>
+    <string name="thursday">Четвер</string>
+    <string name="friday">П\'ятниця</string>
+    <string name="saturday">Субота</string>
+    <string name="sunday">Неділя</string>
+
+    <string name="change">Змінити</string>
+    <string name="homework_please">Дз</string>
+    <string name="save">Зберегти</string>
+
+    <string name="add_to_this_day">На цей день</string>
+    <string name="add_to_the_next_lesson">На наступний урок</string>
+
+    <string name="done_hw">виконано</string>
+    <string name="not_done_hw">не виконано</string>
+    <string name="appearance">Вигляд</string>
+
+    <string name="use_dynamic_colors">Використовувати dynamic colors</string>
+    <string name="dynamic_colors_summary">Змінює коліри додатку з шпалери телефону (Android 12+)</string>
+    <string name="app_theme">Колірна схема</string>
+    <string name="choose_app_theme">виберіть схему</string>
+    <string name="configure_schedule">Налаштувати розклад</string>
+    <string name="animation">Анімація</string>
+    <string name="configure_animations">Налаштувати аніміції</string>
+    <string name="change_schedule">Змінити розклад</string>
+    <string name="add_lessons">Додати уроки</string>
+    <string name="add_time">Додати час</string>
+    <string name="delete_db">видалити ДБ</string>
+    <string name="schedule_animation">Анімація розхкладу</string>
+    <string name="change_animation_of_schedule_enter">Змінити анімацію переходу в розклад</string>
+    <string name="change_animation_of_homework_enter">Змінити анімацію переходу в завдання</string>
+    <string name="homework_animation">Анімація завданнь</string>
+
+    <string name="delete_temporal_schedule">Видалити тимчасовий розклад</string>
+    <string name="delete_homework">Видалити всі завдання</string>
+    <string name="delete_schedule">Видалити розклад</string>
+    <string name="delete_time_list">Видалити список часів</string>
+    <string name="delete_lesson_list">Видалити список уроків</string>
+
+    <string name="save_changes">Зберегти зміни</string>
+    <string name="cancel">Скасувати</string>
+
+    <string name="add_lesson">Додати урок</string>
+    <string name="delete_this_lesson">Видалити цей урок?</string>
+    <string name="delete_confirm">Ви справді хочете видалити це?</string>
+    <string name="delete">Видалити</string>
+    <string name="edit_lesson">Редагування уроку</string>
+    <string name="write_lesson">Напишіть урко</string>
+    <string name="delete_this_time">Видалити цей час?</string>
+    <string name="start_time">Час початку</string>
+    <string name="end_time">Час кінця</string>
+    <string name="search">Пошук</string>
+    <string name="chip_done">Виконано?</string>
+    <string name="chip_lesson">Який урок?</string>
+    <string name="chip_date">Який день?</string>
+    <string name="chip_image">З фото?</string>
+    <string name="chip_sort">Сортування</string>
+    <string name="home_fab">Назад</string>
+    <string name="all_days">Всі дні</string>
+    <string name="from_today_and_beyond">З сьогодні та далі</string>
+    <string name="from_past_to_today">З минулого по сьогодні</string>
+    <string name="all">Всі</string>
+    <string name="done">Виконано</string>
+    <string name="not_done">Не виконано</string>
+
+    <string name="sort_by_field">Сортувати за</string>
+
+    <string name="date">Датою</string>
+    <string name="homework_sort">Завданням</string>
+    <string name="lesson_sort">Уроками</string>
+    <string name="with_image">З фотом</string>
+    <string name="without_image">Без фото</string>
+
+    <string name="sort_order">Сортування</string>
+
+    <string name="ascending">Зростаючий</string>
+    <string name="descending">Спадаючи</string>
+
+    <string name="marked_as_undone">Позначено як не виконано</string>
+    <string name="undo">Скасувати</string>
+    <string name="permission_denied">Дозвіл відмовлено</string>
+    <string name="permission_for_were_denied_the_app_may_not_work_properly">Дозвіл до %1$s було відмовлено. Додаток може працювати не правильно.</string>
+    <string name="go_to_settings">До налаштувань</string>
+    <string name="write_homework">Напишіть завдання</string>
+    <string name="this_homework_already_exists">Це завдання вже існує</string>
+    <string name="delete_item_s">Видалити %1$s завданнь?</string>
+    <string name="due_date">\nВиконати до</string>
+    <string name="selected">%1$s вибрано</string>
+    <string name="select_date">виберіть дату</string>
+    <string name="delete_those_items">Видалити ці завдання?</string>
+    <string name="choose_from_galery">вибрати з галереї</string>
+    <string name="take_a_picture">зробити фото</string>
+    <string name="of">" з "</string>
+    <string name="save_the_changes">Зберегти зміни</string>
+    <string name="alpha">Прозорість</string>
+    <string name="_0_invisible_n1_fully_visible"><![CDATA[0 -> найбільш прозоре \n1 -> не прозоре]]></string>
+    <string name="scale">Маштаб</string>
+    <string name="x_horizontal">X : Горизонтально</string>
+    <string name="y_vertical">Y : Вертикально</string>
+    <string name="duration">Тривалість</string>
+    <string name="duration_summary">тривалість анімації в мілісекундах</string>
+    <string name="translation">Переміщення</string>
+    <string name="pivot">Точка опори</string>
+
+    <string name="in_between_keyframe">Другий кадр</string>
+
+    <string name="choose_interpolator">Інтерполятор</string>
+
+    <string name="accelerate">Accelerate</string>
+    <string name="accelerate_decelerate">Accelerate decelerate</string>
+    <string name="anticipate">Anticipate</string>
+    <string name="anticipate_overshoot">Anticipate overshoot</string>
+    <string name="bounce">Bounce</string>
+    <string name="decelerate">Decelerate</string>
+    <string name="fast_out_slow_in">Fast out slow in</string>
+    <string name="fast_out_linear_in">Fast out linear in</string>
+    <string name="linear_out_slow_in">Linear out Slow in</string>
+    <string name="linear">Linear</string>
+    <string name="overshoot">Overshoot</string>
+
+    <string name="turned_on">Увімкнено</string>
+    <string name="turned_off">Вимкнено</string>
+    <string name="schedule">Розклад</string>
+    <string name="settings">Налаштування</string>
+    <string name="homework">Завдання</string>
+    <string name="share_options">Варіанти надсилання</string>
+    <string name="share_all">Надіслати все</string>
+    <string name="share_only_text">Надіслати тільки текст</string>
+    <string name="share_only_photo">Надіслати тільки фото</string>
+    <string name="share">Надіслати</string>
+    <string name="lesson">Урок</string>
+
+    <string name="system_default">Системна</string>
+    <string name="english">Англійська</string>
+    <string name="ukrainian">Українська</string>
+    <string name="choose_language">Виберіть мову</string>
+    <string name="marked_as_done">Позначено як виконано</string>
+    <string name="homework_added_for">Завдання додано на %1$s</string>
+    <string name="set_to">set to %1$s</string>
+    <string name="pls_restart_the_app_to_apply_changes">pls restart the app to apply changes</string>
+</resources>

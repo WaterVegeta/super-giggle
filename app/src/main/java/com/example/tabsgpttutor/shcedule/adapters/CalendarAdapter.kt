@@ -99,7 +99,7 @@ class CalendarAdapter(
                     setTextColor(blendColors(secondaryCont, onSecondaryCont, 0.7f))
                     setIconTint(ColorStateList.valueOf(blendColors(secondaryCont, onSecondaryCont, 0.7f)))
                     setIconResource(R.drawable.baseline_done_24)
-                    text = "виконано"
+                    text = context.getString(R.string.done_hw)
                     isEnabled = false
                     isClickable = false
 
@@ -112,7 +112,7 @@ class CalendarAdapter(
                     setTextColor(onTertiary)
                     setIconTint(ColorStateList.valueOf(onTertiary))
                     setIconResource(R.drawable.outline_close_24)
-                    text = "не виконано"
+                    text = context.getString(R.string.not_done_hw)
                     isEnabled = true
                     isClickable = true
                 }

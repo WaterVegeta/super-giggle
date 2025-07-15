@@ -20,8 +20,10 @@ object ThemeHelper {
         }
 
         // Apply dynamic colors if enabled and available
-        if (dynamicColorsEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            DynamicColors.applyToActivitiesIfAvailable(context.applicationContext as Application)
+        if (dynamicColorsEnabled) {
+            DynamicColors.applyToActivitiesIfAvailable(
+                context.applicationContext as Application
+            )
         }
     }
 

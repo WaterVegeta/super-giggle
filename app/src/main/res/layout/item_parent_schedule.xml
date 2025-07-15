@@ -25,7 +25,7 @@
         android:layout_marginHorizontal="10dp"
         android:id="@+id/btnAddLesson"
         style="@style/ElevetedButtonSmallCorners"
-        android:text="Add"
+        android:text="@string/add_lesson"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"/>

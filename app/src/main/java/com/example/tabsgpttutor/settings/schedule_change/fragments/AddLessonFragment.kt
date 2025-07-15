@@ -1,13 +1,11 @@
-package com.example.tabsgpttutor.schedule_change.fragments
+package com.example.tabsgpttutor.settings.schedule_change.fragments
 
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -21,8 +19,7 @@ import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.SettingsViewModel
 import com.example.tabsgpttutor.data_base.LessonChange
-import com.example.tabsgpttutor.schedule_change.ChangeScheduleAct
-import com.example.tabsgpttutor.schedule_change.adapters.LessonChangeAdapter
+import com.example.tabsgpttutor.settings.schedule_change.adapters.LessonChangeAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -30,7 +27,7 @@ import io.realm.kotlin.Realm
 import kotlinx.coroutines.launch
 
 class AddLessonFragment: Fragment(R.layout.add_lesson_fragment) {
-    private var activityRef: ChangeScheduleAct? = null
+
     lateinit var recyclerView: RecyclerView
     lateinit var addBtn: Button
     lateinit var rvAdapter: LessonChangeAdapter
@@ -73,37 +70,25 @@ class AddLessonFragment: Fragment(R.layout.add_lesson_fragment) {
         }
 
     }
-    private fun showLessonDialog() {
-        val lessons = arrayOf("Math", "Science", "History", "Art", "Math", "Science", "History", "Art", "Math", "Science", "History", "Art", "Math", "Science", "History", "Art") // Your lesson list
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Select Lesson")
-            .setItems(lessons) {  dialog: DialogInterface, which: Int ->
-                val selectedLesson = lessons[which]
-                Toast.makeText(requireContext(), "Selected: $selectedLesson", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
 
     private fun deleteItem(item: LessonChange) {
         val mDiaolog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete this lesson?")
-            .setMessage("Are you sure you want to delete this?")
-            .setPositiveButton("Delete") { dialog, _ ->
+            .setTitle(getString(R.string.delete_this_lesson))
+            .setMessage(getString(R.string.delete_confirm))
+            .setPositiveButton(getString(R.string.delete)) { dialog, _ ->
                 lifecycleScope.launch {
                     realm.write {
                         findLatest(item)?.let { delete(it) }
                     }
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .create()
         mDiaolog.show()
     }
 
     private fun editItem(item: LessonChange) {
-        addLesson("Edit lesson", item)
+        addLesson(getString(R.string.edit_lesson), item)
     }
 
 
@@ -118,7 +103,7 @@ class AddLessonFragment: Fragment(R.layout.add_lesson_fragment) {
         val alertDialog = MaterialAlertDialogBuilder(requireContext())
             .setBackgroundInsetStart(32)
             .setBackgroundInsetEnd(32)
-            .setTitle(titleText ?: "Add lesson")
+            .setTitle(titleText ?: getString(R.string.add_lesson))
             .setView(dialogView)
             .create()
 
@@ -147,7 +132,7 @@ class AddLessonFragment: Fragment(R.layout.add_lesson_fragment) {
         saveBtn.setOnClickListener {
             val newLesson = editText.text
             if (newLesson.isNullOrEmpty()){
-                textLayout.error = "Write lesson"
+                textLayout.error = getString(R.string.write_lesson)
                 textLayout.isErrorEnabled = true
                 return@setOnClickListener
             }

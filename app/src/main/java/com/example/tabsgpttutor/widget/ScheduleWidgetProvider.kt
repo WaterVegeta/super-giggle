@@ -7,7 +7,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.RemoteViews
+import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
+import com.example.tabsgpttutor.data_base.shedule.Schedule
+import io.realm.kotlin.ext.query
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -25,53 +28,27 @@ class ScheduleWidgetProvider: AppWidgetProvider() {
 
         if (appWidgetIds != null) {
             for (id in appWidgetIds) {
-                var k = 0
+
                 val date = LocalDate.now()
                 val time = LocalTime.now()
 
-                when (date.dayOfWeek.toString()) {
-                    "MONDAY" -> if (time.hour >= 15 && time.minute >= 5) {
-                        k++
-                    } else {
-                        k = 0
-                    }
+                val realm = MyDynamic.realm
+                val items = realm.query<Schedule>().find()
+                var k = 0
+                for (i in items){
+                    if (i.dayOfWeek == date.dayOfWeek.toString()){
+                        i.lessonAndTime.findLast { it.lessonEndHour.isNotEmpty() && it.lessonEndMinute.isNotEmpty() }?.let {
+                            val endMin = it.lessonEndMinute
+                            val endHour = it.lessonEndHour
+                            k = if (time.hour.toInt() >= endHour.toInt() && time.minute.toInt() >= endMin.toInt()){
+                                1
+                            } else 0
+                        }
+                        break
 
-                    "TUESDAY" -> if (time.hour >= 16 && time.minute >= 0) {
-                        k++
-                    } else {
-                        k = 0
                     }
-
-                    "WEDNESDAY" -> if (time.hour >= 15 && time.minute >= 5) {
-                        k++
-                    } else {
-                        k = 0
-                    }
-
-                    "THURSDAY" -> if (time.hour >= 16 && time.minute >= 0) {
-                        k++
-                    } else {
-                        k = 0
-                    }
-
-                    "FRIDAY" -> if (time.hour >= 14 && time.minute >= 10) {
-                        k++
-                        k++
-                        k++
-                    } else {
-                        k = 0
-                    }
-
-                    "SATURDAY" -> {
-                        k++
-                        k++
-                    }
-
-                    "SUNDAY" -> {
-                        k++
-                    }
-
                 }
+
                 val intent = Intent(context, ScheduleWidgetService::class.java)
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
                 intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)) // required for uniqueness
@@ -90,7 +67,7 @@ class ScheduleWidgetProvider: AppWidgetProvider() {
                     DayOfWeek.SUNDAY -> context?.resources?.getString(R.string.sunday)
                 }
 
-                val formatter = DateTimeFormatter.ofPattern("dd MM yyy")
+                val formatter = DateTimeFormatter.ofPattern("dd MMMM")
                 val formate = date.plusDays(k.toLong()).format(formatter)
 
                 views.setTextViewText(R.id.dateText, formate.toString())

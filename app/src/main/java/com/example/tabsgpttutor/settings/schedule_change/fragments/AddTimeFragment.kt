@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.schedule_change.fragments
+package com.example.tabsgpttutor.settings.schedule_change.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,7 +17,7 @@ import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.SettingsViewModel
 import com.example.tabsgpttutor.data_base.TimeChange
-import com.example.tabsgpttutor.schedule_change.adapters.TimeChangeAdapter
+import com.example.tabsgpttutor.settings.schedule_change.adapters.TimeChangeAdapter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
@@ -81,6 +81,7 @@ class AddTimeFragment: Fragment() {
 
 
         btnSave = view.findViewById(R.id.addLesson)
+        btnSave.text = getString(R.string.add_time)
         btnSave.setOnClickListener {
             timeDialog(null, null, null, null, null)
         }
@@ -89,9 +90,9 @@ class AddTimeFragment: Fragment() {
 
     private fun deleteItem(item: TimeChange) {
         val mDiaolog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete this time?")
-            .setMessage("Are you sure you want to delete this?")
-            .setPositiveButton("Delete") { dialog, _ ->
+            .setTitle(getString(R.string.delete_this_time))
+            .setMessage(getString(R.string.delete_confirm))
+            .setPositiveButton(getString(R.string.delete)) { dialog, _ ->
                 lifecycleScope.launch {
                     realm.write {
                         // Correct deletion syntax for Kotlin SDK
@@ -99,7 +100,7 @@ class AddTimeFragment: Fragment() {
                     }
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .create()
         mDiaolog.show()
     }
@@ -110,7 +111,7 @@ class AddTimeFragment: Fragment() {
 
     fun timeDialog(hourStart: Int?, minuteStart: Int?, hourEnd : Int?, minuteEnd: Int?, item: TimeChange? ){
         val timePicker = MaterialTimePicker.Builder()
-            .setTitleText("Start Time")
+            .setTitleText(getString(R.string.start_time))
             .setInputMode(INPUT_MODE_CLOCK)
             .setTimeFormat(TimeFormat.CLOCK_24H)
             .setHour(hourStart ?: LocalTime.now().hour)
@@ -128,7 +129,7 @@ class AddTimeFragment: Fragment() {
 
     private fun endTimeDialog(startHour: String, startMinute: String, hourEnd: Int?, minuteEnd: Int?, item: TimeChange?) {
         val timePicker = MaterialTimePicker.Builder()
-            .setTitleText("End Time")
+            .setTitleText(getString(R.string.end_time))
             .setInputMode(INPUT_MODE_CLOCK)
             .setTimeFormat(TimeFormat.CLOCK_24H)
             .setHour(hourEnd ?: LocalTime.now().hour)

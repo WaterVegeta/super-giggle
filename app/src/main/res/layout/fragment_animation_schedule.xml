@@ -15,18 +15,26 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_marginBottom="25dp">
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/animSwitch"
-                android:padding="10dp"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_marginHorizontal="5dp"
                 android:layout_width="match_parent"
-                android:text="Turned on"
-                android:textSize="34sp"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                />
+                app:strokeWidth="0dp"
+                android:backgroundTint="?attr/colorSurfaceContainer"
+                >
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/animSwitch"
+                    android:padding="10dp"
+                    android:layout_width="match_parent"
+                    android:text="Turned on"
+                    android:textSize="34sp"
+                    android:layout_height="wrap_content"
+                    />
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                android:layout_marginTop="10dp"
                 android:layout_marginHorizontal="5dp"
                 app:strokeColor="@android:color/transparent"
                 android:backgroundTint="?attr/colorSurfaceContainer"
@@ -42,15 +50,15 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Alpha"
-                        android:textSize="18dp"
+                        android:text="@string/alpha"
+                        android:textSize="18sp"
                         />
 
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="0 -> invisible \n1 -> fully visible"
-                        android:textSize="16dp"
+                        android:text="@string/_0_invisible_n1_fully_visible"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
 
@@ -86,15 +94,15 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Scale"
-                        android:textSize="18dp"
+                        android:text="@string/scale"
+                        android:textSize="18sp"
                         />
 
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="X : Horizontal "
-                        android:textSize="16dp"
+                        android:text="@string/x_horizontal"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
 
@@ -123,8 +131,8 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Y : Vertical "
-                        android:textSize="16dp"
+                        android:text="@string/y_vertical"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
 
@@ -160,21 +168,22 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Duration"
-                        android:textSize="18dp"
+                        android:text="@string/duration"
+                        android:textSize="18sp"
                         />
 
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="duration of animation in miliseconds "
-                        android:textSize="16dp"
+                        android:text="@string/duration_summary"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
+
                         <TextView android:id="@+id/tvDuration"
                             android:layout_marginStart="10dp"
                             android:layout_gravity="center"
@@ -204,15 +213,15 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Translation"
-                        android:textSize="18dp"
+                        android:text="@string/translation"
+                        android:textSize="18sp"
                         />
 
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="X : Horizontal "
-                        android:textSize="16dp"
+                        android:text="@string/x_horizontal"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
 
@@ -242,8 +251,8 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Y : Vertical "
-                        android:textSize="16dp"
+                        android:text="@string/y_vertical"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
                     <LinearLayout
@@ -279,15 +288,15 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Pivot"
-                        android:textSize="18dp"
+                        android:text="@string/pivot"
+                        android:textSize="18sp"
                         />
 
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="X : Horizontal "
-                        android:textSize="16dp"
+                        android:text="@string/x_horizontal"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
 
@@ -316,8 +325,8 @@
                     <TextView android:layout_marginHorizontal="15dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Y : Vertical "
-                        android:textSize="16dp"
+                        android:text="@string/y_vertical"
+                        android:textSize="16sp"
                         android:textColor="@android:color/darker_gray"
                         />
 
@@ -363,7 +372,7 @@
                     <TextView
                         android:textSize="18sp"
                         android:layout_marginHorizontal="15dp"
-                        android:text="Choose interpolator"
+                        android:text="@string/choose_interpolator"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -379,58 +388,58 @@
                             android:id="@+id/accelerate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Accelerate"
+                            android:text="@string/accelerate"
                             />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/accelerateDecelerate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Accelerate decelerate" />
+                            android:text="@string/accelerate_decelerate" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/anticipate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Anticipate" />
+                            android:text="@string/anticipate" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/anticipateOvershoot"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Anticipate overshoot"/>
+                            android:text="@string/anticipate_overshoot"/>
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/bounce"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Bounce" />
+                            android:text="@string/bounce" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/decelerate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Decelerate" />
+                            android:text="@string/decelerate" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/fastOutSlowIn"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Fast out slow in" />
+                            android:text="@string/fast_out_slow_in" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/fastOutLinearIn"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Fast out linear in" />
+                            android:text="@string/fast_out_linear_in" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/linearOutSlowIn"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Linear out Slow in" />
+                            android:text="@string/linear_out_slow_in" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/linear"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Linear" />
+                            android:text="@string/linear" />
                         <com.google.android.material.radiobutton.MaterialRadioButton
                             android:id="@+id/overshoot"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Overshoot" />
+                            android:text="@string/overshoot" />
                     </RadioGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -442,14 +451,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <LinearLayout
-                    android:padding="5dp"
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
                     <com.google.android.material.materialswitch.MaterialSwitch
-                        android:text="In between keyframe"
+                        android:text="@string/in_between_keyframe"
                         android:textSize="20sp"
                         android:id="@+id/keyFrameSwitch"
                         android:layout_weight="0"
@@ -458,7 +461,6 @@
                         android:layout_height="wrap_content"
                         />
 
-                </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 

@@ -41,7 +41,7 @@ class FullScreenImage : AppCompatActivity() {
     lateinit var textOfImage: TextView
     lateinit var toolbar: MaterialToolbar
     val viewModel : HwViewModel by viewModels()
-    lateinit var imageUris: List<String>
+    lateinit var imageUris: MutableList<String>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -51,7 +51,7 @@ class FullScreenImage : AppCompatActivity() {
         hideSystemBars()
         setContentView(R.layout.activity_full_screen_image)
 
-        appBar= findViewById(R.id.appBar)
+        appBar = findViewById(R.id.appBar)
         toolbar = findViewById<MaterialToolbar>(R.id.toolBarImage)
 //        setSupportActionBar(toolbar)
 //        supportActionBar?.apply {
@@ -62,13 +62,15 @@ class FullScreenImage : AppCompatActivity() {
         textOfImage= findViewById(R.id.textImage)
 
         viewPager = findViewById<ViewPager2>(R.id.imageViewPager)
-        imageUris = intent.getStringArrayExtra("imageUris")!!.toList()
+        imageUris = intent.getStringArrayExtra("imageUris")!!.toMutableList()
         Log.v("recived uri", "recived: $imageUris")
+
         val startPosition = intent.getIntExtra("startPosition", 0)
         val homework = intent.getStringExtra("homework")
         val lesson = intent.getStringExtra("lesson")
-        val ids = intent.getStringArrayExtra("ids")!!.toList()
-        textOfImage.text = (startPosition+1).toString() + " of " + (imageUris.size.toString())
+        val ids = intent.getStringArrayExtra("ids")!!.toMutableList()
+
+        textOfImage.text = (startPosition+1).toString() + getString(R.string.of) + (imageUris.size.toString())
         toolbar.title = homework
         toolbar.subtitle = lesson
 
@@ -77,14 +79,11 @@ class FullScreenImage : AppCompatActivity() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 setUpPhotoViewTap(viewPager, 0)
-                textOfImage.text = (position+1).toString() + " of " + (imageUris.size.toString())
+                textOfImage.text = (position+1).toString() + getString(R.string.of) + (imageUris.size.toString())
 
             }
         })
-//        viewPager.setOnTouchListener { _, e ->
-//            setUpPhotoViewTap()
-//            false
-//        }
+
         viewPager.post {
             setUpPhotoViewTap(viewPager, 0)
             appBar.translationY = -appBar.height.toFloat()
@@ -124,13 +123,14 @@ class FullScreenImage : AppCompatActivity() {
                     true
                 }
                 R.id.delete ->{
-                    Toast.makeText(this, "delete", Toast.LENGTH_LONG).show()
-                    val currentUri = Uri.parse(imageUris[viewPager.currentItem])
-                    val currentId = ids[viewPager.currentItem]
+                    val position = viewPager.currentItem
+                    val currentUri = Uri.parse(imageUris[position])
+                    val currentId = ids[position]
                     viewModel.deleteCurImage(currentUri, currentId)
-                    imageUris.minus(currentUri)
-                    ids.minus(currentId)
-                    viewPager.adapter?.notifyItemRemoved(viewPager.currentItem)
+                    imageUris.removeAt(position)
+                    ids.removeAt(position)
+
+                    viewPager.adapter?.notifyItemRemoved(position)
                     true
                 }
                 else -> false
@@ -139,10 +139,6 @@ class FullScreenImage : AppCompatActivity() {
 
     }
 
-//    override fun onSupportNavigateUp(): Boolean {
-//        onBackPressed()
-//        return true
-//    }
     fun setUpPhotoViewTap(viewPager: ViewPager2, position: Int){
         val rv = viewPager.getChildAt(position) as RecyclerView
         val currentHolder = rv.findViewHolderForAdapterPosition(viewPager.currentItem)

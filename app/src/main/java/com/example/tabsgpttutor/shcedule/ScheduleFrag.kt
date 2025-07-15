@@ -3,13 +3,8 @@ package com.example.tabsgpttutor.shcedule
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
@@ -25,12 +20,12 @@ import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.CalendarView
-import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -38,7 +33,6 @@ import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.tabsgpttutor.HwViewModel
 import com.example.tabsgpttutor.data_base.Homework
@@ -58,11 +52,10 @@ import com.google.android.material.textfield.TextInputLayout
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
-import kotlin.math.abs
+import java.time.format.DateTimeFormatter
 import kotlin.math.ceil
 
 class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
@@ -72,14 +65,14 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
     lateinit var viewPager: ViewPager2
     val OFFSET = 1000
     lateinit var calendarFAB: FloatingActionButton
-    lateinit var deleteFAB: FloatingActionButton
+
     lateinit var homeFAB: ExtendedFloatingActionButton
     var localDate = LocalDate.now()
     var localTime = LocalTime.now()
     var k = 0
     lateinit var realm: Realm
     var curPosition = 0
-    lateinit var currentDay: LocalDate
+
     lateinit var animShow: Animation
     lateinit var animHide: Animation
     lateinit var firstNoteText: String
@@ -90,17 +83,17 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
 //        @Suppress("DEPRECATION")
 //        requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 //    }
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        Log.d("k value", "k = $k local time ${localTime.hour} ${localTime.minute} local date ${localDate.dayOfWeek}")
-    }
 
     @SuppressLint("ClickableViewAccessibility", "ServiceCast")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         realm = MyDynamic.Companion.realm
 
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
+            insets
+        }
         val items = realm.query<Schedule>().find()
         k = 0
         for (i in items){
@@ -108,9 +101,18 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                 i.lessonAndTime.findLast { it.lessonEndHour.isNotEmpty() && it.lessonEndMinute.isNotEmpty() }?.let {
                     val endMin = it.lessonEndMinute
                     val endHour = it.lessonEndHour
-                    k = if (localTime.hour.toInt() >= endHour.toInt() && localTime.minute.toInt() >= endMin.toInt()){
+                    k = if (localTime.hour.toInt() == endHour.toInt()){
+                        if (localTime.minute.toInt() >= endMin.toInt()){
                             1
-                        } else 0
+                        }
+                        else{
+                            0
+                        }
+                    }
+                    else if(localTime.hour.toInt() >= endHour.toInt()){
+                        1
+                    }
+                    else 0
                 }
                 break
 
@@ -265,7 +267,7 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                 curPosition = position
             }
         })
-        animShow = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_animation)
+        animShow = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_animation_show)
 //        calendarFAB.startAnimation(animShow)
 
 //        calendarFAB.apply {
@@ -452,34 +454,30 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         }
     }
 
-    fun doneHw(fGDate: LocalDate, fGnote: String, fGsubject: String, position: Int){
-        val fragPosition = viewPager.currentItem
-        val fragTag = (viewPager.adapter as DayPagerAdapter).getFragmentTag(fragPosition)
-        val refFrag = childFragmentManager.findFragmentByTag(fragTag) as? DayFragment
-        val homework = realm.query<Homework>("date == $0 AND note == $1 AND lesson == $2",
-            fGDate.toString(), fGnote, fGsubject).first().find()
-
-        var timeList = resources.getStringArray(R.array.six)
-        var thatTime = timeList[position]
-
+    fun doneHw(hwId: String){
         lifecycleScope.launch {
-            realm.write {
-                if (homework != null) {
-                    findLatest(homework)?.done = true
+            val hw = viewModel.findHwById(hwId)!!
+            viewModel.doneHw(hw, null)
+            val snackbarText = if(hw.done) getString(R.string.marked_as_undone) else getString(R.string.marked_as_done)
+            val colorOnSurface = MaterialColors.getColor(calendarFAB, R.attr.colorOnSurface)
+            Snackbar.make(viewPager, snackbarText, Snackbar.LENGTH_LONG)
+                .setAnchorView(calendarFAB)
+                .setBackgroundTint(MaterialColors.getColor(calendarFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
+                .setTextColor(colorOnSurface)
+                .setActionTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorTertiary))
+                .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+                .setAction(getString(R.string.undo)) {
+                    viewModel.doneHw(hw, hw.done)
                 }
-            }
-//            if (refFrag != null) {
-//                refFrag.refreshData(fGDate, fGsubject, thatTime, position)
-//                Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
-//            }
+                .show()
         }
+
     }
 
-    fun nextSubjectDate(subject: String, FGdate: LocalDate, pressedPosition: Int) {
-        Log.d("NextSubf", "subject: $subject date: $FGdate position: $pressedPosition")
-        val today = FGdate
+    fun nextSubjectDate(subject: String,
+                        fragmentDay: LocalDate) {
         for (i in 1..60){
-            val date = today.plusDays(i.toLong())
+            val date = fragmentDay.plusDays(i.toLong())
             val dayOfWeekName = date.dayOfWeek.name
 
             val schedule = realm.query<Schedule>("dayOfWeek == $0", dayOfWeekName).first().find()
@@ -496,44 +494,19 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                     showAddHomeworkDialog(
                         subject = subject,
                         date,
-                        pressedPosition,
-                        i
+                        fragmentDay
                     )
                     break
                 }
             }
 
         }
-//        for (i in 1..60) {
-//            val date = today.plusDays(i.toLong())
-//            val dayOfWeek = date.dayOfWeek
-//            val weekNumber = ceil(date.dayOfYear / 7.0).toInt()
-//            val isEvenWeek = weekNumber % 2 == 0
-//
-//            val lessons = when (dayOfWeek) {
-//                DayOfWeek.MONDAY -> if (isEvenWeek) resources.getStringArray(R.array.monday1) else resources.getStringArray(
-//                    R.array.monday2
-//                )
-//
-//                DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
-//                DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
-//                DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
-//                DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
-//                else -> continue
-//            }
-//
-//            if (lessons.contains(subject)) {
-//                showAddHomeworkDialog(subject, date, pressedPosition, i, lessons)
-//                break
-//            }
-//        }
     }
 
     fun showAddHomeworkDialog(
         subject: String,
-        sDate: LocalDate,
-        position: Int,
-        toDay: Int
+        foundDate: LocalDate,
+        fragmentDay: LocalDate
     ) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_homework, null)
         val input = dialogView.findViewById<TextInputEditText>(R.id.noteInput)
@@ -549,184 +522,97 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
 
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(dialogView)
-        val isHomewrkExists =
-            realm.query<Homework>("date == $0 AND lesson == $1", sDate.toString(), subject).first()
-                .find()
 
-        var timeList = resources.getStringArray(R.array.six)
-        var thatTime = timeList[position]
+        var selectedDate = foundDate
 
+        input.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE){
+                button.performClick()
+                true
+            } else false
+        }
+        button.setOnClickListener {
+            var noteText = input.text.toString()
+            if (noteText.isEmpty()){
+                txtLayout.error = getString(R.string.write_homework)
+                txtLayout.isErrorEnabled = true
+                return@setOnClickListener
+            }
+            lifecycleScope.launch {
+                val isHwExists = viewModel.findHwByDateLesson(selectedDate.toString(), subject)
+                realm.write {
+                    if (isHwExists != null) {
+                        findLatest(isHwExists)?.note = noteText
+                    } else {
+                        val newItem = Homework().apply {
+                            lesson = subject
+                            date = selectedDate.toString()
+                            note = noteText
+                        }
+                        copyToRealm(newItem)
+                    }
+                }
+
+                bottomSheetDialog.dismiss()
+                val formatter = DateTimeFormatter.ofPattern("dd MMMM ")
+
+                Snackbar.make(calendarFAB,
+                    getString(R.string.homework_added_for, selectedDate.format(formatter)), Snackbar.LENGTH_LONG)
+                    .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
+                    .setAnchorView(calendarFAB)
+                    .setActionTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorTertiary))
+                    .setBackgroundTint(MaterialColors.getColor(calendarFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
+                    .setTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorOnSurface))
+                    .setAction(getString(R.string.undo)) {
+                        lifecycleScope.launch {
+                            realm.write {
+                                if (isHwExists != null){
+                                    findLatest(isHwExists)?.note = isHwExists.note
+                                }
+                                else{
+                                    realm.query<Homework>("lesson == $0 AND date == $1",
+                                        subject, selectedDate.toString()).first().find()
+                                        ?.let { findLatest(it)?.let { delete(it) } }
+                                }
+                            }
+                        }
+                    }.show()
+            }
+        }
 
         toggleGroup.addOnButtonCheckedListener { group, checkedId, isChecked ->
             if (isChecked) {
                 when (checkedId) {
                     R.id.addNewButton -> {
-                        firstNoteText = input.text.toString()
-                        val fragPosition = viewPager.currentItem + toDay
-                        val fragTag = (viewPager.adapter as DayPagerAdapter).getFragmentTag(fragPosition)
-                        Log.d("MainActivity", "currentItem: $fragPosition and tag $fragTag")
+                        selectedDate = foundDate
 
-                        val refFrag = childFragmentManager.findFragmentByTag(fragTag) as? DayFragment
+                        firstNoteText = input.text.toString()
+
+                        val isHwExists = viewModel.findHwByDateLesson(foundDate.toString(), subject)
                         lifecycleScope.launch {
                             val noteTextValue: String? = realm.write {
-                                if (isHomewrkExists != null) {
-                                    findLatest(isHomewrkExists)?.note
+                                if (isHwExists != null) {
+                                    findLatest(isHwExists)?.note
                                 } else firstNoteText
                             }
                             input.setText(noteTextValue ?: "")
-                        }
-
-                        button.setOnClickListener {
-                            var noteText = input.text.toString()
-                            if (noteText.isEmpty()){
-                                txtLayout.error = "Write homework or leave"
-                                txtLayout.isErrorEnabled = true
-                                return@setOnClickListener
-                            }
-                            lifecycleScope.launch {
-                                realm.write {
-                                    if (isHomewrkExists != null) {
-                                        findLatest(isHomewrkExists)?.note = noteText
-                                    } else {
-                                        val newItem = Homework().apply {
-                                            lesson = subject
-                                            date = sDate.toString()
-                                            note = noteText
-                                        }
-                                        copyToRealm(newItem)
-                                    }
-                                }
-
-                                bottomSheetDialog.dismiss()
-                                Snackbar.make(calendarFAB, "Homework added for $sDate", Snackbar.LENGTH_LONG)
-                                    .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
-                                    .setActionTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorTertiary))
-                                    .setBackgroundTint(MaterialColors.getColor(calendarFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
-                                    .setTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorOnSurface))
-                                    .setAction("Undo") {
-                                        lifecycleScope.launch {
-                                            realm.write {
-                                                if (isHomewrkExists != null){
-                                                    findLatest(isHomewrkExists)?.note = isHomewrkExists.note
-                                                }
-                                                else{
-                                                    realm.query<Homework>("lesson == $0 AND date == $1 AND note == $2",
-                                                        subject, sDate.toString(), noteText).first().find()
-                                                        ?.let { findLatest(it)?.let { delete(it) } }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .show()
-//                                Toast.makeText(
-//                                    requireContext(),
-//                                    "Homework added for $sDate",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-                                val allHomework = realm.query<Homework>(
-                                    "date == $0 AND lesson == $1",
-                                    sDate.toString(), subject
-                                ).first().find()?.note
-                                Log.d("HomeworkDatasds", "data: $allHomework")
-
-//                                if (refFrag != null) {
-//                                    refFrag.refreshData(sDate, subject, thatTime, position)
-//                                    Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
-//                                }
-                                viewPager.setCurrentItem(viewPager.currentItem, true)
-                            }
                         }
 
                     }
 
                     R.id.editDayButton -> {
-                        firstNoteText = input.text.toString()
-                        val fragPosition = viewPager.currentItem
-                        val fragTag = (viewPager.adapter as DayPagerAdapter).getFragmentTag(fragPosition)
-                        Log.d("MainActivity", "currentItem: $fragPosition and tag $fragTag")
+                        selectedDate = fragmentDay
 
-                        val refFrag = childFragmentManager.findFragmentByTag(fragTag) as? DayFragment
-                        currentDay =
-                            LocalDate.now().plusDays((viewPager.currentItem - OFFSET).toLong())
-                        Log.d("CurrentDate", "date: $currentDay")
-                        var week = ceil(currentDay.dayOfYear / 7.0)
-                        var currentLessons = when(currentDay.dayOfWeek) {
-                            DayOfWeek.MONDAY -> if (week % 2 == 0.0) resources.getStringArray(R.array.monday1)
-                            else resources.getStringArray(R.array.monday2)
-                            DayOfWeek.TUESDAY -> resources.getStringArray(R.array.tues)
-                            DayOfWeek.WEDNESDAY -> resources.getStringArray(R.array.wend)
-                            DayOfWeek.THURSDAY -> resources.getStringArray(R.array.thurs)
-                            DayOfWeek.FRIDAY -> resources.getStringArray(R.array.frid)
-                            else -> arrayOf("")
-                        }
-                        val isHomewrkExists = realm.query<Homework>("date == $0 AND lesson == $1", currentDay.toString(), subject).first()
-                            .find()
+                        firstNoteText = input.text.toString()
+
+                        val isHwExists = viewModel.findHwByDateLesson(fragmentDay.toString(), subject)
                         lifecycleScope.launch {
                             val noteTextValue: String? = realm.write {
-                                if (isHomewrkExists != null) {
-                                    findLatest(isHomewrkExists)?.note
+                                if (isHwExists != null) {
+                                    findLatest(isHwExists)?.note
                                 } else firstNoteText
                             }
                             input.setText(noteTextValue ?: "")
-                        }
-
-                        button.setOnClickListener {
-                            var noteText = input.text.toString()
-                            if (noteText.isEmpty()){
-                                txtLayout.error = "Write homework or leave"
-                                return@setOnClickListener
-                            }
-                            lifecycleScope.launch {
-                                realm.write {
-                                    if (isHomewrkExists != null) {
-                                        findLatest(isHomewrkExists)?.note = noteText
-                                    } else {
-                                        val newItem = Homework().apply {
-                                            lesson = subject
-                                            date = currentDay.toString()
-                                            note = noteText
-                                        }
-                                        copyToRealm(newItem)
-                                    }
-                                }
-
-                                bottomSheetDialog.dismiss()
-                                Snackbar.make(calendarFAB, "Homework added for $currentDay", Snackbar.LENGTH_INDEFINITE)
-                                    .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
-                                    .setActionTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorTertiary))
-                                    .setBackgroundTint(MaterialColors.getColor(calendarFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
-                                    .setTextColor(MaterialColors.getColor(calendarFAB, R.attr.colorOnSurface))
-                                    .setAction("Undo") {
-                                        lifecycleScope.launch {
-                                            realm.write {
-                                                if (isHomewrkExists != null){
-                                                    findLatest(isHomewrkExists)?.note = isHomewrkExists.note
-                                                }
-                                                else{
-                                                    realm.query<Homework>("lesson == $0 AND date == $1 AND note == $2",
-                                                        subject, currentDay.toString(), noteText).first().find()
-                                                        ?.let { findLatest(it)?.let { delete(it) } }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .show()
-//                                Toast.makeText(
-//                                    requireContext(),
-//                                    "Homework added for $currentDay",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-                                val allHomework = realm.query<Homework>(
-                                    "date == $0 AND lesson == $1",
-                                    currentDay.toString(), subject
-                                ).first().find()?.note
-                                Log.d("HomeworkDatasds", "data: $allHomework")
-
-//                                if (refFrag != null) {
-//                                    refFrag.refreshData(currentDay, subject, thatTime, position)
-//                                    Log.d("FragmentFound", "tag of frag: $refFrag, $fragTag")
-//                                }
-                            }
                         }
                     }
                 }

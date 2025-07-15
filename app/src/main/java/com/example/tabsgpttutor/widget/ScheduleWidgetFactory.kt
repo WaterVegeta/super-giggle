@@ -3,7 +3,10 @@ package com.example.tabsgpttutor.widget
 import android.content.Context
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import com.example.tabsgpttutor.MyDynamic
 import com.example.tabsgpttutor.R
+import com.example.tabsgpttutor.data_base.shedule.Schedule
+import io.realm.kotlin.ext.query
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -18,76 +21,86 @@ class ScheduleWidgetFactory(private val context: Context): RemoteViewsService.Re
     }
 
     override fun onDataSetChanged() {
-        var k = 0
+        data.clear()
+
         val date = LocalDate.now()
         val time = LocalTime.now()
 
-        when (date.dayOfWeek.toString()) {
-            "MONDAY" -> if (time.hour >= 15 && time.minute >= 5) {
-                k++
-            } else {
-                k = 0
-            }
+        val realm = MyDynamic.realm
+        val items = realm.query<Schedule>().find()
+        var k = 0
+        for (i in items){
+            if (i.dayOfWeek == date.dayOfWeek.toString()){
+                i.lessonAndTime.findLast { it.lessonEndHour.isNotEmpty() && it.lessonEndMinute.isNotEmpty() }?.let {
+                    val endMin = it.lessonEndMinute
+                    val endHour = it.lessonEndHour
+                    k = if (time.hour.toInt() == endHour.toInt()){
+                        if (time.minute.toInt() >= endMin.toInt()){
+                            1
+                        }
+                        else{
+                            0
+                        }
+                    }
+                    else if(time.hour.toInt() >= endHour.toInt()){
+                        1
+                    }
+                    else 0
+                }
+                break
 
-            "TUESDAY" -> if (time.hour >= 16 && time.minute >= 0) {
-                k++
-            } else {
-                k = 0
             }
-
-            "WEDNESDAY" -> if (time.hour >= 15 && time.minute >= 5) {
-                k++
-            } else {
-                k = 0
-            }
-
-            "THURSDAY" -> if (time.hour >= 16 && time.minute >= 0) {
-                k++
-            } else {
-                k = 0
-            }
-
-            "FRIDAY" -> if (time.hour >= 14 && time.minute >= 10) {
-                k++
-                k++
-                k++
-            } else {
-                k = 0
-            }
-
-            "SATURDAY" -> {
-                k++
-                k++
-            }
-
-            "SUNDAY" -> {
-                k++
-            }
-
         }
 
+        val newDate = date.plusDays(k.toLong())
 
+        val isEvenWeek = (ceil(newDate.dayOfYear / 7.0).toInt() % 2 == 0)
 
-        val week = ceil(date.plusDays(k.toLong()).dayOfYear / 7.0)
+        val schedule = realm.query<Schedule>("dayOfWeek == $0", newDate.dayOfWeek.name).find().first()
 
-        timeList = context.resources.getStringArray(R.array.six)
+        schedule.lessonAndTime.map { lesson ->
+            val subject = if (isEvenWeek && !lesson.lessonSchedeleOnEven.isNullOrEmpty())
+                lesson.lessonSchedeleOnEven else lesson.lessonScheduleOnOdd
 
-        val dayOfWeek = date.plusDays(k.toLong()).dayOfWeek
-        lessonList = when (dayOfWeek) {
-            DayOfWeek.MONDAY -> if (week % 2 == 0.0) context.resources.getStringArray(R.array.monday1)
-            else context.resources.getStringArray(R.array.monday2)
-            DayOfWeek.TUESDAY -> context.resources.getStringArray(R.array.tues)
-            DayOfWeek.WEDNESDAY -> context.resources.getStringArray(R.array.wend)
-            DayOfWeek.THURSDAY -> context.resources.getStringArray(R.array.thurs)
-            DayOfWeek.FRIDAY -> context.resources.getStringArray(R.array.frid)
-            else -> arrayOf("не ма")
+            val endMinute = when(lesson.lessonEndMinute){
+                "0"->"00"
+                "1"->"01"
+                "2"->"02"
+                "3"->"03"
+                "4"->"04"
+                "5"->"05"
+                "6"->"06"
+                "7"->"07"
+                "8"->"08"
+                "9"->"09"
+                else -> lesson.lessonEndMinute
+            }
+            val time = if (lesson.lessonStart.isNotEmpty() && lesson.lessonEndHour.isNotEmpty() &&
+                lesson.lessonEndMinute.isNotEmpty())"${lesson.lessonStart} - ${lesson.lessonEndHour}:${endMinute}"
+            else ""
+
+            data.add(WidDataClass(subject, time))
         }
-        for (i in lessonList.indices) {
-            val subject = lessonList[i]
-            val timeLes = timeList[i]
 
-            data.add(WidDataClass(subject, timeLes))
-        }
+//        timeList = context.resources.getStringArray(R.array.six)
+//
+//        val dayOfWeek = date.plusDays(k.toLong()).dayOfWeek
+////        lessonList = when (dayOfWeek) {
+////            DayOfWeek.MONDAY -> if (week % 2 == 0.0) context.resources.getStringArray(R.array.monday1)
+////            else context.resources.getStringArray(R.array.monday2)
+////            DayOfWeek.TUESDAY -> context.resources.getStringArray(R.array.tues)
+////            DayOfWeek.WEDNESDAY -> context.resources.getStringArray(R.array.wend)
+////            DayOfWeek.THURSDAY -> context.resources.getStringArray(R.array.thurs)
+////            DayOfWeek.FRIDAY -> context.resources.getStringArray(R.array.frid)
+////            else -> arrayOf("не ма")
+////        }
+//        lessonList = arrayOf("Yed ")
+//        for (i in lessonList.indices) {
+//            val subject = lessonList[i]
+//            val timeLes = timeList[i]
+//
+//            data.add(WidDataClass(subject, timeLes))
+//        }
 
     }
 

@@ -1,18 +1,31 @@
 package com.example.tabsgpttutor.settings
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
+import com.example.tabsgpttutor.LanguageChanger
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.ThemeHelper
-import com.example.tabsgpttutor.animation_pref.AnimationActivity
-import com.example.tabsgpttutor.schedule_change.ChangeScheduleAct
-import java.util.prefs.Preferences
+import com.example.tabsgpttutor.settings.animation_pref.AnimationActivity
+import com.example.tabsgpttutor.settings.schedule_change.ChangeScheduleAct
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.intellij.lang.annotations.Language
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -21,6 +34,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onCreate(savedInstanceState)
         Log.d("FragmentCreated", "SettingsFragment")
 
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
+            insets
+        }
     }
 
     override fun onCreatePreferences(
@@ -39,11 +61,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
 
         // Dynamic colors change listener
-        findPreference<SwitchPreferenceCompat>("dynamic_colors")?.setOnPreferenceChangeListener { _, newValue ->
-            val themePreference = sharedPreferences.getString("theme", "system")
-            ThemeHelper.applyTheme(themePreference.toString(), newValue as Boolean, requireContext())
-            requireActivity().recreate()
-            true
+
+        val dynamicPreference = findPreference<SwitchPreferenceCompat>("dynamic_colors")
+        if (Build.VERSION.SDK_INT >= 31){
+            dynamicPreference?.setOnPreferenceChangeListener { _, newValue ->
+                val themePreference = sharedPreferences.getString("theme", "system")
+                ThemeHelper.applyTheme(themePreference.toString(), newValue as Boolean, requireContext())
+                requireActivity().recreate()
+                if (!newValue as Boolean){
+                    Toast.makeText(requireContext(),
+                        getString(R.string.pls_restart_the_app_to_apply_changes), Toast.LENGTH_LONG).show()
+                }
+                true
+            }
+        }
+        else{
+            dynamicPreference?.isVisible = false
         }
 
         findPreference<Preference>("change_act")?.setOnPreferenceClickListener {
@@ -52,6 +85,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             startActivity(intent)
             true // Return true if the click is handled.
         }
+
         findPreference<Preference>("animation")?.setOnPreferenceClickListener {
             Log.d("Preferences", "ScheduleChange was clicked")
             val intent = Intent(requireContext(), AnimationActivity::class.java)
@@ -59,6 +93,38 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true // Return true if the click is handled.
         }
 
+        val languagePreference = findPreference<Preference>("language")
+        val language = LanguageChanger.getLanguage()
+        languagePreference?.summary = if(language == "default"){
+            getString(R.string.set_to, getString(R.string.system_default))
+        }else if (language == "uk"){
+            "Українська"
+        } else {
+            "English"
+        }
+
+
+        languagePreference?.setOnPreferenceClickListener {
+            showLanguageDiaolog()
+            true
+        }
+
+
+    }
+
+    fun showLanguageDiaolog(){
+        val languages = arrayOf(getString(R.string.system_default),
+            getString(R.string.english), getString(R.string.ukrainian))
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.choose_language))
+            .setItems(languages) { _, item ->
+                when(item){
+                    0 -> LanguageChanger.setLanguage("default", requireContext())
+                    1 -> LanguageChanger.setLanguage("en", requireContext())
+                    2 -> LanguageChanger.setLanguage("uk", requireContext())
+                }
+            }.setNegativeButton(getString(R.string.cancel), null)
+                .show()
     }
 
     override fun onResume() {
@@ -77,42 +143,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onDestroyView()
         Log.d("FragmentDestroyedView", "SettingsFragment")
     }
-
-
-
-//    override fun onCreateView(
-//        inflater: LayoutInflater, container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View {
-//        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_settings, container, false)
-//    }
-//
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        val items = listOf(
-//            view.findViewById<TextView>(R.id.settingsText)
-//        )
-//
-//        val baseDelay = 100L
-//        val duration = 350L
-//        val interpolator = OvershootInterpolator(1.1f) // Gentle pop
-//
-//        for ((index, item) in items.withIndex()) {
-//            item.alpha = 0f
-//            item.scaleX = 0.9f
-//            item.scaleY = 0.9f
-//
-//            item.animate()
-//                .alpha(1f)
-//                .scaleX(1f)
-//                .scaleY(1f)
-//                .setStartDelay(baseDelay * index)
-//                .setDuration(duration)
-//                .setInterpolator(interpolator)
-//                .start()
-//        }
-//    }
-
 
 }

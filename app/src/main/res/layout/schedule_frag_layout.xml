@@ -28,7 +28,7 @@
         android:layout_gravity="bottom|center"
         android:hapticFeedbackEnabled="true"
         android:id="@+id/homeFAB"
-        android:text="Home"
+        android:text="@string/home_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

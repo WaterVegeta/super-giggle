@@ -103,17 +103,17 @@ class DayFragment() : Fragment() {
 
 
         val date = LocalDate.parse(requireArguments().getString("date"))
-        val formatter = DateTimeFormatter.ofPattern("dd MM yyy")
+        val formatter = DateTimeFormatter.ofPattern("dd MMMM ")
         dateTextView.text = date.format(formatter).toString()
 
         weekDateText.text = when(date.dayOfWeek){
-            DayOfWeek.MONDAY -> resources.getString(R.string.monday)
-            DayOfWeek.TUESDAY -> resources.getString(R.string.tuesday)
-            DayOfWeek.WEDNESDAY -> resources.getString(R.string.wednesday)
-            DayOfWeek.THURSDAY -> resources.getString(R.string.thursday)
-            DayOfWeek.FRIDAY -> resources.getString(R.string.friday)
-            DayOfWeek.SATURDAY -> resources.getString(R.string.saturday)
-            DayOfWeek.SUNDAY -> resources.getString(R.string.sunday)
+            DayOfWeek.MONDAY -> getString(R.string.monday)
+            DayOfWeek.TUESDAY -> getString(R.string.tuesday)
+            DayOfWeek.WEDNESDAY -> getString(R.string.wednesday)
+            DayOfWeek.THURSDAY -> getString(R.string.thursday)
+            DayOfWeek.FRIDAY -> getString(R.string.friday)
+            DayOfWeek.SATURDAY -> getString(R.string.saturday)
+            DayOfWeek.SUNDAY -> getString(R.string.sunday)
         }
 
 
@@ -129,14 +129,12 @@ class DayFragment() : Fragment() {
             onItemLongClick = { clickedLesson, position ->
                 (parentFragment as ScheduleFrag).nextSubjectDate(
                     clickedLesson.subject,
-                    date,
-                    position
+                    date
                 )
             },
             onDone = { clickedLesson, position ->
                 (parentFragment as ScheduleFrag).doneHw(
-                    date,
-                    clickedLesson.homework.toString(), clickedLesson.subject, position
+                    clickedLesson.hwId
                 )
             }
         )

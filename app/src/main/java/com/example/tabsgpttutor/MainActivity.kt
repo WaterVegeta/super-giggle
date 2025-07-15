@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private val viewModel: SettingsViewModel by viewModels()
 
+    lateinit var navHostFragment: NavHostFragment
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -47,18 +48,50 @@ class MainActivity : AppCompatActivity() {
                 apply()
             }
         }
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
-        val navHostFragment = supportFragmentManager
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+//            insets
+//        }
+
+        navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
         // Connect BottomNavigationView with NavController
-        findViewById<BottomNavigationView>(R.id.navBar).setupWithNavController(navController)
+        val navBar = findViewById<BottomNavigationView>(R.id.navBar)
+        navBar.setupWithNavController(navController)
+//        navBar.setOnItemSelectedListener { item ->
+//            when(item.itemId){
+//                R.id.nav_schedule -> {
+//                    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+//                        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//                        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+//                        insets
+//                    }
+//
+//                }
+//                R.id.nav_hwList -> {
+//                    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+//                        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//                        v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
+//                        insets
+//                    }
+//
+//                }
+//                R.id.nav_settings -> {
+//                    ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+//                        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//                        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+//                        insets
+//                    }
+//
+//                }
+//                else -> false
+//            }
+//            false
+//        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

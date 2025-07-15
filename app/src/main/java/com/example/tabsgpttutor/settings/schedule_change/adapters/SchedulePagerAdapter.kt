@@ -1,5 +1,6 @@
-package com.example.tabsgpttutor.schedule_change.adapters
+package com.example.tabsgpttutor.settings.schedule_change.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tabsgpttutor.R
 import com.example.tabsgpttutor.data_base.temp_schedule.TempLessonAndTime
 import com.example.tabsgpttutor.data_base.temp_schedule.TempSchedule
-import com.example.tabsgpttutor.schedule_change.adapters.ChildScheduleAdapter
+import java.time.DayOfWeek
 
 class SchedulePagerAdapter(
     private val addLesson: (TempSchedule) -> Unit,
@@ -32,7 +33,7 @@ class SchedulePagerAdapter(
 
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
         val schedule = getItem(position)
-        holder.tvDayOfWeek.text = schedule.dayOfWeek
+        holder.tvDayOfWeek.text = getDayOfWeek(holder.itemView.context, schedule.dayOfWeek)
 //        holder.lessonsRecyclerView.itemAnimator = DefaultItemAnimator().apply {
 //            addDuration = 9999
 //            changeDuration = 250
@@ -47,6 +48,18 @@ class SchedulePagerAdapter(
         }
     }
 
+    fun getDayOfWeek(context: Context, dayOfWeek: String): String{
+        return when(dayOfWeek){
+            DayOfWeek.MONDAY.name.uppercase() -> context.getString(R.string.monday)
+            DayOfWeek.TUESDAY.name.uppercase() -> context.getString(R.string.tuesday)
+            DayOfWeek.WEDNESDAY.name.uppercase() -> context.getString(R.string.wednesday)
+            DayOfWeek.THURSDAY.name.uppercase() -> context.getString(R.string.thursday)
+            DayOfWeek.FRIDAY.name.uppercase() -> context.getString(R.string.friday)
+            DayOfWeek.SATURDAY.name.uppercase() -> context.getString(R.string.saturday)
+            DayOfWeek.SUNDAY.name.uppercase() -> context.getString(R.string.sunday)
+            else -> { "ERROR"}
+        }
+    }
 
 
     class ScheduleDiffCallback : DiffUtil.ItemCallback<TempSchedule>() {

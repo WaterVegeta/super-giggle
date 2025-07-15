@@ -2,6 +2,7 @@ package com.example.tabsgpttutor.homwrklist
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -27,12 +28,12 @@ import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.HorizontalScrollView
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioGroup
 
@@ -41,10 +42,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -60,8 +62,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tabsgpttutor.data_base.Homework
 import com.example.tabsgpttutor.HwViewModel
 import com.example.tabsgpttutor.R
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
@@ -73,10 +75,11 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.radiobutton.MaterialRadioButton
-import com.google.android.material.sidesheet.SideSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+
+import eightbitlab.com.blurview.BlurView
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -89,13 +92,12 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.apply
 
-
 class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
     private val viewModel: HwViewModel by viewModels()
 
+
     lateinit var searchToolbar: TextInputLayout
-    lateinit var sortFAB: FloatingActionButton
     private var actionMode: ActionMode? = null
     lateinit var adapter: HwListAdapter
     lateinit var chipBtn: Chip
@@ -110,6 +112,12 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     lateinit var chipDate: Chip
     lateinit var chipImage: Chip
     lateinit var chipSort: Chip
+
+    lateinit var chip_layout: CoordinatorLayout
+    lateinit var chip_blur: BlurView
+    lateinit var appBar: AppBarLayout
+
+    lateinit var blurView: BlurView
 
     private lateinit var recyclerView: RecyclerView
     lateinit var listItems: List<String>
@@ -179,15 +187,41 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         }
     }
     lateinit var layout: CoordinatorLayout
+    var isToolBarShown = false
+    lateinit var dateText: String
+    lateinit var doneText: String
+    lateinit var imageText: String
+    lateinit var lessonText: String
+
+    val ALL = 0
+    val TODAY_BEYOND = 1
+    val PAST_TODAY = 2
+
+    val DONE = 3
+    val NOT_DONE = 4
+
+    val WITH_IMAGE = 5
+    val NO_IMAGE = 6
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("FragmentCreated", "HwListFragment")
 
+        dateText = getString(R.string.chip_date)
+        doneText = getString(R.string.chip_done)
+        imageText = getString(R.string.chip_image)
+        lessonText = getString(R.string.chip_lesson)
+
         recyclerView = view.findViewById(R.id.recyclerView)
         addFAB = view.findViewById<FloatingActionButton>(R.id.bottomSheetButton)
-        sortFAB = view.findViewById(R.id.sortFAB)
         searchToolbar = view.findViewById(R.id.searchToolbar)
+//        blurView = view.findViewById(R.id.blurView)
+        chip_blur = view.findViewById(R.id.chip_blur)
+
+        chip_layout = view.findViewById(R.id.chip_layout)
+        appBar = view.findViewById(R.id.app_bar)
+
+
 
         chipGroup = view.findViewById(R.id.chipGroup)
         chipDone = view.findViewById(R.id.chipDone)
@@ -199,53 +233,46 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         for (i in sortChips){
             when(i){
                 chipDone -> {
-                    if (viewModel.done.value != "All"){
-                        i.text = viewModel.done.value
-                        i.isCheckable = true
-                        i.isChecked = true
+                    if (viewModel.done_sort.value != ALL){
+                        val text = if (viewModel.done_sort.value == DONE){
+                            getString(R.string.done)
+                        } else getString(R.string.not_done)
+                        checkChip(i, true, text)
                     }
                 }
                 chipDate -> {
-                    if (viewModel.date.value != "date >= $0"){
-                        i.apply {
-                            text = when(viewModel.date.value){
-                                "date <= $0" -> "From past to today"
-                                null -> "All days"
-                                else -> "From today and beyond"
-                            }
-                            isChecked = true
-                            isCheckable = true
+                    if (viewModel.date.value != TODAY_BEYOND){
+                        val text = when(viewModel.date.value){
+                            PAST_TODAY-> getString(R.string.from_past_to_today)
+                            ALL -> getString(R.string.all_days)
+                            else -> getString(R.string.from_today_and_beyond)
                         }
+                        checkChip(i, true, text)
+
                     }
                 }
                 chipImage -> {
-                    if (viewModel.image.value != "All"){
-                        i.apply {
-                            text = viewModel.image.value
-                            isChecked = true
-                            isCheckable = true
+                    if (viewModel.image.value != ALL){
+                        val text = if (viewModel.image.value == WITH_IMAGE){
+                            getString(R.string.with_image)
                         }
+                        else getString(R.string.without_image)
+
+                        checkChip(i, true, text)
                     }
                 }
                 chipLesson -> {
                     if (viewModel.lesson.value != "All"){
-                        i.apply {
-                            text = viewModel.lesson.value
-                            isChecked = true
-                            isCheckable = true
-                        }
+                        checkChip(i, true, viewModel.lesson.value)
                     }
                 }
                 chipSort ->{
                     if (viewModel.sortField.value != "date"){
-                        i.apply {
-                            text = when(viewModel.sortField.value){
-                                "note" -> "Homework"
-                                else ->  "Lesson"
-                            }
-                            isChecked = true
-                            isCheckable = true
+                        val text = when(viewModel.sortField.value){
+                            "note" -> getString(R.string.homework_sort)
+                            else ->  getString(R.string.lesson_sort)
                         }
+                        checkChip(i, true, text)
                     }
                 }
             }
@@ -334,51 +361,101 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         searchText.doOnTextChanged {text, _, _, _ ->
             viewModel.onSearch(text.toString())
         }
+        var expanded = false
 
-        searchToolbar.setStartIconOnClickListener {
-            chipGroup.isVisible = !chipGroup.isVisible
-        }
-        toolbar = view.findViewById<MaterialToolbar>(R.id.actionToolBar)
-        toolbar.navigationIcon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorOnSurface))
-        toolbar.menu.findItem(R.id.action_delete).icon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorError))
-        toolbar.menu.findItem(R.id.action_share).icon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorSecondary))
-        toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.action_delete -> {
-                    deleteSelectedItems()
-                    true
+        val animDuration = 200L
+        val animInter = DecelerateInterpolator()
+        appBar.addOnOffsetChangedListener { v, verticalOffset ->
+            val totalScrollRange = appBar.totalScrollRange
+
+            if (verticalOffset == 0) {
+                // Fully expanded
+                expanded = true
+                recyclerView.animate().apply {
+                    translationY(appBar.height.toFloat())
+                    setInterpolator(animInter)
+                    setDuration(animDuration)
+                    withEndAction {
+//                        recyclerView.translationY = 0f
+                        recyclerView.setPadding(
+                            recyclerView.paddingLeft,
+                            recyclerView.paddingTop,
+                            recyclerView.paddingRight,
+                            appBar.height
+                        )
+                    }
+                    start()
                 }
-
-                R.id.action_edit -> {
-                    editSelectedItem()
-                    true
+            } else if (Math.abs(verticalOffset) >= totalScrollRange) {
+                // Fully collapsed
+                expanded = false
+                recyclerView.setPadding(
+                    recyclerView.paddingLeft,
+                    recyclerView.paddingTop,
+                    recyclerView.paddingRight,
+                    0
+                )
+                recyclerView.animate().apply {
+                    translationY(0f)
+                    setInterpolator(animInter)
+                    setDuration(animDuration)
+                    start()
                 }
-
-                R.id.action_share -> {
-                    shareItems()
-                    true
-                }
-
-                else -> false
             }
         }
-        toolbar.setNavigationOnClickListener {
-            hideActionMode()
+
+        searchToolbar.setStartIconOnClickListener {
+
+            chip_layout.isVisible = true
+            appBar.setExpanded(!expanded, true)
+
         }
-        adapter = HwListAdapter(object : HwListAdapter.OnItemClickListener{
+        toolbar = view.findViewById<MaterialToolbar>(R.id.actionToolBar)
+        toolbar.apply {
+            navigationIcon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorOnSurface))
+            menu.findItem(R.id.action_delete).icon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorError))
+            menu.findItem(R.id.action_share).icon?.mutate()?.setTint(MaterialColors.getColor(toolbar, com.google.android.material.R.attr.colorSecondary))
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.action_delete -> {
+                        deleteSelectedItems()
+                        true
+                    }
+
+                    R.id.action_edit -> {
+                        editSelectedItem()
+                        true
+                    }
+
+                    R.id.action_share -> {
+                        shareItems()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+            setNavigationOnClickListener {
+                hideActionMode()
+            }
+        }
+
+        adapter = HwListAdapter( object : HwListAdapter.OnItemClickListener{
             override fun onItemLongClick(itemId: String) {
                 if (!toolbar.isVisible){
-//                    actionMode = requireActivity().startActionMode(actionModeCallback)
                     showToolBar()
+                    Log.i("Toolbar", "long item show toolbar : $itemId")
                 }
+                Log.i("Toolbar", "long item not show toolbar : $itemId")
                 adapter.toggleSelection(itemId)
                 updateTitle()
             }
 
             override fun onItemClick(itemId: String) {
-                if (toolbar.isVisible){
+                if (isToolBarShown){
                     adapter.toggleSelection(itemId)
                     updateTitle()
+                    Log.i("Toolbar", "click item : $itemId")
                 }
             }
         }, onDone = {clickedLesson ->
@@ -388,22 +465,11 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 addImage(hwList)
             })
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.homeworkList.collect { adapter.updateData(it) }
-
-            }
-        }
-
-
-        lifecycleScope.launch {
-            viewModel.uniqueLessons.collect {
-                listItems = it
-            }
-        }
-        val animBut = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_animation)
+        val animButShow = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_animation_show)
         val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_pop_in)
+        val animButHide = AnimationUtils.loadAnimation(requireContext(), R.anim.fab_anim_hide)
 
+        var isFabVis = true
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
@@ -415,28 +481,79 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             addOnScrollListener(object: RecyclerView.OnScrollListener(){
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    if (dy>0){
-                        addFAB.hide()
+
+                    if (dy > 10 && isFabVis){
+                        isFabVis = false
+                        addFAB.animate().apply {
+//                            startAnimation(animButHide)
+//                            hide()
+                            translationY(500f)
+                            setInterpolator(FastOutSlowInInterpolator())
+                        }
+//                        addFAB.downAnim()
+//                        addFAB.hide()
                     }
-                    else if (dy<0 && addFAB.isShown == false){
-                        addFAB.apply {
-                            startAnimation(animBut)
-                            show()
+                    else if (dy < -10 && !isFabVis){
+//                        addFAB.backAnim()
+                        isFabVis = true
+                        addFAB.animate().apply {
+//                            startAnimation(animButShow)
+//                            show()
+                            translationY(0f)
+                            setInterpolator(FastOutSlowInInterpolator())
                         }
                     }
                 }
             })
+//            addItemDecoration(TopMarginDecoration(this@HomewListFragment.adapter))
+
             startAnimation(anim)
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+//            val layoutMarg = toolbar.layoutParams as ViewGroup.MarginLayoutParams
+//            layoutMarg.topMargin = systemBars.top
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
+            insets
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.homeworkList.collect { adapter.updateData(it) }
+
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.uniqueLessons.collect {
+                listItems = it
+            }
         }
 
         addFAB.apply {
             setOnClickListener {
                 bottomSheetShow()
             }
-            startAnimation(animBut)
+//            startAnimation(animBut)
         }
-        sortFAB.setOnClickListener {
-            sortView()
+    }
+
+    fun checkChip(chip: Chip, check: Boolean, newText: String){
+        if (check){
+            chip.apply {
+                text = newText
+                isCheckable = true
+                isChecked = true
+            }
+        }
+        else {
+            chip.apply {
+                text = newText
+                isChecked = false
+                isCheckable = false
+            }
         }
     }
 
@@ -458,43 +575,31 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         }
         when(chipId){
             R.id.chipDate ->{
-                tvChoose.text = "Date"
-                radioAll.text = "All days"
-                radioDone.text = "From today and beyond"
-                radioNotDone.text = "From past to today"
+                tvChoose.text = dateText
+                radioAll.text = getString(R.string.all_days)
+                radioDone.text = getString(R.string.from_today_and_beyond)
+                radioNotDone.text = getString(R.string.from_past_to_today)
 
                 when(viewModel.date.value){
-                    "date <= $0" -> radioNotDone.isChecked = true
-                    "date >= $0" -> radioDone.isChecked = true
+                    PAST_TODAY -> radioNotDone.isChecked = true
+                    TODAY_BEYOND -> radioDone.isChecked = true
                     else -> radioAll.isChecked = true
                 }
                 groupDone.setOnCheckedChangeListener { v, itemId ->
                     when(itemId){
                         R.id.radioAll ->{
-                            viewModel.changeDate(radioAll.text.toString())
-                            chipDate.apply {
-                                text = "date"
-                                isCheckable = false
-                                isChecked = false
-                            }
+                            viewModel.changeDate(ALL)
+                            checkChip(chipDate, false, dateText)
                             bottomSheetDialog.dismiss()
                         }
                         R.id.radioDone ->{
-                            chipDate.apply {
-                                text = radioDone.text
-                                isCheckable = true
-                                isChecked = true
-                            }
-                            viewModel.changeDate(radioDone.text.toString())
+                            checkChip(chipDate, true, radioDone.text.toString())
+                            viewModel.changeDate(TODAY_BEYOND)
                             bottomSheetDialog.dismiss()
                         }
                         R.id.radioNotDone ->{
-                            chipDate.apply {
-                                text = radioNotDone.text
-                                isCheckable = true
-                                isChecked = true
-                            }
-                            viewModel.changeDate(radioNotDone.text.toString())
+                            checkChip(chipDate, true, radioNotDone.text.toString())
+                            viewModel.changeDate(PAST_TODAY)
                             bottomSheetDialog.dismiss()
                         }
                     }
@@ -503,39 +608,27 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             }
             R.id.chipDone ->{
 
-                when(viewModel.done.value){
-                    radioNotDone.text.toString() -> radioNotDone.isChecked = true
-                    radioDone.text.toString() -> radioDone.isChecked = true
+                when(viewModel.done_sort.value){
+                    NOT_DONE -> radioNotDone.isChecked = true
+                    DONE -> radioDone.isChecked = true
                     else -> radioAll.isChecked = true
                 }
-                tvChoose.text = "Done"
+                tvChoose.text = doneText
                 groupDone.setOnCheckedChangeListener { v, itemId ->
                     when(itemId){
                         R.id.radioAll ->{
-                            viewModel.changeDone(radioAll.text.toString())
-                            chipDone.apply {
-                                text = "done"
-                                isCheckable = false
-                                isChecked = false
-                            }
+                            viewModel.changeDone(ALL)
+                            checkChip(chipDone, false, doneText)
                             bottomSheetDialog.dismiss()
                         }
                         R.id.radioDone ->{
-                            chipDone.apply {
-                                text = radioDone.text
-                                isCheckable = true
-                                isChecked = true
-                            }
-                            viewModel.changeDone(radioDone.text.toString())
+                            checkChip(chipDone, true, radioDone.text.toString())
+                            viewModel.changeDone(DONE)
                             bottomSheetDialog.dismiss()
                         }
                         R.id.radioNotDone ->{
-                            chipDone.apply {
-                                text = radioNotDone.text
-                                isCheckable = true
-                                isChecked = true
-                            }
-                            viewModel.changeDone(radioNotDone.text.toString())
+                            checkChip(chipDone, true, radioNotDone.text.toString())
+                            viewModel.changeDone(NOT_DONE)
                             bottomSheetDialog.dismiss()
                         }
                     }
@@ -545,36 +638,33 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
             }
             R.id.chipImage ->{
-                tvChoose.text = "Image"
-                radioDone.text = "With image"
-                radioNotDone.text = "Without image"
+                tvChoose.text = imageText
+                radioDone.text = getString(R.string.with_image)
+                radioNotDone.text = getString(R.string.without_image)
                 when(viewModel.image.value){
-                    radioNotDone.text.toString() -> radioNotDone.isChecked = true
-                    radioDone.text.toString() -> radioDone.isChecked = true
+                    NO_IMAGE -> radioNotDone.isChecked = true
+                    WITH_IMAGE -> radioDone.isChecked = true
                     else -> radioAll.isChecked = true
                 }
 
                 groupDone.setOnCheckedChangeListener { v, itemId ->
                     when(itemId){
                         R.id.radioAll ->{
-                            viewModel.changeImage(radioAll.text.toString())
-                            chipImage.text = "image"
-                            chipImage.isCheckable = false
-                            chipImage.isChecked = false
+                            checkChip(chipImage, false, imageText)
+
+                            viewModel.changeImage(ALL)
                             bottomSheetDialog.dismiss()
                         }
                         R.id.radioDone ->{
-                            chipImage.text = "With image"
-                            chipImage.isCheckable = true
-                            chipImage.isChecked = true
-                            viewModel.changeImage(radioDone.text.toString())
+                            checkChip(chipImage, true, radioDone.text.toString())
+
+                            viewModel.changeImage(WITH_IMAGE)
                             bottomSheetDialog.dismiss()
                         }
                         R.id.radioNotDone ->{
-                            chipImage.text = "Without image"
-                            chipImage.isCheckable = true
-                            chipImage.isChecked = true
-                            viewModel.changeImage(radioNotDone.text.toString())
+                            checkChip(chipImage, true, radioNotDone.text.toString())
+
+                            viewModel.changeImage(NO_IMAGE)
                             bottomSheetDialog.dismiss()
                         }
                     }
@@ -582,7 +672,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 bottomSheetDialog.show()
             }
             R.id.chipLesson ->{
-                tvChoose.text = "Lesson"
+                tvChoose.text = lessonText
                 radioDone.isVisible = false
                 radioNotDone.isVisible = false
 
@@ -591,9 +681,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 }
                 radioAll.setOnCheckedChangeListener { _, state ->
                     if (state){
-                        chipLesson.text = "lesson"
-                        chipLesson.isCheckable = false
-                        chipLesson.isChecked = false
+                        checkChip(chipLesson, false, lessonText)
                         viewModel.changeLesson("All")
                         bottomSheetDialog.dismiss()
                     }
@@ -611,10 +699,8 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                     }
                     radioButton.setOnCheckedChangeListener {button, state ->
                         if (state){
-                            chipLesson.text = i
+                            checkChip(chipLesson, true, i)
                             viewModel.changeLesson(i)
-                            chipLesson.isCheckable = true
-                            chipLesson.isChecked = true
                             bottomSheetDialog.dismiss()
                         }
                     }
@@ -628,10 +714,10 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 val radioSortHomework = dialog.findViewById<MaterialRadioButton>(R.id.radioSortHomework)
                 val radioSortLesson = dialog.findViewById<MaterialRadioButton>(R.id.radioSortLesson)
 
-                tvChoose.text = "Sort order"
+                tvChoose.text = getString(R.string.sort_order)
                 linearLayout.isVisible = true
-                radioAll.text = "Ascending"
-                radioDone.text = "Descending"
+                radioAll.text = getString(R.string.ascending)
+                radioDone.text = getString(R.string.descending)
                 radioNotDone.isVisible = false
                 when(viewModel.sortOrder.value){
                     Sort.ASCENDING -> radioAll.isChecked = true
@@ -641,7 +727,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                     i.setOnCheckedChangeListener {v, state ->
                         if (state){
                             val sortOrder = when(v.text.toString()){
-                                "Descending" -> Sort.DESCENDING
+                                getString(R.string.descending) -> Sort.DESCENDING
                                 else -> Sort.ASCENDING
                             }
                             viewModel.changeSortOrder(sortOrder)
@@ -658,8 +744,8 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                     i.setOnCheckedChangeListener { v, state ->
                         if (state){
                             val sortField = when(v.text.toString()){
-                                "Homework" -> "note"
-                                "Lesson" -> "lesson"
+                                getString(R.string.homework_sort) -> "note"
+                                getString(R.string.lesson_sort) -> "lesson"
                                 else -> "date"
                             }
                             viewModel.changeSortField(sortField)
@@ -672,6 +758,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
     }
     fun showToolBar(){
+        isToolBarShown = true
         toolbar.isVisible = true
         toolbar.translationX = recyclerView.width.toFloat()
         searchToolbar.animate().apply {
@@ -680,12 +767,20 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             setInterpolator(DecelerateInterpolator())
 
         }
+
+        appBar.animate().apply {
+            translationX(-recyclerView.width.toFloat())
+            setDuration(200)
+            setInterpolator(DecelerateInterpolator())
+        }
         toolbar.animate().apply {
             translationX(0f)
             setDuration(200)
             setInterpolator(DecelerateInterpolator())
             withEndAction {
-                chipGroup.isVisible = false
+                Log.i("Toolbar", "show toolbar")
+//                chipGroup.isVisible = false
+
                 searchToolbar.visibility = View.INVISIBLE }
 
         }
@@ -696,7 +791,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     }
     fun hideActionMode(){
         searchToolbar.isVisible = true
-
+        isToolBarShown = false
 
         toolbar.animate().apply {
             translationX(recyclerView.width.toFloat())
@@ -709,46 +804,39 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             translationX(0f)
             setDuration(200)
             setInterpolator(DecelerateInterpolator())
-            withEndAction { toolbar.isVisible = false }
+            withEndAction {
+                Log.i("Toolbar", "hide tool bar")
+                toolbar.isVisible = false }
             addFAB.animate().apply {
                 translationY(0f)
             }
         }
+        appBar.animate().apply {
+            appBar.translationX = -recyclerView.width.toFloat()
+            translationX(0f)
+            setDuration(200)
+            setInterpolator(DecelerateInterpolator())
+        }
 
         adapter.clearSelection()
-//        actionMode?.finish()
-//        searchToolbar.postDelayed({
-//            searchToolbar.isGone = false
-//        }, 470)
-//        actionMode?.hide(2000)
-//        actionMode?.finish()
-    }
-
-
-    fun sortView(){
-        val sideView = layoutInflater.inflate(R.layout.side_sheet_layout, null)
-        val sideSheet = SideSheetDialog(requireContext())
-        sideSheet.setContentView(sideView)
-        sideSheet.show()
     }
 
     fun doneHw(clickedLesson: Homework){
         viewModel.doneHw(clickedLesson, null)
-        val snackbarText = if(clickedLesson.done) "Marked as undone" else "Done"
+        val snackbarText = if(clickedLesson.done) getString(R.string.marked_as_undone) else getString(R.string.done)
         val colorOnSurface = MaterialColors.getColor(addFAB, R.attr.colorOnSurface)
-        val botNav = requireActivity().findViewById<BottomNavigationView>(R.id.navBar)
+
         Snackbar.make(recyclerView, snackbarText, Snackbar.LENGTH_LONG)
             .setAnchorView(addFAB)
             .setBackgroundTint(MaterialColors.getColor(addFAB, com.google.android.material.R.attr.colorSurfaceContainerHigh))
             .setTextColor(colorOnSurface)
             .setActionTextColor(MaterialColors.getColor(addFAB, R.attr.colorTertiary))
             .setAnimationMode(Snackbar.ANIMATION_MODE_SLIDE)
-            .setAction("Undo") {
+            .setAction(getString(R.string.undo)) {
                 viewModel.doneHw(clickedLesson, clickedLesson.done)
             }
             .show()
     }
-
 
     fun addImage(hwList: Homework){
         val addImageDialog = layoutInflater.inflate(R.layout.bottom_sheet_image, null)
@@ -848,15 +936,19 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
 
     private fun showPermissionDeniedDialog(action: String) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Permission Denied")
-            .setMessage("Permission for ${action} were denied. The app may not work properly.")
-            .setPositiveButton("Go to settings") { _, _ ->
+            .setTitle(getString(R.string.permission_denied))
+            .setMessage(
+                getString(
+                    R.string.permission_for_were_denied_the_app_may_not_work_properly,
+                    action
+                ))
+            .setPositiveButton(getString(R.string.go_to_settings)) { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val uri = Uri.fromParts("package", requireContext().packageName, null)
                 intent.data = uri
                 startActivity(intent)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
     fun takePicture(){
@@ -881,7 +973,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         val textLayout = dialogView.findViewById<TextInputLayout>(R.id.textLayout)
         val editText = dialogView.findViewById<TextInputEditText>(R.id.titleEditText)
         val saveBtn = dialogView.findViewById<Button>(R.id.btnClose)
-        editText.requestFocus()
+
 
         val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listItems.toList())
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -905,14 +997,27 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             }
         }
 
-
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         bottomSheetDialog.setContentView(dialogView)
 
+        bottomSheetDialog.setOnShowListener {
+            editText.postDelayed({
+                editText.requestFocus()
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
+            }, 400)
+        }
 
         editText.doOnTextChanged { text, start, before, count ->
             textLayout.isErrorEnabled = false
             textLayout.error = null
+        }
+
+        editText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE){
+                saveBtn.performClick()
+                true
+            } else false
         }
 
         chipBtn.setOnClickListener {
@@ -925,7 +1030,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
             var noteText = editText.text.toString()
 
             if (noteText.isEmpty()){
-                textLayout.error = "Write something bitch"
+                textLayout.error = getString(R.string.write_homework)
                 textLayout.isErrorEnabled = true
                 return@setOnClickListener
             }
@@ -940,7 +1045,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                 if (position != null){
                         Toast.makeText(
                             requireContext(),
-                            "This hw already exists",
+                            getString(R.string.this_homework_already_exists),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -948,6 +1053,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                         viewModel.addHw(lastValidDate.toString(), noteText, spinner.selectedItem.toString())
                     }
                     withContext(Dispatchers.Main) {
+                        editText.clearFocus()
                         bottomSheetDialog.hide()
 
                     }
@@ -1002,7 +1108,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
 
         val deleteAdapter = DeleteAdapter()
-        tvDelete.text = "Delete ${selectedIds.size} item(s)?"
+        tvDelete.text = getString(R.string.delete_item_s, selectedIds.size.toString())
         rvDelete.apply {
             adapter = deleteAdapter
             lifecycleScope.launch {
@@ -1036,62 +1142,136 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     }
 
     private fun shareItems() {
-        val selected = adapter.getSelectedIds()
-        lifecycleScope.launch {
-            val lista = viewModel.homeworkList.first()
-            val shareList = lista.filter { selected.contains(it.id) }
-            val textShare : MutableList<String> = mutableListOf()
-            val images = arrayListOf<Uri>()
-            for (i in shareList){
-                textShare.add("Lesson: " + i.lesson + "\nHomework: " + i.note + "\nDue date: " + i.date)
-                i.images.map { it.imageUri.toUri() }.forEach {
-                    images.add(it)
-                }
-            }
+        val dialogView = layoutInflater.inflate(R.layout.share_options, null)
+        val closeBtn = dialogView.findViewById<ImageButton>(R.id.closeBtn)
+        val radioGroup = dialogView.findViewById<RadioGroup>(R.id.radio_group)
+        val shareBtn = dialogView.findViewById<MaterialButton>(R.id.share_button)
 
-            if (images.isEmpty()){
-                val shareIntent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "text/plain"
-//                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, images)
-                    putExtra(Intent.EXTRA_TEXT, textShare.joinToString(separator = "\n\n"))
-//                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                }
-                startActivity(Intent.createChooser(shareIntent, "Share text"))
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        bottomSheetDialog.setContentView(dialogView)
 
-            }
-            else{
-                val shareIntent = Intent().apply {
-                    action = Intent.ACTION_SEND_MULTIPLE
-                    type = "image/*"
-                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, images)
-                    putExtra(Intent.EXTRA_TEXT, textShare.joinToString(separator = "\n\n"))
-                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        closeBtn.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
 
-                }
-                val chooserIntent = Intent.createChooser(shareIntent, "Share Images").apply {
-                    // Add flags to chooser intent too
-                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                            Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                val resInfoList = requireContext().packageManager
-                    .queryIntentActivities(chooserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+        shareBtn.setOnClickListener {
+            val selected = adapter.getSelectedIds()
+            lifecycleScope.launch {
+                val lista = viewModel.homeworkList.first()
+                val shareList = lista.filter { selected.contains(it.id) }
+                val textShare : MutableList<String> = mutableListOf()
+                val images = arrayListOf<Uri>()
 
-                for (info in resInfoList) {
-                    for (uri in images) {
-                        requireContext().grantUriPermission(
-                            info.activityInfo.packageName,
-                            uri,
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
+                when(radioGroup.checkedRadioButtonId){
+                    R.id.share_all ->{
+                        for (i in shareList){
+                            textShare.add(
+                                getString(R.string.lesson) + ": " + i.lesson + "\n " + getString(R.string.homework) +
+                                    ": " + i.note + "\n" + getString(R.string.due_date) + ": " + i.date)
+                            i.images.map { it.imageUri.toUri() }.forEach {
+                                images.add(it)
+                            }
+                        }
+
+                        if (images.isEmpty()){
+                            val shareIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, textShare.joinToString(separator = "\n\n"))
+                            }
+                            startActivity(Intent.createChooser(shareIntent, "Share text"))
+
+                        }
+                        else{
+                            val shareIntent = Intent().apply {
+                                action = Intent.ACTION_SEND_MULTIPLE
+                                type = "image/*"
+                                putParcelableArrayListExtra(Intent.EXTRA_STREAM, images)
+                                putExtra(Intent.EXTRA_TEXT, textShare.joinToString(separator = "\n\n"))
+                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+
+                            }
+                            val chooserIntent = Intent.createChooser(shareIntent, "Share Images").apply {
+                                // Add flags to chooser intent too
+                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
+                            val resInfoList = requireContext().packageManager
+                                .queryIntentActivities(chooserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+
+                            for (info in resInfoList) {
+                                for (uri in images) {
+                                    requireContext().grantUriPermission(
+                                        info.activityInfo.packageName,
+                                        uri,
+                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    )
+                                }
+                            }
+                            startActivity(chooserIntent)
+                        }
+
+                    }
+                    R.id.share_text ->{
+                        for (i in shareList){
+                            textShare.add(getString(R.string.lesson_sort) + ": " + i.lesson + "\n " + getString(R.string.homework_sort) +
+                                    ": " + i.note + "\n" + getString(R.string.due_date) + ": " + i.date)
+                        }
+                        val shareIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, textShare.joinToString(separator = "\n\n"))
+                        }
+                        startActivity(Intent.createChooser(shareIntent, "Share text"))
+                    }
+                    R.id.share_photo ->{
+                        for (i in shareList){
+                            i.images.map { it.imageUri.toUri() }.forEach {
+                                images.add(it)
+                            }
+                        }
+                        if (images.isEmpty()){
+                            Toast.makeText(requireContext(), "no images to share", Toast.LENGTH_LONG).show()
+                        }
+                        else{
+                            val shareIntent = Intent().apply {
+                                action = Intent.ACTION_SEND_MULTIPLE
+                                type = "image/*"
+                                putParcelableArrayListExtra(Intent.EXTRA_STREAM, images)
+                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+
+                            }
+                            val chooserIntent = Intent.createChooser(shareIntent, "Share Images").apply {
+                                // Add flags to chooser intent too
+                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                        Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
+                            val resInfoList = requireContext().packageManager
+                                .queryIntentActivities(chooserIntent, PackageManager.MATCH_DEFAULT_ONLY)
+
+                            for (info in resInfoList) {
+                                for (uri in images) {
+                                    requireContext().grantUriPermission(
+                                        info.activityInfo.packageName,
+                                        uri,
+                                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    )
+                                }
+                            }
+                            startActivity(chooserIntent)
+                        }
+
                     }
                 }
-                startActivity(chooserIntent)
+                withContext(Dispatchers.Main) {
+                    hideActionMode()
+                }
             }
-            withContext(Dispatchers.Main) {
-                hideActionMode()
-            }
+            bottomSheetDialog.dismiss()
+
         }
+
+        bottomSheetDialog.show()
     }
 
     private fun editSelectedItem() {
@@ -1147,7 +1327,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
         saveBtn.setOnClickListener {
             var noteText = editText.text.toString()
             if (noteText.isEmpty()){
-                textLayout.error = "Write homework bitch"
+                textLayout.error = getString(R.string.write_homework)
                 textLayout.isErrorEnabled = true
                 return@setOnClickListener
             }
@@ -1160,8 +1340,6 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
                     }
             }
 
-
-
         }
 
         bottomSheetDialog.show()
@@ -1172,7 +1350,7 @@ class HomewListFragment : Fragment(R.layout.fragment_homew_list) {
     private fun updateTitle() {
         val count = adapter.getSelectedIds().size
         if (count != 0){
-            toolbar.title = "$count selected"
+            toolbar.title = getString(R.string.selected, count.toString())
             toolbar.menu?.findItem(R.id.action_edit)?.isVisible = (count == 1)
 
         } else {

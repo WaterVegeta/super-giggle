@@ -1,13 +1,12 @@
-package com.example.tabsgpttutor.schedule_change.fragments
+package com.example.tabsgpttutor.settings.schedule_change.fragments
 
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
 import com.example.tabsgpttutor.R
-import com.example.tabsgpttutor.schedule_change.ChangeScheduleAct
+import com.example.tabsgpttutor.settings.schedule_change.ChangeScheduleAct
 
 class ChangeScheduleFragment: PreferenceFragmentCompat(){
     override fun onCreatePreferences(
@@ -15,27 +14,27 @@ class ChangeScheduleFragment: PreferenceFragmentCompat(){
         rootKey: String?
     ) {
         setPreferencesFromResource(R.xml.preferences, "change_schedule_screen")
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+//        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         findPreference<Preference>("change_add_lesson")?.setOnPreferenceClickListener {
             Log.d("Preferences", "change_add_lesson was clicked")
-            atachFragment(AddLessonFragment(), "Add/change lesson")
+            atachFragment(AddLessonFragment(), getString(R.string.add_lesson))
             true // Return true if the click is handled.
         }
 
         findPreference<Preference>("change_add_time")?.setOnPreferenceClickListener {
             Log.d("Preferences", "change_add_lesson was clicked")
-            atachFragment(AddTimeFragment(), "Add/change time")
+            atachFragment(AddTimeFragment(), getString(R.string.add_time))
             true // Return true if the click is handled.
         }
 
         findPreference<Preference>("change_schedule")?.setOnPreferenceClickListener {
             Log.d("Preferences", "change_add_lesson was clicked")
-            atachFragment(AddScheduleFragment(), "Change schedule")
+            atachFragment(AddScheduleFragment(), getString(R.string.change_schedule))
             true // Return true if the click is handled.
         }
         findPreference<Preference>("pref_delete_db")?.setOnPreferenceClickListener {
             Log.d("Preferences", "pref_delete_db")
-            atachFragment(DeleteDbFragment(), "Delete db")
+            atachFragment(DeleteDbFragment(), getString(R.string.delete_db))
             true // Return true if the click is handled.
         }
     }

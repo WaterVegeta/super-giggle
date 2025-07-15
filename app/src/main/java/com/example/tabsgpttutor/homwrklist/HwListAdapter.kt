@@ -8,12 +8,14 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
 import android.util.Log
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat.startActivity
@@ -31,6 +33,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.core.net.toUri
+import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 
 class HwListAdapter(
@@ -39,9 +42,9 @@ class HwListAdapter(
     val addImage: (Homework) -> Unit
 ) : ListAdapter<Homework, HwListAdapter.ViewHolder>(HwDiffUtill()) {
 
-
     private val selectedItems = mutableSetOf<String>()
-    private var lastPosition = -1
+
+//    var blurHeight = 0
 
         interface OnItemClickListener {
             fun onItemLongClick(itemId: String)
@@ -95,6 +98,13 @@ class HwListAdapter(
         val dueDate = holder.rvDueDate
         val context = holder.itemView.context
 
+//        val layoutMarg = holder.rvCardView.layoutParams as ViewGroup.MarginLayoutParams
+//        val expectedMargin = if (currentItem.id == currentList.first().id) blurHeight else context.resources.getDimensionPixelSize(R.dimen.defaultMargin)
+
+//        if (layoutMarg.topMargin != expectedMargin) {
+//            layoutMarg.topMargin = expectedMargin
+//            holder.rvCardView.layoutParams = layoutMarg
+//        }
 
         when{
             currentDate.toString() == currentItem.date -> dueDate.text = "Сьогодні"

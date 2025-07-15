@@ -25,10 +25,14 @@ class MyDynamic: Application() {
         super.onCreate()
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
         val themePreference = sharedPreferences.getString("theme", "system")
         val dynamicColorsEnabled = sharedPreferences.getBoolean("dynamic_colors", true)
 
+        val appLanguage = sharedPreferences.getString("app_language", "default")
+
         ThemeHelper.applyTheme(themePreference.toString(), dynamicColorsEnabled, this)
+        LanguageChanger.setLanguage(appLanguage.toString(), this)
 
 //        DynamicColors.applyToActivitiesIfAvailable(this)
         val migration = AutomaticSchemaMigration { context ->

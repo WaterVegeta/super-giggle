@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dynamicWid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="13dp"
     android:orientation="vertical"
-    android:theme="@style/Theme.MaterialComponents.DayNight"
-    android:background="@drawable/wid_dynamic_background">
+    android:theme="@style/Theme.MaterialComponents.DayNight">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,19 +15,17 @@
 
         <TextView
             android:textColor="@color/text_white"
-            android:layout_alignParentStart="true"
             android:layout_weight="1"
 
             android:id="@+id/weekText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="СОСИ ІЛЮХА"
+            tools:text="COCvda"
 
             android:textSize="20sp" />
 
         <TextView android:id="@+id/dateText"
-            android:text="Ponedilok"
-            android:layout_alignParentEnd="true"
+            tools:text="Ponedilok"
             android:textAlignment="textEnd"
             android:layout_weight="1"
             android:textColor="@color/text_white"

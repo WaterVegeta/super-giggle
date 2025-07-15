@@ -1,4 +1,4 @@
-package com.example.tabsgpttutor.schedule_change.fragments
+package com.example.tabsgpttutor.settings.schedule_change.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels

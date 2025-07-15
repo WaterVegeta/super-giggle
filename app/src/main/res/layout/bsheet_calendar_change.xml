@@ -23,7 +23,7 @@
         android:layout_marginHorizontal="20dp"
         android:layout_marginBottom="10dp"
         style="@style/Widget.AppCompat.Button"
-        android:text="Change"
+        android:text="@string/change"
         android:textAllCaps="false"
         android:textSize="20sp"/>
 

@@ -23,11 +23,6 @@ class FullScreenImageAdapter(private val uris: List<String>,
 ) :
     RecyclerView.Adapter<FullScreenImageAdapter.ImageViewHolder>() {
 
-        interface OnImageTap{
-            fun onSingleTap()
-            fun onDoubleTap()
-    }
-
     class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val fullImage: PhotoView = itemView.findViewById(R.id.fullImage)
     }

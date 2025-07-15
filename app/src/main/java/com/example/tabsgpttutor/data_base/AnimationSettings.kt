@@ -8,7 +8,7 @@ class AnimationSettings : RealmObject {
     @PrimaryKey var _id : String = UUID.randomUUID().toString()
     var whatView : String = ""
 
-    var firstAnim : Boolean = true
+    var firstAnim : Boolean = false
     var firstInterpolator : String = "LinearInterpolator"
 
     var firstScaleX : Float = 1f
