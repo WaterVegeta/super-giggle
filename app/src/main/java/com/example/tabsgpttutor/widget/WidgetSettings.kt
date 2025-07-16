@@ -11,8 +11,11 @@ import android.widget.TextView
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.tabsgpttutor.R
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.slider.Slider
 
 class WidgetSettings : AppCompatActivity() {
@@ -25,14 +28,24 @@ class WidgetSettings : AppCompatActivity() {
     lateinit var valueSlider: Slider
     lateinit var alphaSlider: Slider
 
+    lateinit var textChangeButton: MaterialButton
+
     var hue : Float = 0f
     var saturation: Float = 0f
     var hueValue: Float = 0f
     var alpha: Float = 0f
+    var isTextBlack = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.widget_settings)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
+            insets
+        }
 
         colorView = findViewById(R.id.color_view)
         hueSlider = findViewById(R.id.hue_slider)
@@ -40,6 +53,8 @@ class WidgetSettings : AppCompatActivity() {
         valueSlider = findViewById(R.id.value_slider)
         alphaSlider = findViewById(R.id.alpha_slider)
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
+
+        textChangeButton = findViewById(R.id.change_txt_color)
 
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
@@ -98,6 +113,21 @@ class WidgetSettings : AppCompatActivity() {
             changeViewColor(hue, saturation, hueValue, alpha)
         }
 
+        val weekText = findViewById<TextView>(R.id.weekText)
+        val dateText = findViewById<TextView>(R.id.dateText)
+
+        textChangeButton.setOnClickListener {
+            isTextBlack = !isTextBlack
+            if (isTextBlack){
+                weekText.setTextColor(Color.BLACK)
+                dateText.setTextColor(Color.BLACK)
+            }
+            else{
+                weekText.setTextColor(Color.WHITE)
+                dateText.setTextColor(Color.WHITE)
+            }
+        }
+
         val intent = intent
         val extras = intent.extras
 
@@ -117,7 +147,11 @@ class WidgetSettings : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        WidgetPreferences.saveColor(this, appWidgetId, adjustHueSA(hue, saturation, hueValue, alpha))
+        val textColor = if (isTextBlack) Color.BLACK else Color.WHITE
+        WidgetPreferences.saveColor(
+            this, appWidgetId, adjustHueSA(hue, saturation, hueValue, alpha),
+            textColor
+        )
 
         val appWidgetManager = AppWidgetManager.getInstance(this)
         DynamicWidProvider.updateWidget(this, appWidgetManager, appWidgetId)

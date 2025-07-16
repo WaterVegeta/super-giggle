@@ -1,5 +1,6 @@
 package com.example.tabsgpttutor.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.widget.RemoteViewsService
 import java.time.LocalDate

@@ -145,6 +145,16 @@
             android:valueTo="1"
             android:value="1"
             />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/change_txt_color"
+            app:layout_constraintTop_toBottomOf="@id/alpha_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Change text color"
+            app:cornerRadius="10dp"
+            android:layout_marginHorizontal="10dp"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

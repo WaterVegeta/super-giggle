@@ -77,6 +77,7 @@ class DynamicWidProvider: AppWidgetProvider() {
     companion object {
         fun updateWidget(context: Context?, appWidgetManager: AppWidgetManager?, appWidgetId: Int) {
             val colorPref = WidgetPreferences.loadColor(context, appWidgetId)
+            val textColorPref = WidgetPreferences.loadTextColor(context, appWidgetId)
 
             val date = LocalDate.now()
             val time = LocalTime.now()
@@ -122,6 +123,9 @@ class DynamicWidProvider: AppWidgetProvider() {
 
             rv.setTextViewText(R.id.dateText, formate.toString())
             rv.setTextViewText(R.id.weekText, weekDate)
+
+            rv.setTextColor(R.id.dateText, textColorPref)
+            rv.setTextColor(R.id.weekText, textColorPref)
 
             appWidgetManager?.updateAppWidget(appWidgetId, rv)
 

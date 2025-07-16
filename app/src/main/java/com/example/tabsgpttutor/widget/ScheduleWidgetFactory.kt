@@ -1,6 +1,7 @@
 package com.example.tabsgpttutor.widget
 
 import android.content.Context
+import android.graphics.Color
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.example.tabsgpttutor.MyDynamic
@@ -16,12 +17,15 @@ class ScheduleWidgetFactory(private val context: Context): RemoteViewsService.Re
     private val data = arrayListOf<WidDataClass>()
     private lateinit var lessonList: Array<String>
     private lateinit var timeList: Array<String>
+    private var textColor: Int = Color.BLACK
 
     override fun onCreate() {
     }
 
     override fun onDataSetChanged() {
         data.clear()
+
+//        val textColor = WidgetPreferences.loadTextColor(context, id)
 
         val date = LocalDate.now()
         val time = LocalTime.now()
@@ -114,6 +118,8 @@ class ScheduleWidgetFactory(private val context: Context): RemoteViewsService.Re
         val views = RemoteViews(context.packageName, R.layout.wid_schedule_item)
         views.setTextViewText(R.id.lessonText, data[position].subject)
         views.setTextViewText(R.id.timeText, data[position].time)
+        views.setTextColor(R.id.lessonText, textColor)
+        views.setTextColor(R.id.timeText, textColor)
         return views
     }
 
