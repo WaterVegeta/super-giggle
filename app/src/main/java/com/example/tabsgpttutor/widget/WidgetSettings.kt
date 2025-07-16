@@ -3,19 +3,23 @@ package com.example.tabsgpttutor.widget
 import android.Manifest
 import android.app.WallpaperManager
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import com.example.tabsgpttutor.R
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.slider.Slider
 
 class WidgetSettings : AppCompatActivity() {
@@ -30,17 +34,32 @@ class WidgetSettings : AppCompatActivity() {
 
     lateinit var textChangeButton: MaterialButton
 
+    lateinit var btnSystem: MaterialButton
+    lateinit var btnDay: MaterialButton
+    lateinit var btnNight: MaterialButton
+    lateinit var btnDynamic: MaterialButton
+    lateinit var btnCustom: MaterialButton
+
+    val SYSTEM = 0
+    val DAY = 1
+    val NIGHT = 2
+    val DYNAMIC = 3
+    val CUSTOM = 69
+
+    var currentMode = SYSTEM
+
     var hue : Float = 0f
     var saturation: Float = 0f
     var hueValue: Float = 0f
     var alpha: Float = 0f
-    var isTextBlack = true
+    var isTextBlack = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.widget_settings)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.toolbar)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
@@ -52,6 +71,38 @@ class WidgetSettings : AppCompatActivity() {
         satSlider = findViewById(R.id.saturation_slider)
         valueSlider = findViewById(R.id.value_slider)
         alphaSlider = findViewById(R.id.alpha_slider)
+
+        btnSystem = findViewById(R.id.btnSystem)
+        btnDay = findViewById(R.id.btnDay)
+        btnNight = findViewById(R.id.btnNight)
+        btnDynamic = findViewById(R.id.btnDynamic)
+        btnCustom = findViewById(R.id.btnCustom)
+
+        btnSystem.setOnClickListener {
+            currentMode = SYSTEM
+            changeMode()
+        }
+
+        btnDay.setOnClickListener {
+            currentMode = DAY
+            changeMode()
+        }
+
+        btnNight.setOnClickListener {
+            currentMode = NIGHT
+            changeMode()
+        }
+
+        btnDynamic.setOnClickListener {
+            currentMode = DYNAMIC
+            changeMode()
+        }
+
+        btnCustom.setOnClickListener {
+            currentMode = CUSTOM
+            changeMode()
+        }
+
         val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
 
         textChangeButton = findViewById(R.id.change_txt_color)
@@ -60,25 +111,6 @@ class WidgetSettings : AppCompatActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
         }
-
-//        val sliders = listOf(
-//            hueSlider,
-//            satSlider,
-//            valueSlider,
-//            alphaSlider
-//        )
-//        val hvs = listOf(
-//            hue,
-//            saturation,
-//            value,
-//            alpha
-//        )
-//
-//        for ((index, i) in sliders.withIndex()){
-//            i.addOnChangeListener { v, value, _ ->
-//
-//            }
-//        }
 
 
         hue = hueSlider.value
@@ -146,6 +178,23 @@ class WidgetSettings : AppCompatActivity() {
 
     }
 
+    fun changeMode(){
+        val list = listOf(
+            hueSlider,
+            satSlider,
+            alphaSlider,
+            valueSlider
+        )
+        for (i in list){
+            if (currentMode == CUSTOM){
+                i.isVisible = true
+            }
+            else{
+                i.isVisible = false
+            }
+        }
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         val textColor = if (isTextBlack) Color.BLACK else Color.WHITE
         WidgetPreferences.saveColor(
@@ -155,6 +204,9 @@ class WidgetSettings : AppCompatActivity() {
 
         val appWidgetManager = AppWidgetManager.getInstance(this)
         DynamicWidProvider.updateWidget(this, appWidgetManager, appWidgetId)
+        val idsTrans = appWidgetManager.getAppWidgetIds(ComponentName(this,
+            DynamicWidProvider::class.java))
+        appWidgetManager.notifyAppWidgetViewDataChanged(idsTrans, R.id.listView)
 
         val resultValue = Intent()
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

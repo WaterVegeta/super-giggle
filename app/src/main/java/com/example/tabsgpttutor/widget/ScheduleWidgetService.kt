@@ -8,6 +8,9 @@ import java.time.LocalTime
 
 class ScheduleWidgetService: RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
-        return ScheduleWidgetFactory(applicationContext)
+        val appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+        return ScheduleWidgetFactory(
+            applicationContext,
+            appWidgetId)
     }
 }
