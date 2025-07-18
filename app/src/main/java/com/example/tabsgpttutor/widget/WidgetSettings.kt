@@ -40,6 +40,11 @@ class WidgetSettings : AppCompatActivity() {
     lateinit var btnDynamic: MaterialButton
     lateinit var btnCustom: MaterialButton
 
+    lateinit var dateText: TextView
+    lateinit var weekText: TextView
+
+//    val textList = listOf(dateText, weekText)
+
     val SYSTEM = 0
     val DAY = 1
     val NIGHT = 2
@@ -145,8 +150,8 @@ class WidgetSettings : AppCompatActivity() {
             changeViewColor(hue, saturation, hueValue, alpha)
         }
 
-        val weekText = findViewById<TextView>(R.id.weekText)
-        val dateText = findViewById<TextView>(R.id.dateText)
+        weekText = findViewById(R.id.weekText)
+        dateText = findViewById(R.id.dateText)
 
         textChangeButton.setOnClickListener {
             isTextBlack = !isTextBlack
@@ -179,18 +184,44 @@ class WidgetSettings : AppCompatActivity() {
     }
 
     fun changeMode(){
-        val list = listOf(
+        val customList = listOf(
             hueSlider,
             satSlider,
             alphaSlider,
-            valueSlider
+            valueSlider,
+            textChangeButton
         )
-        for (i in list){
-            if (currentMode == CUSTOM){
+        if (currentMode == CUSTOM){
+            for (i in customList){
                 i.isVisible = true
             }
-            else{
+        }
+        else{
+            for (i in customList){
                 i.isVisible = false
+            }
+            when(currentMode){
+                SYSTEM ->{
+
+                }
+                DAY ->{
+                    colorView.setBackgroundColor(Color.WHITE)
+                    dateText.setTextColor(Color.BLACK)
+                    weekText.setTextColor(Color.BLACK)
+                }
+                NIGHT ->{
+                    colorView.setBackgroundColor(Color.BLACK)
+                    dateText.setTextColor(Color.WHITE)
+                    weekText.setTextColor(Color.WHITE)
+                }
+                DYNAMIC ->{
+                    colorView.setBackgroundColor(MaterialColors.getColor(this, com.google.android.material.R.attr.colorSecondary,
+                        Color.RED))
+                    dateText.setTextColor(MaterialColors.getColor(this, com.google.android.material.R.attr.colorOnSecondary,
+                        Color.BLACK))
+                    weekText.setTextColor(MaterialColors.getColor(this, R.attr.colorOnTertiary,
+                        Color.BLACK))
+                }
             }
         }
     }
@@ -204,6 +235,7 @@ class WidgetSettings : AppCompatActivity() {
 
         val appWidgetManager = AppWidgetManager.getInstance(this)
         DynamicWidProvider.updateWidget(this, appWidgetManager, appWidgetId)
+
         val idsTrans = appWidgetManager.getAppWidgetIds(ComponentName(this,
             DynamicWidProvider::class.java))
         appWidgetManager.notifyAppWidgetViewDataChanged(idsTrans, R.id.listView)
