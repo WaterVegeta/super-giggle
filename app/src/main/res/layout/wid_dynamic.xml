@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:padding="13dp"
     android:orientation="vertical"
-    android:theme="@style/Theme.MaterialComponents.DayNight">
+    android:theme="@android:style/Theme.DeviceDefault.DayNight"
+    android:background="?android:attr/colorBackground"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +16,7 @@
         android:paddingBottom="5dp">
 
         <TextView
-            android:textColor="@color/text_white"
+            android:textColor="?android:attr/colorAccent"
             android:layout_weight="1"
 
             android:id="@+id/weekText"
@@ -28,7 +30,7 @@
             tools:text="Ponedilok"
             android:textAlignment="textEnd"
             android:layout_weight="1"
-            android:textColor="@color/text_white"
+            android:textColor="?android:attr/colorAccent"
 
             android:textSize="20sp"
             android:layout_width="0dp"

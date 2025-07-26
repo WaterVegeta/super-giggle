@@ -130,5 +130,9 @@
     <string name="homework_added_for">Homework added for %1$s</string>
     <string name="set_to">set to %1$s</string>
     <string name="pls_restart_the_app_to_apply_changes">pls restart the app to apply changes</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
 
 </resources>

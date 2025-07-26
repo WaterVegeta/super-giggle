@@ -6,16 +6,16 @@
 
     <fragment
         android:id="@+id/nav_schedule"
-        android:name="com.example.tabsgpttutor.shcedule.ScheduleFrag"
+        android:name="com.example.task_king.shcedule.ScheduleFrag"
         android:label="Schedule" />
 
     <fragment
         android:id="@+id/nav_hwList"
-        android:name="com.example.tabsgpttutor.homwrklist.HomewListFragment"
+        android:name="com.example.task_king.homwrklist.HomewListFragment"
         android:label="Homework" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.example.tabsgpttutor.settings.SettingsFragment"
+        android:name="com.example.task_king.settings.SettingsFragment"
         android:label="Settings" />
 </navigation>

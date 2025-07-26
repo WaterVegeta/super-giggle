@@ -7,20 +7,22 @@
     android:id="@+id/main">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:background="?attr/colorSurface"
+        android:background="@drawable/bottom_corners"
+        android:backgroundTint="?attr/colorSurfaceContainer"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/toolbar"
+        app:title="dawdaw"
+        android:padding="20dp"
         />
 
     <LinearLayout
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="24dp"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
 
-        android:background="@drawable/alpha_toolbar"
+        android:background="@drawable/all_corners"
 
         android:id="@+id/color_view"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
@@ -63,150 +65,208 @@
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
-        android:background="?attr/colorSurface"
         app:layout_constraintTop_toBottomOf="@id/color_view"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_width="match_parent"
         android:layout_height="0dp">
-        <LinearLayout android:orientation="vertical"
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:backgroundTint="?attr/colorSurfaceContainer"
+            app:cardCornerRadius="20dp"
+            android:layout_marginHorizontal="5dp"
+            >
 
-            <HorizontalScrollView
-                android:scrollbars="none"
-                android:layout_width="wrap_content"
+            <LinearLayout android:orientation="vertical"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                >
-                <LinearLayout
-                    android:padding="10dp"
+                android:padding="10dp">
+
+                <HorizontalScrollView
+                    android:scrollbars="none"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSystem"
+                    android:layout_height="wrap_content"
+                    >
+                    <LinearLayout
+                        android:padding="10dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="System"
-                        />
+                        android:layout_height="wrap_content">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDay"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Day"
-                        />
+                        <com.google.android.material.button.MaterialButton
+                            app:strokeColor="@color/button_selector_stroke"
+                            app:strokeWidth="3dp"
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNight"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Night"
-                        />
+                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                            app:iconTint="@null"
+                            android:backgroundTint="@android:color/transparent"
+                            app:cornerRadius="15dp"
+                            app:icon="@drawable/widget_day"
+                            app:iconGravity="top"
+                            app:iconSize="50dp"
+                            android:id="@+id/btnSystem"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="System"
+                            />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDynamic"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Dynamic colors"
-                        />
+                        <com.google.android.material.button.MaterialButton
+                            app:strokeColor="@color/button_selector_stroke"
+                            app:strokeWidth="3dp"
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnCustom"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Custom"
-                        />
-                </LinearLayout>
-            </HorizontalScrollView>
+                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                            app:iconTint="@null"
+                            android:backgroundTint="@android:color/transparent"
+                            app:cornerRadius="15dp"
+                            app:icon="@drawable/widget_day"
+                            app:iconGravity="top"
+                            app:iconSize="50dp"
+                            android:id="@+id/btnDay"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Day"
+                            />
 
-            <TextView
+                        <com.google.android.material.button.MaterialButton
+                            app:strokeColor="@color/button_selector_stroke"
+                            app:strokeWidth="3dp"
 
+                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                            android:backgroundTint="@android:color/transparent"
+                            app:iconTint="@color/black"
+                            app:cornerRadius="15dp"
+                            app:icon="@drawable/widget_day"
+                            app:iconGravity="top"
+                            app:iconSize="50dp"
+                            android:id="@+id/btnNight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Night"
+                            />
 
-                app:layout_constraintTop_toTopOf="parent"
-                android:padding="10dp"
-                android:textSize="20sp"
-                android:id="@+id/tvHue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Hue"/>
-            <com.google.android.material.slider.Slider
+                        <com.google.android.material.button.MaterialButton
+                            app:strokeColor="@color/button_selector_stroke"
+                            app:strokeWidth="3dp"
 
-                android:id="@+id/hue_slider"
-                app:layout_constraintTop_toBottomOf="@id/tvHue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:valueFrom="0"
-                android:valueTo="360"
-                />
-            <TextView
+                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                            app:iconTint="@null"
+                            android:backgroundTint="@android:color/transparent"
+                            app:cornerRadius="15dp"
+                            app:icon="@drawable/wid_dynamic"
+                            app:iconGravity="top"
+                            app:iconSize="50dp"
+                            android:id="@+id/btnDynamic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dynamic colors"
+                            />
 
-                android:padding="10dp"
-                android:textSize="20sp"
-                app:layout_constraintTop_toBottomOf="@id/hue_slider"
-                android:id="@+id/tvSaturation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Saturation"/>
-            <com.google.android.material.slider.Slider
+                        <com.google.android.material.button.MaterialButton
+                            app:strokeColor="@color/button_selector_stroke"
+                            app:strokeWidth="3dp"
 
-                android:id="@+id/saturation_slider"
-                app:layout_constraintTop_toBottomOf="@id/tvSaturation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:valueFrom="0"
-                android:valueTo="1"
-                android:value="1"
-                />
-            <TextView
+                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                            app:iconTint="@null"
+                            android:backgroundTint="@android:color/transparent"
+                            app:cornerRadius="15dp"
+                            app:icon="@drawable/wid_custom"
+                            app:iconGravity="top"
+                            app:iconSize="50dp"
+                            android:id="@+id/btnCustom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Custom"
+                            />
+                    </LinearLayout>
+                </HorizontalScrollView>
 
-                android:padding="10dp"
-                android:textSize="20sp"
-                app:layout_constraintTop_toBottomOf="@id/saturation_slider"
-                android:id="@+id/tvValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Value"/>
-            <com.google.android.material.slider.Slider
+                <TextView
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:padding="10dp"
+                    android:textSize="20sp"
+                    android:id="@+id/tvHue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hue"/>
+                <com.google.android.material.slider.Slider
 
-                android:id="@+id/value_slider"
-                app:layout_constraintTop_toBottomOf="@id/tvValue"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:valueFrom="0"
-                android:valueTo="1"
-                android:value="1"
-                />
-            <TextView
+                    android:id="@+id/hue_slider"
+                    app:layout_constraintTop_toBottomOf="@id/tvHue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0"
+                    android:valueTo="360"
+                    />
+                <TextView
 
-                android:padding="10dp"
-                android:textSize="20sp"
-                app:layout_constraintTop_toBottomOf="@id/value_slider"
-                android:id="@+id/tvAlpha"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Transparency"/>
-            <com.google.android.material.slider.Slider
+                    android:padding="10dp"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toBottomOf="@id/hue_slider"
+                    android:id="@+id/tvSaturation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Saturation"/>
+                <com.google.android.material.slider.Slider
 
-                android:id="@+id/alpha_slider"
-                app:layout_constraintTop_toBottomOf="@id/tvAlpha"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:valueFrom="0"
-                android:valueTo="1"
-                android:value="1"
-                />
-            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/saturation_slider"
+                    app:layout_constraintTop_toBottomOf="@id/tvSaturation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:value="1"
+                    />
+                <TextView
 
-                android:id="@+id/change_txt_color"
-                app:layout_constraintTop_toBottomOf="@id/alpha_slider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Change text color"
-                app:cornerRadius="10dp"
-                android:layout_marginHorizontal="10dp"
-                />
-        </LinearLayout>
+                    android:padding="10dp"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toBottomOf="@id/saturation_slider"
+                    android:id="@+id/tvValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Brightness"/>
+                <com.google.android.material.slider.Slider
+
+                    android:id="@+id/value_slider"
+                    app:layout_constraintTop_toBottomOf="@id/tvValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:value="1"
+                    />
+                <TextView
+
+                    android:padding="10dp"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toBottomOf="@id/value_slider"
+                    android:id="@+id/tvAlpha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Transparency"/>
+                <com.google.android.material.slider.Slider
+
+                    android:id="@+id/alpha_slider"
+                    app:layout_constraintTop_toBottomOf="@id/tvAlpha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:value="1"
+                    />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/change_txt_color"
+                    app:layout_constraintTop_toBottomOf="@id/alpha_slider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Change text color"
+                    app:cornerRadius="10dp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_gravity="bottom"
+                    />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </androidx.core.widget.NestedScrollView>
 
 

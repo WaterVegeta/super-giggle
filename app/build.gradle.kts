@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tabsgpttutor"
+    namespace = "com.example.task_king"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.tabsgpttutor"
+        applicationId = "com.example.task_king"
         minSdk = 30
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
