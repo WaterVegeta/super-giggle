@@ -4,73 +4,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main">
+    android:id="@+id/main"
+    android:background="@android:color/transparent">
 
     <com.google.android.material.appbar.MaterialToolbar
-        android:background="@drawable/bottom_corners"
-        android:backgroundTint="?attr/colorSurfaceContainer"
+
+        android:layout_marginHorizontal="5dp"
+        android:background="@drawable/inside_box"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/toolbar"
         app:title="dawdaw"
-        android:padding="20dp"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:navigationIconTint="?attr/colorOnSurface"
         />
 
-    <LinearLayout
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-
-        android:background="@drawable/all_corners"
-
-        android:id="@+id/color_view"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:padding="13dp"
-        android:orientation="vertical">
-
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/widget_preview"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintBottom_toTopOf="@id/cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="5dp">
-
-            <TextView
-                android:textColor="@color/text_white"
-                android:layout_weight="1"
-
-                android:id="@+id/weekText"
-                android:layout_width="0dp"
+            android:layout_marginHorizontal="45dp">
+            <include
+                layout="@layout/wid_dynamic"
+                android:layout_height="195dp"
+                android:layout_width="wrap_content"
+                />
+            <include
+                android:id="@+id/firstItem"
+                android:layout_marginTop="64dp"
+                android:layout_marginHorizontal="28dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Monday"
+                layout="@layout/wid_schedule_item"
+                />
+            <View
+                android:id="@+id/divider"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/firstItem"
+                android:layout_marginHorizontal="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="?android:attr/listDivider"
+                />
+            <include
+                android:layout_marginTop="13dp"
+                android:layout_below="@id/divider"
+                android:id="@+id/secondItem"
+                android:layout_marginHorizontal="28dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/wid_schedule_item"
+                />
+        </RelativeLayout>
 
-                android:textSize="20sp" />
-
-            <TextView android:id="@+id/dateText"
-                android:text="20 July"
-                android:textAlignment="textEnd"
-                android:layout_weight="1"
-                android:textColor="@color/text_white"
-
-                android:textSize="20sp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <ListView android:id="@+id/listView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
-    </LinearLayout>
-
-    <androidx.core.widget.NestedScrollView
-        app:layout_constraintTop_toBottomOf="@id/color_view"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="24dp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="?attr/colorSurfaceContainer"
@@ -78,168 +70,15 @@
             android:layout_marginHorizontal="5dp"
             >
 
-            <LinearLayout android:orientation="vertical"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp">
-
-                <HorizontalScrollView
-                    android:scrollbars="none"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    >
-                    <LinearLayout
-                        android:padding="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.button.MaterialButton
-                            app:strokeColor="@color/button_selector_stroke"
-                            app:strokeWidth="3dp"
-
-                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                            app:iconTint="@null"
-                            android:backgroundTint="@android:color/transparent"
-                            app:cornerRadius="15dp"
-                            app:icon="@drawable/widget_day"
-                            app:iconGravity="top"
-                            app:iconSize="50dp"
-                            android:id="@+id/btnSystem"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="System"
-                            />
-
-                        <com.google.android.material.button.MaterialButton
-                            app:strokeColor="@color/button_selector_stroke"
-                            app:strokeWidth="3dp"
-
-                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                            app:iconTint="@null"
-                            android:backgroundTint="@android:color/transparent"
-                            app:cornerRadius="15dp"
-                            app:icon="@drawable/widget_day"
-                            app:iconGravity="top"
-                            app:iconSize="50dp"
-                            android:id="@+id/btnDay"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Day"
-                            />
-
-                        <com.google.android.material.button.MaterialButton
-                            app:strokeColor="@color/button_selector_stroke"
-                            app:strokeWidth="3dp"
-
-                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                            android:backgroundTint="@android:color/transparent"
-                            app:iconTint="@color/black"
-                            app:cornerRadius="15dp"
-                            app:icon="@drawable/widget_day"
-                            app:iconGravity="top"
-                            app:iconSize="50dp"
-                            android:id="@+id/btnNight"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Night"
-                            />
-
-                        <com.google.android.material.button.MaterialButton
-                            app:strokeColor="@color/button_selector_stroke"
-                            app:strokeWidth="3dp"
-
-                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                            app:iconTint="@null"
-                            android:backgroundTint="@android:color/transparent"
-                            app:cornerRadius="15dp"
-                            app:icon="@drawable/wid_dynamic"
-                            app:iconGravity="top"
-                            app:iconSize="50dp"
-                            android:id="@+id/btnDynamic"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Dynamic colors"
-                            />
-
-                        <com.google.android.material.button.MaterialButton
-                            app:strokeColor="@color/button_selector_stroke"
-                            app:strokeWidth="3dp"
-
-                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                            app:iconTint="@null"
-                            android:backgroundTint="@android:color/transparent"
-                            app:cornerRadius="15dp"
-                            app:icon="@drawable/wid_custom"
-                            app:iconGravity="top"
-                            app:iconSize="50dp"
-                            android:id="@+id/btnCustom"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Custom"
-                            />
-                    </LinearLayout>
-                </HorizontalScrollView>
 
                 <TextView
                     app:layout_constraintTop_toTopOf="parent"
                     android:padding="10dp"
                     android:textSize="20sp"
-                    android:id="@+id/tvHue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Hue"/>
-                <com.google.android.material.slider.Slider
-
-                    android:id="@+id/hue_slider"
-                    app:layout_constraintTop_toBottomOf="@id/tvHue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:valueFrom="0"
-                    android:valueTo="360"
-                    />
-                <TextView
-
-                    android:padding="10dp"
-                    android:textSize="20sp"
-                    app:layout_constraintTop_toBottomOf="@id/hue_slider"
-                    android:id="@+id/tvSaturation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Saturation"/>
-                <com.google.android.material.slider.Slider
-
-                    android:id="@+id/saturation_slider"
-                    app:layout_constraintTop_toBottomOf="@id/tvSaturation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:valueFrom="0"
-                    android:valueTo="1"
-                    android:value="1"
-                    />
-                <TextView
-
-                    android:padding="10dp"
-                    android:textSize="20sp"
-                    app:layout_constraintTop_toBottomOf="@id/saturation_slider"
-                    android:id="@+id/tvValue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Brightness"/>
-                <com.google.android.material.slider.Slider
-
-                    android:id="@+id/value_slider"
-                    app:layout_constraintTop_toBottomOf="@id/tvValue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:valueFrom="0"
-                    android:valueTo="1"
-                    android:value="1"
-                    />
-                <TextView
-
-                    android:padding="10dp"
-                    android:textSize="20sp"
-                    app:layout_constraintTop_toBottomOf="@id/value_slider"
                     android:id="@+id/tvAlpha"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -254,20 +93,39 @@
                     android:valueTo="1"
                     android:value="1"
                     />
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/change_txt_color"
-                    app:layout_constraintTop_toBottomOf="@id/alpha_slider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Change text color"
-                    app:cornerRadius="10dp"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_gravity="bottom"
-                    />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </androidx.core.widget.NestedScrollView>
 
+                <com.google.android.material.button.MaterialButton
+
+                    android:id="@+id/cancel_button"
+                    app:layout_constraintTop_toBottomOf="@id/alpha_slider"
+                    app:layout_constraintEnd_toStartOf="@+id/save_button"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cancel"
+
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+
+                    style="@style/Widget.Material3.Button.TextButton.Dialog"
+                    />
+                <com.google.android.material.button.MaterialButton
+
+                    android:id="@+id/save_button"
+                    app:layout_constraintTop_toTopOf="@id/cancel_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/cancel_button"
+
+
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/save"
+
+                    android:layout_marginEnd="10dp"
+
+                    style="@style/Widget.Material3.Button.TextButton"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

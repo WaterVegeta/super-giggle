@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/MyWidgetTheme"
+    >
 
-    <TextView android:id="@+id/lessonText"
+    <TextView
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/timeText"
+
+        android:id="@+id/lessonText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Lesson"
-        android:layout_weight="1"
-        android:textSize="24sp"
+        android:text="@string/lesson"
+        android:textSize="18sp"
+        android:textColor="?attr/colorOnSurface"
         />
 
-    <TextView android:id="@+id/timeText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="10:20--10:39"
-        android:textSize="24sp"
-        android:textAlignment="textEnd"/>
+    <TextView
+        android:layout_alignParentEnd="true"
 
-</LinearLayout>
+        android:id="@+id/timeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:25–11:05"
+        android:textSize="18sp"
+        android:textAlignment="textEnd"
+        android:textColor="?attr/colorOnSurface"
+        />
+
+</RelativeLayout>

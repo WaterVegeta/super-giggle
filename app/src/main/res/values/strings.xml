@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">CRebuilt</string>
+    <string name="app_name" translatable="false">TasKing</string>
 
     <string name="monday">Monday</string>
     <string name="tuesday">Tuesday</string>
@@ -128,11 +128,8 @@
     <string name="choose_language">Choose language</string>
     <string name="marked_as_done">Marked as done</string>
     <string name="homework_added_for">Homework added for %1$s</string>
-    <string name="set_to">set to %1$s</string>
-    <string name="pls_restart_the_app_to_apply_changes">pls restart the app to apply changes</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="configure">Configure</string>
-    <string name="add_widget">Add widget</string>
-    <string name="app_widget_description">This is an app widget description</string>
+    <string name="set_to">%1$s</string>
+    <string name="pls_restart_the_app_to_apply_changes">Restart the app to apply changes</string>
+    <string name="_13_september">13 September</string>
 
 </resources>

@@ -21,6 +21,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "tabsGPTtutor"
+rootProject.name = "task_king"
 include(":app")
  

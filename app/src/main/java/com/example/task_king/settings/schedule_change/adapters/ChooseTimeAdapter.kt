@@ -3,14 +3,46 @@ package com.example.task_king.settings.schedule_change.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.example.task_king.R
+import com.example.task_king.data_base.LessonChange
 import com.example.task_king.data_base.TimeChange
-import com.example.task_king.settings.schedule_change.adapters.TimeChangeAdapter.ViewHolder
 
-class ChooseTimeAdapter(val addTime: (TimeChange) -> Unit): ListAdapter<TimeChange, ViewHolder>(
-    TimeChangeAdapter.TimeDiffUtill()
-) {
+class ChooseTimeAdapter(
+    val addTime: (TimeChange) -> Unit,
+    val editTime:(TimeChange) -> Unit,
+    val deleteTime:(TimeChange) -> Unit
+): ListAdapter<TimeChange, ChooseTimeAdapter.ViewHolder>(TimeDiffUtill())
+{
+    class TimeDiffUtill: DiffUtil.ItemCallback<TimeChange>(){
+        override fun areItemsTheSame(
+            oldItem: TimeChange,
+            newItem: TimeChange
+        ): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(
+            oldItem: TimeChange,
+            newItem: TimeChange
+        ): Boolean {
+            return oldItem.lessonStartHour == newItem.lessonStartHour
+                    && oldItem.lessonStartMinute == newItem.lessonStartMinute
+        }
+
+    }
+
+    class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
+        val rvLesson: TextView = itemView.findViewById(R.id.tvLesson)
+        val rvCardView: CardView = itemView.findViewById(R.id.cardView)
+        val rvDelete: ImageButton = itemView.findViewById(R.id.deleteBtn)
+//        val rvEdit: ImageButton = itemView.findViewById(R.id.editBtn)
+    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -19,6 +51,9 @@ class ChooseTimeAdapter(val addTime: (TimeChange) -> Unit): ListAdapter<TimeChan
             LayoutInflater.from(parent.context).inflate(R.layout.item_lesson_change, parent, false)
         )
     }
+
+    var editMode = false
+    var deleteMode = false
 
     override fun onBindViewHolder(
         holder: ViewHolder,
@@ -59,8 +94,20 @@ class ChooseTimeAdapter(val addTime: (TimeChange) -> Unit): ListAdapter<TimeChan
         val timeText = currentItem.lessonStartHour + ":" + startMinute + "–" +currentItem.lessonEndHour + ":" + endMinute
         holder.rvLesson.text = timeText
 
-        holder.rvCardView.setOnClickListener {
-            addTime(currentItem)
+        if (editMode){
+            holder.rvCardView.setOnClickListener {
+                editTime(currentItem)
+            }
+        }
+        else if (deleteMode){
+            holder.rvCardView.setOnClickListener {
+                deleteTime(currentItem)
+            }
+        }
+        else{
+            holder.rvCardView.setOnClickListener {
+                addTime(currentItem)
+            }
         }
     }
 }

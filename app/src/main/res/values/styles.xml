@@ -30,6 +30,21 @@
         <item name="android:background">?android:attr/colorBackground</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
+
+    <style name="MaterialButton.Primary.Icon" parent="Widget.Material3.Button.Icon">
+        <item name="iconSize">22dp</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:paddingHorizontal">18dp</item>
+        <item name="android:paddingVertical">10dp</item>
+
+    </style>
+
+    <style name="MaterialButton.Secondary.Icon" parent="MaterialButton.Primary.Icon">
+        <item name="android:backgroundTint">?attr/colorPrimaryContainer</item>
+        <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+        <item name="iconTint">?attr/colorOnPrimaryContainer</item>
+        <item name="android:layout_marginStart">10dp</item>
+    </style>
 </resources>
 
     <!--<style name="ExpandedTitle" parent="TextAppearance.MaterialComponents.Headline6">-->

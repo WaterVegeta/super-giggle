@@ -2,6 +2,7 @@ package com.example.task_king
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.task_king.data_base.AnimationSettings
 import com.example.task_king.data_base.shedule.LessonAndTime
@@ -61,6 +62,47 @@ class SettingsViewModel : ViewModel() {
             emptyList()
         )
 
+    fun addItem(item: LessonChange?, newLesson: String){
+        viewModelScope.launch {
+            realm.write {
+                if (item != null){
+                    findLatest(item)?.lesson = newLesson.toString()
+                } else{
+                    copyToRealm(LessonChange().apply {
+                        lesson = newLesson.toString()
+                    })
+
+                }
+            }
+        }
+    }
+    fun timeItem(item: TimeChange?,
+                 startMinute: String,
+                 startHour: String,
+                 endMinute: String,
+                 endHour: String){
+        viewModelScope.launch {
+            realm.write {
+                if (item != null){
+                    findLatest(item)?.apply {
+                        lessonStartHour = startHour
+                        lessonStartMinute = startMinute
+                        lessonEndHour = endHour
+                        lessonEndMinute = endMinute
+                    }
+                } else {
+                    val newTime = TimeChange().apply {
+                        lessonStartHour = startHour
+                        lessonStartMinute = startMinute
+                        lessonEndHour = endHour
+                        lessonEndMinute = endMinute
+                    }
+                    copyToRealm(newTime)
+
+                }
+            }
+        }
+    }
 
     fun firstSetUp(){
         viewModelScope.launch {
@@ -106,17 +148,26 @@ class SettingsViewModel : ViewModel() {
 //        }
 //    }
 
-    fun clearEvenLesson(schedule: TempSchedule, lessonAndTime: TempLessonAndTime?){
+    fun clearTime(schedule: TempSchedule, lessonAndTime: TempLessonAndTime){
         viewModelScope.launch {
             realm.write {
                 findLatest(schedule)?.apply {
                     changeFuctor ++
                 }
-                if (lessonAndTime != null){
-                    findLatest(lessonAndTime)?.let {
+                findLatest(lessonAndTime)?.let {
+                    it.lessonStart = ""
+                }
+            }
+        }
+    }
+    fun clearEvenLesson(schedule: TempSchedule, lessonAndTime: TempLessonAndTime){
+        viewModelScope.launch {
+            realm.write {
+                findLatest(schedule)?.apply {
+                    changeFuctor ++
+                }
+                findLatest(lessonAndTime)?.let {
                         it.lessonSchedeleOnEven = ""
-                    }
-
                 }
             }
         }
@@ -144,6 +195,7 @@ class SettingsViewModel : ViewModel() {
         }
 
     }
+
 
     fun lessonAdd(item: TempSchedule, selectedLesson: String){
         viewModelScope.launch {
@@ -182,6 +234,19 @@ class SettingsViewModel : ViewModel() {
                 }
                 findLatest(schedule)?.apply {
                     changeFuctor ++
+                }
+            }
+        }
+    }
+
+    fun deleteLesson(lessonItem: LessonChange?, timeItem: TimeChange?){
+        viewModelScope.launch {
+            realm.write {
+                if (lessonItem != null){
+                    findLatest(lessonItem)?.let { delete(it) }
+                }
+                else if (timeItem != null){
+                    findLatest(timeItem)?.let { delete(it) }
                 }
             }
         }

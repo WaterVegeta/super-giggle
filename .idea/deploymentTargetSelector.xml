@@ -2,12 +2,15 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="app">
+      <SelectionState runConfigName="Task King">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-07-23T13:10:46.362343Z">
+      </SelectionState>
+      <SelectionState runConfigName="task_king.app">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-08-13T20:00:39.300435600Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Bruh\.android\avd\andr_11.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\DAD\.android\avd\Pixel_5.avd" />
             </handle>
           </Target>
         </DropdownSelection>

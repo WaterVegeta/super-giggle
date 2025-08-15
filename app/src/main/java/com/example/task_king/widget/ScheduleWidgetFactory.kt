@@ -29,7 +29,7 @@ class ScheduleWidgetFactory(
         data.clear()
 
         Log.i("Widget Factory", "id: $id")
-        textColor = WidgetPreferences.loadTextColor(context, id)
+//        textColor = WidgetPreferences.loadTextColor(context, id)
 
 
         val date = LocalDate.now()
@@ -125,8 +125,8 @@ class ScheduleWidgetFactory(
         views.setTextViewText(R.id.lessonText, data[position].subject)
         views.setTextViewText(R.id.timeText, data[position].time)
 
-        views.setTextColor(R.id.lessonText, textColor)
-        views.setTextColor(R.id.timeText, textColor)
+//        views.setTextColor(R.id.lessonText, textColor)
+//        views.setTextColor(R.id.timeText, textColor)
         return views
     }
 

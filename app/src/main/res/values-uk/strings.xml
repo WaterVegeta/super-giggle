@@ -142,6 +142,8 @@
     <string name="choose_language">Виберіть мову</string>
     <string name="marked_as_done">Позначено як виконано</string>
     <string name="homework_added_for">Завдання додано на %1$s</string>
-    <string name="set_to">set to %1$s</string>
-    <string name="pls_restart_the_app_to_apply_changes">pls restart the app to apply changes</string>
+
+    <string name="set_to">%1$s</string>
+    <string name="pls_restart_the_app_to_apply_changes">Перезапустіть додаток щоб застосувати зміни</string>
+    <string name="_13_september">13 вересня</string>
 </resources>

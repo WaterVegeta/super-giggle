@@ -1,43 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/dynamicWid"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="13dp"
-    android:orientation="vertical"
-    android:theme="@android:style/Theme.DeviceDefault.DayNight"
-    android:background="?android:attr/colorBackground"
+    android:theme="@style/MyWidgetTheme"
     >
 
-    <LinearLayout
+    <FrameLayout android:id="@+id/wid_background"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/alert_dialog"
+        />
+
+    <TextView
+        android:text="@string/monday"
+        android:padding="13dp"
+        android:textStyle="bold"
+        android:textColor="?attr/colorPrimary"
+        android:layout_alignParentTop="true"
+        android:id="@+id/weekText"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="5dp">
+        android:textSize="20sp" />
 
         <TextView
-            android:textColor="?android:attr/colorAccent"
-            android:layout_weight="1"
-
-            android:id="@+id/weekText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            tools:text="COCvda"
-
-            android:textSize="20sp" />
-
-        <TextView android:id="@+id/dateText"
-            tools:text="Ponedilok"
+            android:padding="13dp"
+            android:id="@+id/dateText"
+            android:text="@string/_13_september"
             android:textAlignment="textEnd"
-            android:layout_weight="1"
-            android:textColor="?android:attr/colorAccent"
+            android:textColor="?attr/colorPrimary"
 
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:textStyle="bold"
             android:textSize="20sp"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-    </LinearLayout>
 
-    <ListView android:id="@+id/listView"
+    <FrameLayout
+        android:layout_marginHorizontal="15dp"
+        android:id="@+id/list_box"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+        android:layout_height="0dp"
+        android:background="@drawable/inside_box"
+        android:layout_alignTop="@id/listView"
+        android:layout_alignBottom="@id/listView"
+        />
+
+    <ListView
+        android:padding="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="18dp"
+        android:layout_below="@id/dateText"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+            android:id="@+id/listView" />
+
+</RelativeLayout>

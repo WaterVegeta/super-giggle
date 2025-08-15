@@ -22,9 +22,8 @@
     <style name="Theme.TabsGPTtutor.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="TransparentConfigTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowShowWallpaper">true</item>
     </style>
 
     <style name="Theme.TabsGPTtutor.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">
@@ -40,6 +39,13 @@
     <style name="Theme.TabsGPTtutor.AppWidgetContainer" parent="Theme.TabsGPTtutor.AppWidgetContainerParent">
         <!-- Apply padding to avoid the content of the widget colliding with the rounded corners -->
         <item name="appWidgetPadding">16dp</item>
+    </style>
+
+    <style name="MyWidgetTheme" parent="Theme.Material3.Light">
+<!--        <item name="colorPrimary">@color/primary_light</item>-->
+<!--        <item name="colorSurface">@color/surface_light</item>-->
+<!--        <item name="colorSurfaceContainer">@color/surface_cont_light</item>-->
+<!--        <item name="colorOnSurface">@color/black</item>-->
     </style>
 
 </resources>

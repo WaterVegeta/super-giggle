@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
+import com.google.android.material.color.MaterialColors
 import kotlin.jvm.java
 
 class ThemeChangeReceiver : BroadcastReceiver() {
@@ -15,27 +16,21 @@ class ThemeChangeReceiver : BroadcastReceiver() {
     private var lastPrimaryColor: Int = Color.TRANSPARENT
     private var lastIsDark: Boolean = false
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == Intent.ACTION_CONFIGURATION_CHANGED) {
             val currentColor = getMaterialYouColor(context)
             val isDark = isDarkMode(context)
 
             // Avoid redundant updates
-            if (currentColor != lastPrimaryColor || isDark != lastIsDark) {
-                lastPrimaryColor = currentColor
-                lastIsDark = isDark
-
                 if (context != null){
                     updateAllWidgets(context)
                 }
-            }
+
         }
     }
 
-    private fun getMaterialYouColor(context: Context?): Int {
-        val wallpaperManager = WallpaperManager.getInstance(context)
-        val wallpaperColors = wallpaperManager.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
-        return wallpaperColors?.primaryColor?.toArgb() ?: Color.GRAY
+    private fun getMaterialYouColor(context: Context): Int {
+        return MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimary, Color.RED)
     }
 
     private fun isDarkMode(context: Context?): Boolean {
