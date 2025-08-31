@@ -21,7 +21,7 @@
 
     <string name="appearance">Appearance</string>
     <string name="use_dynamic_colors">Use dynamic colors</string>
-    <string name="dynamic_colors_summary">Matches your app\'s colors to your wallpaper (Android 12+)</string>
+    <string name="dynamic_colors_summary">Matches your app\'s colors to your wallpaper</string>
     <string name="app_theme">App theme</string>
     <string name="choose_app_theme">Choose app theme</string>
     <string name="configure_schedule">Configure schedule</string>
@@ -162,5 +162,8 @@
     <string name="welcome_to_tasking">Welcome to TasKing</string>
     <string name="go_to_the_settings_to_configure_schedule">Go to the Settings to configure schedule</string>
     <string name="ok">OK</string>
+    <string name="day_schedule">Day Schedule</string>
+    <string name="widget_settings">Widget settings</string>
+    <string name="transparency">Transparency</string>
 
 </resources>

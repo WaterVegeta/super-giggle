@@ -11,7 +11,7 @@
     <string name="sunday">Неділя</string>
 
     <string name="change">Змінити</string>
-    <string name="homework_please">Дз</string>
+    <string name="homework_please">Завдання</string>
     <string name="save">Зберегти</string>
 
     <string name="add_to_this_day">На цей день</string>
@@ -22,7 +22,7 @@
     <string name="appearance">Вигляд</string>
 
     <string name="use_dynamic_colors">Використовувати dynamic colors</string>
-    <string name="dynamic_colors_summary">Змінює коліри додатку з шпалери телефону (Android 12+)</string>
+    <string name="dynamic_colors_summary">Змінює коліри додатку з шпалери телефону</string>
     <string name="app_theme">Колірна схема</string>
     <string name="choose_app_theme">виберіть схему</string>
     <string name="configure_schedule">Налаштувати розклад</string>
@@ -179,4 +179,7 @@
     <string name="welcome_to_tasking">Вітаємо в TasKing</string>
     <string name="go_to_the_settings_to_configure_schedule">Перейдіть до Налаштуваннь щоб змінити розклад</string>
     <string name="ok">Ок</string>
+    <string name="day_schedule">Денний Розклад</string>
+    <string name="widget_settings">Налаштування віджета</string>
+    <string name="transparency">Прозорість</string>
 </resources>

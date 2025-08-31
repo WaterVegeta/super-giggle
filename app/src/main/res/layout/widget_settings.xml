@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/toolbar"
-        app:title="dawdaw"
+        app:title="@string/widget_settings"
         app:titleTextColor="?attr/colorOnSurface"
         app:navigationIconTint="?attr/colorOnSurface"
         />
@@ -83,7 +83,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="Transparency"
+                android:text="@string/transparency"
                 android:textSize="20sp"
                 app:layout_constraintTop_toTopOf="parent" />
 

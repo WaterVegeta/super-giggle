@@ -73,16 +73,9 @@
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <receiver
-            android:name=".widget.ThemeChangeReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.CONFIGURATION_CHANGED" />
-            </intent-filter>
-        </receiver>
-        <receiver
             android:name=".widget.DynamicWidProvider"
             android:exported="false"
-            android:label="Some Dynamic BGC">
+            android:label="@string/day_schedule">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
