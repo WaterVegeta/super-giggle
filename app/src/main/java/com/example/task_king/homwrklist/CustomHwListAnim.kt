@@ -12,7 +12,7 @@ class CustomHwListAnim : DefaultItemAnimator(){
         }
 
 
-        Log.d("addDuration", "addDuration: $addDuration")
+//        Log.d("addDuration", "addDuration: $addDuration")
 
         holder?.itemView?.apply {
             alpha = 0f

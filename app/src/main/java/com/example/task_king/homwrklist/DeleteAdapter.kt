@@ -37,7 +37,7 @@ class DeleteAdapter
         val currentItem = getItem(position)
         val date = LocalDate.parse(currentItem.date, formatterInput)
         val formattedDate = date.format(formatterOutput)
-        Log.i("currentData", " lesson: ${currentItem.lesson} note: ${currentItem.note}")
+//        Log.i("currentData", " lesson: ${currentItem.lesson} note: ${currentItem.note}")
 
         holder.rvLesson.text = currentItem.lesson
         holder.rvTitle.text = currentItem.note
@@ -57,10 +57,10 @@ class DeleteAdapter
             holder.rvTitle.paintFlags = 0
         }
         val imageAdapter = ImageAdapter(currentItem.images.toList(), addImage = {
-            Log.d("wd", "dawdwad")
+//            Log.d("wd", "dawdwad")
         },
-            startFullScreen = {dwa, awd ->
-                Log.d("dwad", "$dwa $awd")
+            startFullScreen = {dwa, awd, view ->
+//                Log.d("dwad", "$dwa $awd")
             })
         holder.imageRv.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

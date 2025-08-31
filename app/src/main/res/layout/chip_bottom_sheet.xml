@@ -6,105 +6,118 @@
     android:padding="16dp"
     android:minHeight="350dp"
     >
-
-    <ImageButton
-        app:layout_constraintStart_toStartOf="parent"
+    <androidx.core.widget.NestedScrollView
         app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/closeBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/outline_close_24"
-        android:backgroundTint="@android:color/transparent"
-        app:tint="?attr/colorOnSurface" />
-    <TextView
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/closeBtn"
-        app:layout_constraintStart_toEndOf="@id/closeBtn"
-        android:textSize="22sp"
-        android:id="@+id/tvChoose"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Choose"/>
-    <RadioGroup
-        android:layout_marginTop="20dp"
-        android:id="@+id/groupDone"
-        app:layout_constraintTop_toBottomOf="@id/closeBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:paddingHorizontal="10dp"
-            android:id="@+id/radioAll"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:text="@string/all"/>
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:paddingHorizontal="10dp"
-            android:id="@+id/radioDone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/done"
-            android:textSize="24sp"/>
-        <com.google.android.material.radiobutton.MaterialRadioButton
-            android:paddingHorizontal="10dp"
-            android:id="@+id/radioNotDone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/not_done"
-            android:textSize="24sp"/>
-    </RadioGroup>
-
-    <LinearLayout
-        android:id="@+id/sortLayout"
-        android:visibility="gone"
-        android:layout_marginTop="5dp"
-        app:layout_constraintTop_toBottomOf="@id/groupDone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:textStyle="bold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/sort_by_field"
-            android:textSize="22sp"/>
-        <RadioGroup
-            android:layout_marginTop="10dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:paddingHorizontal="10dp"
-                android:textSize="24sp"
-                android:id="@+id/radioSortDate"
-                android:layout_width="match_parent"
+            <ImageButton
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/closeBtn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/date"
-                />
+                android:src="@drawable/outline_close_24"
+                android:backgroundTint="@android:color/transparent"
+                app:tint="?attr/colorOnSurface" />
 
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:paddingHorizontal="10dp"
-                android:textSize="24sp"
-                android:id="@+id/radioSortHomework"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/homework_sort"
-                />
+            <TextView
+                android:textStyle="bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/closeBtn"
 
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:paddingHorizontal="10dp"
-                android:textSize="24sp"
-                android:id="@+id/radioSortLesson"
+                android:textSize="28sp"
+                android:id="@+id/tvChoose"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Choose"/>
+
+            <RadioGroup
+                android:layout_marginTop="20dp"
+                android:id="@+id/groupDone"
+                app:layout_constraintTop_toBottomOf="@id/closeBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:paddingHorizontal="10dp"
+                    android:id="@+id/radioAll"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:text="@string/all"/>
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:paddingHorizontal="10dp"
+                    android:id="@+id/radioDone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/done"
+                    android:textSize="24sp"/>
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:paddingHorizontal="10dp"
+                    android:id="@+id/radioNotDone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/not_done"
+                    android:textSize="24sp"/>
+            </RadioGroup>
+            <LinearLayout
+
+                android:id="@+id/sortLayout"
+                android:visibility="gone"
+                android:layout_marginTop="5dp"
+                app:layout_constraintTop_toBottomOf="@id/groupDone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/lesson_sort"
-                />
-        </RadioGroup>
-    </LinearLayout>
+                android:orientation="vertical">
+
+                <TextView
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sort_by_field"
+                    android:textSize="28sp"/>
+                <RadioGroup
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:paddingHorizontal="10dp"
+                        android:textSize="24sp"
+                        android:id="@+id/radioSortDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/date"
+                        />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:paddingHorizontal="10dp"
+                        android:textSize="24sp"
+                        android:id="@+id/radioSortHomework"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/homework_sort"
+                        />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:paddingHorizontal="10dp"
+                        android:textSize="24sp"
+                        android:id="@+id/radioSortLesson"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lesson_sort"
+                        />
+                </RadioGroup>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

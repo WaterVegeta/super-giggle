@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:errorEnabled="false"
         app:errorIconDrawable="@drawable/outline_error_24"
-        android:hint="Lesson please"
+        android:hint="@string/lesson_please"
         app:endIconMode="clear_text"
         >
 
@@ -31,7 +31,7 @@
     <Button
         style="@style/ElevetedButtonSmallCorners"
         android:id="@+id/addButton"
-        android:text="Save"
+        android:text="@string/save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/textInputLayout"

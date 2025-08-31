@@ -164,7 +164,6 @@ class HwViewModel: ViewModel() {
     val NO_IMAGE = 6
 
     private val _query = MutableStateFlow("")
-    private val query = _query.asStateFlow()
 
     val done_sort = MutableStateFlow(NOT_DONE)
     val date = MutableStateFlow(TODAY_BEYOND)
@@ -197,15 +196,16 @@ class HwViewModel: ViewModel() {
                     is InitialResults -> change.list
                     is UpdatedResults -> change.list
                 }
-            }
+            }.distinctUntilChanged()
     }
+    val delay = 700L
 
     val homeworkList: StateFlow<List<Homework>> = combine(
-        homeworkDataFlow,
-        _query.debounce(300),
-        done_sort,
-        lesson,
-        image
+        homeworkDataFlow.debounce(delay),
+        _query.debounce(delay),
+        done_sort.debounce(delay),
+        lesson.debounce(delay),
+        image.debounce(delay)
     ) { allData, searchText, doneFilter, lessonFilter, imageFilter ->
         allData.filter { hw ->
             val matchesText = hw.note.contains(searchText, true)
@@ -497,7 +497,8 @@ class HwViewModel: ViewModel() {
     fun findNextNice(today: LocalDate, selected: String) : MutableSet<Long>{
         val schedule = realm.query<Schedule>().find()
         val dateList : MutableSet<Long> = mutableSetOf()
-        for (i in -30..60) {
+        val week = 7
+        for (i in -8 * week..8 * week) {
             val date = today.plusDays(i.toLong())
             val dayOfWeekName = date.dayOfWeek.name
             val scheduleDay = schedule.find { it.dayOfWeek == dayOfWeekName }

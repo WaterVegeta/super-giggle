@@ -136,7 +136,8 @@ class DayFragment() : Fragment() {
                 (parentFragment as ScheduleFrag).doneHw(
                     clickedLesson.hwId
                 )
-            }
+            },
+            requireContext()
         )
         viewModel.updateDate(date)
         recyclerView.apply {

@@ -3,6 +3,9 @@
     <style name="Base.Theme.TabsGPTtutor" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:windowSharedElementEnterTransition">@transition/full_image</item>
+        <item name="android:windowSharedElementExitTransition">@transition/full_image</item>
+<!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
     </style>
 
     <style name="Theme.TabsGPTtutor" parent="Base.Theme.TabsGPTtutor" />

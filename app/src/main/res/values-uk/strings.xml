@@ -88,7 +88,7 @@
     <string name="permission_for_were_denied_the_app_may_not_work_properly">Дозвіл до %1$s було відмовлено. Додаток може працювати не правильно.</string>
     <string name="go_to_settings">До налаштувань</string>
     <string name="write_homework">Напишіть завдання</string>
-    <string name="this_homework_already_exists">Це завдання вже існує</string>
+    <string name="this_homework_already_exists">Це завдання вже існує, змініть дату</string>
     <string name="delete_item_s">Видалити %1$s завданнь?</string>
     <string name="due_date">\nВиконати до</string>
     <string name="selected">%1$s вибрано</string>
@@ -146,4 +146,37 @@
     <string name="set_to">%1$s</string>
     <string name="pls_restart_the_app_to_apply_changes">Перезапустіть додаток щоб застосувати зміни</string>
     <string name="_13_september">13 вересня</string>
+
+    <string name="add_homework">Додати завдання</string>
+    <string name="no_images_to_share">Не маж фотографій щоб поділитися</string>
+    <string name="edit_homework">Редагувати завдання</string>
+    <string name="lesson_picker">Вибір уроків</string>
+    <string name="add_a_new_lesson_or_choose_from_the_list">Додайте новий урок або виберіть з списку</string>
+    <string name="edit_mode">Режим редагування</string>
+    <string name="click_on_lesson_to_edit_it">Натисніть на урок щоб редагувати його</string>
+    <string name="delete_mode">Режим видалення</string>
+    <string name="click_on_lesson_to_delete_it">Натисніть на урок щоб видалити його</string>
+    <string name="click_on_time_to_edit_it">Натисніть на час щоб редагувати його</string>
+    <string name="click_on_time_to_delete_it">Натисніть на час щоб видалити його</string>
+    <string name="clear_time">Очистити час</string>
+    <string name="lesson_please">Урок</string>
+    <string name="add">Додати</string>
+    <string name="choose_time_from_the_list">Додайте новий час або виберіть з списку</string>
+    <string name="add_change_time">Вибір часу</string>
+    <string name="edit">Редагувати</string>
+    <string name="time">+ час</string>
+    <string name="on_even">+ на не парне</string>
+    <string name="clear_lesson">Очистити урок</string>
+    <string name="schedule_settings">Налаштування розкладу</string>
+
+    <string name="system">системна</string>
+    <string name="light">яскрава</string>
+    <string name="dark">темна</string>
+
+    <string name="dark_entr">Темна</string>
+    <string name="light_entr">Яскрава</string>
+    <string name="sorting_options">Варіанти сортуванння</string>
+    <string name="welcome_to_tasking">Вітаємо в TasKing</string>
+    <string name="go_to_the_settings_to_configure_schedule">Перейдіть до Налаштуваннь щоб змінити розклад</string>
+    <string name="ok">Ок</string>
 </resources>

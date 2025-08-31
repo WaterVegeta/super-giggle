@@ -1,6 +1,7 @@
 package com.example.task_king.homwrklist
 
 import android.annotation.SuppressLint
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -24,11 +25,13 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.task_king.MainActivity
 
 class HwListAdapter(
     private val listener: OnItemClickListener,
     private val onDone: (Homework) -> Unit,
-    val addImage: (Homework) -> Unit
+    val addImage: (Homework) -> Unit,
+    val startFullScreen: (Array<String>, Int, Homework, View) -> Unit
 ) : ListAdapter<Homework, HwListAdapter.ViewHolder>(HwDiffUtill()) {
 
     private val selectedItems = mutableSetOf<String>()
@@ -53,6 +56,8 @@ class HwListAdapter(
         }
         notifyItemChanged(currentList.indexOfFirst { it.id == itemId })
     }
+
+    fun getSelectedMode() : Boolean = selectedItems.isNotEmpty()
 
     fun getSelectedIds(): List<String> = selectedItems.toList()
 
@@ -164,14 +169,8 @@ class HwListAdapter(
         val imageAdapter = ImageAdapter(currentItem.images.toList(), addImage = {
             addImage(currentItem)
         },
-            startFullScreen = {uris, startPos ->
-                val intent = Intent(context, FullScreenImage::class.java)
-                intent.putExtra("imageUris", uris)
-                intent.putExtra("startPosition", startPos)
-                intent.putExtra("homework", currentItem.note)
-                intent.putExtra("lesson", currentItem.lesson)
-                intent.putExtra("ids", currentItem.images.map { it.id }.toTypedArray())
-                context.startActivity(intent)
+            startFullScreen = {uris, startPos, view ->
+                startFullScreen(uris, startPos, currentItem, view)
             })
         holder.imageRv.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)

@@ -1,6 +1,7 @@
 package com.example.task_king.settings
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -31,11 +32,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
-            insets
-        }
+
+//        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
+//            insets
+//        }
     }
 
     override fun onCreatePreferences(
@@ -45,13 +47,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.preferences, rootKey)
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
-        // Theme change listener
-        findPreference<ListPreference>("theme")?.setOnPreferenceChangeListener { _, newValue ->
-            val dynamicColorsEnabled = sharedPreferences.getBoolean("dynamic_colors", true)
-            ThemeHelper.applyTheme(newValue.toString(), dynamicColorsEnabled, requireContext())
-            requireActivity().recreate()
-            true
-        }
+
 
         // Dynamic colors change listener
 
@@ -86,6 +82,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
             true // Return true if the click is handled.
         }
 
+//        // Theme change listener
+//        findPreference<ListPreference>("theme")?.setOnPreferenceChangeListener { _, newValue ->
+//            val dynamicColorsEnabled = sharedPreferences.getBoolean("dynamic_colors", true)
+//            ThemeHelper.applyTheme(newValue.toString(), dynamicColorsEnabled, requireContext())
+//            requireActivity().recreate()
+//            true
+//        }
+
+        val themePref = findPreference<Preference>("theme")
+        themePref?.setOnPreferenceClickListener{
+            val dynamicColorsEnabled = sharedPreferences.getBoolean("dynamic_colors", true)
+            showThemeDialog(dynamicColorsEnabled, sharedPreferences)
+            true
+        }
+
         val languagePreference = findPreference<Preference>("language")
         val language = LanguageChanger.getLanguage()
         languagePreference?.summary = if(language == "default"){
@@ -105,6 +116,31 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     }
 
+    fun showThemeDialog(dynamic: Boolean, pref: SharedPreferences){
+        val theme = resources.getStringArray(R.array.theme_entries)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.app_theme))
+            .setItems(theme) { _, item ->
+                when(item){
+                    0 -> {
+                        ThemeHelper.applyTheme("system", dynamic, requireContext())
+                        pref.edit().putString("theme", "system").apply()
+                    }
+                    1 -> {
+                        ThemeHelper.applyTheme("light", dynamic, requireContext())
+                        pref.edit().putString("theme", "light").apply()
+                    }
+                    2 -> {
+                        ThemeHelper.applyTheme("dark", dynamic, requireContext())
+                        pref.edit().putString("theme", "dark").apply()
+                    }
+                }
+                requireActivity().recreate()
+            }.setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
+
     fun showLanguageDiaolog(){
         val languages = arrayOf(getString(R.string.system_default),
             getString(R.string.english), getString(R.string.ukrainian))
@@ -120,10 +156,22 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 .show()
     }
 
+    override fun onStart() {
+        super.onStart()
+        val value = ThemeHelper.getCurrentTheme()
+        val summary = when(value){
+            "system" -> getString(R.string.system)
+            "light" -> getString(R.string.light)
+            "dark" -> getString(R.string.dark)
+            else -> "what"
+        }
+        findPreference<Preference>("theme")?.summary = summary
+    }
+
     override fun onResume() {
         super.onResume()
         // Update the displayed value when returning to settings
-        findPreference<ListPreference>("theme")?.value = ThemeHelper.getCurrentTheme()
+
         Log.d("FragmentResumed", "SettingsFragment")
     }
 

@@ -6,37 +6,35 @@
     android:padding="16dp"
     >
 
-    <LinearLayout
-        android:id="@+id/exit"
+
+    <ImageButton
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:id="@+id/closeBtnShare"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:src="@drawable/outline_close_24"
+        android:backgroundTint="@android:color/transparent"
+        app:tint="?attr/colorOnSurface"
+        />
 
-        <ImageButton
-            android:id="@+id/closeBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/outline_close_24"
-            android:backgroundTint="@android:color/transparent"
-            app:tint="?attr/colorOnSurface" />
+    <TextView
+        android:id="@+id/shareOpt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/closeBtnShare"
 
-        <TextView
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineLarge"
-            android:textStyle="bold"
-
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/share_options"
-            android:layout_gravity="center"
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineLarge"
+        android:textStyle="bold"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/share_options"
             />
-    </LinearLayout>
 
     <RadioGroup
         android:layout_marginVertical="16dp"
         android:id="@+id/radio_group"
-        app:layout_constraintTop_toBottomOf="@id/exit"
+        app:layout_constraintTop_toBottomOf="@id/shareOpt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

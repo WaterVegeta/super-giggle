@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <androidx.cardview.widget.CardView
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.3"
+
+        android:layout_marginHorizontal="5dp"
+        android:layout_marginVertical="1dp"
+        app:cardCornerRadius="20dp"
+        android:id="@+id/cardView"
+        android:outlineProvider="none"
+        app:strokeColor="@android:color/transparent"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerHighest">
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_marginTop="5dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Lesson"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textSize="30sp"
+                android:id="@+id/lessonText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/timeText"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/homeworkText"
+                android:importantForAccessibility="yes"
+                android:layout_marginStart="10dp"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12:30-13:15"
+                android:textSize="27sp"
+                android:id="@+id/timeText"
+                android:importantForAccessibility="yes"
+                android:layout_marginEnd="10dp"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:fontFamily="sans-serif-smallcaps"
+                android:textStyle="bold"
+                android:layout_marginTop="5dp"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/homeworkText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="15dp"
+                android:text="фцвфц 2136"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:textSize="26sp"
+                android:fontFamily="sans-serif-light"
+                android:visibility="visible"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintEnd_toStartOf="@id/isItDoneBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/lessonText" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/isItDoneBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                app:icon="@drawable/outline_close_24"
+                app:iconGravity="end"
+                app:iconSize="19dp"
+                app:iconTint="?attr/colorOnSecondaryContainer"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                android:text="не виконано"
+                android:textSize="16sp"
+                app:layout_constraintTop_toBottomOf="@id/timeText"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:visibility="visible"
+                android:textAlignment="viewEnd"/>
+
+            <!--        <TextView android:id="@+id/homeIdTV"-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            app:layout_constraintTop_toBottomOf="@id/homeworkText"-->
+            <!--            app:layout_constraintStart_toStartOf="parent"-->
+            <!--            android:textSize="24sp"-->
+            <!--            android:textColor="?attr/colorOnPrimary"/>-->
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,6 +22,7 @@ import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.CalendarView
+import android.widget.ImageButton
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -55,6 +56,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 import kotlin.math.ceil
 
 class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
@@ -72,6 +74,7 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
     lateinit var realm: Realm
     var curPosition = 0
 
+    lateinit var rect: Rect
     lateinit var animShow: Animation
     lateinit var animHide: Animation
     lateinit var firstNoteText: String
@@ -88,11 +91,11 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         super.onViewCreated(view, savedInstanceState)
         realm = MyDynamic.Companion.realm
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
-            insets
-        }
+//        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, v.paddingBottom)
+//            insets
+//        }
         val items = realm.query<Schedule>().find()
         k = 0
         for (i in items){
@@ -123,33 +126,89 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         viewPager = view.findViewById(R.id.viewPager)
         viewPager.adapter = DayPagerAdapter(this)
         viewPager.setCurrentItem(OFFSET + k, false)
-//        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            val pageMarginPx = resources.getDimensionPixelOffset(R.dimen.pageMargin)
-//            val pageOffsetPx = resources.getDimensionPixelOffset(R.dimen.pageOffset)
-//            Log.i("Offsetpawd", "$pageOffsetPx")
-//
-//            viewPager.setPageTransformer { page, position ->
-//                when {
-//                    position < -1 -> { // [-Infinity,-1)
-//                        page.alpha = 0f
+        val smallestWidth2 = requireContext().resources.configuration.screenWidthDp
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (smallestWidth2 >= 1024){
+                viewPager.offscreenPageLimit = 2
+                viewPager.setPageTransformer { page, position ->
+                    when {
+                        position < -2 ->{
+                            page.alpha = 0f
+                        }
+
+                        position <= 0 || position <= 2 -> { // [-Infinity,-1)
+                            page.alpha = 1f
+                            page.translationX = page.width * -position * 0.66569f
+//                        page.scaleX = 1 / 3f
+                        }
+                        position > 2 ->{
+                            page.alpha = 0f
+                        }
+
+                        else -> { // (1,+Infinity]
+                            page.alpha = 0f
+                        }
+                    }
+                }
+
+            }
+            else if (smallestWidth2 >= 600){
+                viewPager.offscreenPageLimit = 2
+                viewPager.setPageTransformer {page, position ->
+                    val pageWidth = page.width
+                    val pageHeight = page.height
+                    val SIDE_MARGIN_PERCENT = 0.1f
+                    val MIN_ALPHA = 0.5f
+                    val MIN_SCALE = 0.85f
+
+
+                    page.apply {
+                        when{
+                            position < -1 -> { // [-Infinity,-1)
+                                // This page is way off-screen to the left.
+                                alpha = 0f
+                            }
+                            position <= 0 -> { // [-1,0]
+                                // Use the default slide transition when moving to the left page.
+                                alpha = 1f
+                                translationX = 0f
+
+                                translationZ = 0f
+                                scaleX = 1f
+                                scaleY = 1f
+                            }
+                            position <= 1 -> { // (0,1]
+                                // Fade the page out.
+//                                alpha = 1 - position
+
+                                // Counteract the default slide transition.
+                                translationX = pageWidth / 2 * -position
+                                // Move it behind the left page.
+//                                translationZ = -1f
+
+                                // Scale the page down (between MIN_SCALE and 1).
+                                val scaleFactor = (MIN_SCALE + (1 - MIN_SCALE) * (1 - Math.abs(position)))
+//                                scaleX = scaleFactor
+//                                scaleY = scaleFactor
+                            }
+//                            position < 2 ->{
+//                                alpha = 1f
+//                            }
+                            else -> { // (1,+Infinity]
+                                // This page is way off-screen to the right.
+                                alpha = 1f
+                            }
+                        }
+
+                    }
+//                    if (position == 1f){
+//                        page.translationX = -page.width * 0.75f
 //                    }
-//                    position <= 1 -> { // [-1,1]
-//                        page.alpha = 1f
-//
-//                        // Counteract the default slide transition
-//                        page.translationX = -position * page.width
-//
-//                        // Set scale to 1 to maintain original size
-//                        page.scaleX = 1f
-//                        page.scaleY = 1f
-//                    }
-//                    else -> { // (1,+Infinity]
-//                        page.alpha = 0f
-//                    }
-//                }
-//            }
-//
-//            // Add padding so pages aren't clipped
+//                    Math.abs(position)
+                }
+            }
+
+            // Add padding so pages aren't clipped
 //            viewPager.setPadding(pageOffsetPx, 0, pageOffsetPx, 0)
 //            viewPager.clipToPadding = false
 //            viewPager.clipChildren = false
@@ -171,22 +230,24 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
 //                    }
 //                }
 //            })
-//        } else {
-//            // For portrait - normal single page behavior
-//            viewPager.setPageTransformer(null)
+        } else {
+            // For portrait - normal single page behavior
+            viewPager.setPageTransformer(null)
 //            viewPager.setPadding(0, 0, 0, 0)
 //            viewPager.clipToPadding = true
 //            viewPager.clipChildren = true
-//        }
+        }
 
 
-        Log.d("FragmentCreated", "ScheduleFragment, k: $k offset: $OFFSET currentItem: ${viewPager.currentItem}")
+//        Log.d("FragmentCreated", "ScheduleFragment, k: $k offset: $OFFSET currentItem: ${viewPager.currentItem}")
 //        viewPager.offscreenPageLimit = 2
 
         calendarFAB = view.findViewById(R.id.calendarFAB)
         calendarFAB.setOnTouchListener { v, event ->
             when(event.action){
                 MotionEvent.ACTION_DOWN -> {
+                    rect = Rect()
+                    v.getGlobalVisibleRect(rect)
                     v.animate()
                         .setInterpolator(DecelerateInterpolator())
                         .scaleX(0.8f)
@@ -196,8 +257,6 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                 }
                 MotionEvent.ACTION_UP -> {
 
-                    val rect = Rect()
-                    v.getGlobalVisibleRect(rect)
                     if (rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
                         // Finger lifted inside the FAB
                         Log.d("FAB", "Touch Up Inside")
@@ -427,19 +486,22 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
             updateHomeButton(targetPosition)
 
         }
-        bottomSheetDialog.show()
-        dialogView.post {
-            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.let {
-                val behavior = BottomSheetBehavior.from(it)
-
-                if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                    it.requestLayout()
-                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
-                }
-            }
+        bottomSheetDialog.behavior.apply {
+            state = BottomSheetBehavior.STATE_EXPANDED
         }
+        bottomSheetDialog.show()
+//        dialogView.post {
+//            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+//            bottomSheet?.let {
+//                val behavior = BottomSheetBehavior.from(it)
+//
+//                if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+////                    it.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
+////                    it.requestLayout()
+//                    behavior.state = BottomSheetBehavior.STATE_SETTLING
+//                }
+//            }
+//        }
     }
 
     fun updateHomeButton(position: Int) {
@@ -511,6 +573,7 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         val input = dialogView.findViewById<TextInputEditText>(R.id.noteInput)
         val txtLayout = dialogView.findViewById<TextInputLayout>(R.id.textInputLayout)
         val button = dialogView.findViewById<Button>(R.id.addButton)
+        val closeBtn = dialogView.findViewById<ImageButton>(R.id.closeBtnBot)
         val toggleGroup = dialogView.findViewById<MaterialButtonToggleGroup>(R.id.toggleGroup)
         input.requestFocus()
 
@@ -523,6 +586,10 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
         bottomSheetDialog.setContentView(dialogView)
 
         var selectedDate = foundDate
+
+        closeBtn.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
 
         input.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE){
@@ -617,6 +684,7 @@ class ScheduleFrag: Fragment(R.layout.schedule_frag_layout) {
                 }
             }
         }
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheetDialog.show()
         toggleGroup.check(R.id.addNewButton)
     }

@@ -17,7 +17,7 @@ class FullScreenImageAdapter(private val uris: List<String>,
     RecyclerView.Adapter<FullScreenImageAdapter.ImageViewHolder>() {
 
     class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val fullImage: PhotoView = itemView.findViewById(R.id.fullImage)
+        val fullImage: PhotoView = itemView.findViewById(R.id.imageView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -32,22 +32,6 @@ class FullScreenImageAdapter(private val uris: List<String>,
         Glide.with(holder.itemView.context)
             .load(currentImage)
             .into(holder.fullImage)
-//        val gesture = GestureDetector(holder.fullImage.context, object : GestureDetector.SimpleOnGestureListener(){
-//            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-//                listener.onSingleTap()
-//                Log.i("single", "single tap")
-//                return false
-//            }
-//
-//            override fun onDoubleTap(e: MotionEvent): Boolean {
-//                Log.i("double", "double tap")
-//                return false
-//            }
-//        })
-//        holder.fullImage.setOnTouchListener { _, e ->
-//            gesture.onTouchEvent(e)
-//            true
-//        }
     }
 
     override fun getItemCount() = uris.size

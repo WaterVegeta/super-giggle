@@ -79,7 +79,7 @@
     <string name="permission_for_were_denied_the_app_may_not_work_properly">Permission for %1$s were denied. The app may not work properly.</string>
     <string name="go_to_settings">Go to settings</string>
     <string name="write_homework">Write homework</string>
-    <string name="this_homework_already_exists">This homework already exists</string>
+    <string name="this_homework_already_exists">This homework already exists, change date</string>
     <string name="delete_item_s">Delete %1$s item(s)?</string>
     <string name="due_date">\nDue date</string>
     <string name="selected">%1$s selected</string>
@@ -131,5 +131,36 @@
     <string name="set_to">%1$s</string>
     <string name="pls_restart_the_app_to_apply_changes">Restart the app to apply changes</string>
     <string name="_13_september">13 September</string>
+    <string name="add_homework">Add homework</string>
+    <string name="no_images_to_share">No images to share</string>
+    <string name="edit_homework">Edit homework</string>
+    <string name="lesson_picker">Lesson picker</string>
+    <string name="add_a_new_lesson_or_choose_from_the_list">Add a new lesson or choose from the list</string>
+    <string name="edit_mode">Edit mode</string>
+    <string name="click_on_lesson_to_edit_it">Click on lesson to edit it</string>
+    <string name="delete_mode">Delete mode</string>
+    <string name="click_on_lesson_to_delete_it">Click on lesson to delete it</string>
+    <string name="click_on_time_to_edit_it">Click on time to edit it</string>
+    <string name="click_on_time_to_delete_it">Click on time to delete it</string>
+    <string name="clear_time">Clear time</string>
+    <string name="lesson_please">Lesson please</string>
+    <string name="add">Add</string>
+    <string name="choose_time_from_the_list">Add a new time or choose from the list</string>
+    <string name="add_change_time">Time picker</string>
+    <string name="edit">Edit</string>
+    <string name="time">+ time</string>
+    <string name="on_even">+ on even</string>
+    <string name="clear_lesson">Clear lesson</string>
+    <string name="schedule_settings">Schedule settings</string>
+    <string name="system">system</string>
+    <string name="light">light</string>
+    <string name="dark">dark</string>
+
+    <string name="dark_entr">Dark</string>
+    <string name="light_entr">Light</string>
+    <string name="sorting_options">Sorting options</string>
+    <string name="welcome_to_tasking">Welcome to TasKing</string>
+    <string name="go_to_the_settings_to_configure_schedule">Go to the Settings to configure schedule</string>
+    <string name="ok">OK</string>
 
 </resources>

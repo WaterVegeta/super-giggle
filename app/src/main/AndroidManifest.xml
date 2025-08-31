@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <queries/>
+
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature
@@ -29,11 +31,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TabsGPTtutor"
-        tools:targetApi="33"
-        >
-        <activity android:name=".widget.WidgetSettings"
-            android:theme="@style/TransparentConfigTheme"
-            />
+        tools:targetApi="33">
+        <activity
+            android:name=".settings.schedule_change.SomeAct"
+            android:exported="false" />
+        <activity
+            android:name=".widget.WidgetSettings"
+            android:theme="@style/TransparentConfigTheme" />
         <activity
             android:name=".homwrklist.FullScreenImage"
             android:exported="false" />
@@ -45,6 +49,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
+            android:enableOnBackInvokedCallback="true"
             android:exported="true"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -52,21 +57,17 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-<!--        <receiver-->
-<!--            android:name=".widget.ScheduleWidgetProvider"-->
-<!--            android:exported="false"-->
-<!--            android:label="Some BGC">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-<!--            </intent-filter>-->
-
-<!--            <meta-data-->
-<!--                android:name="android.appwidget.provider"-->
-<!--                android:resource="@xml/shedule_widget_provider" />-->
-<!--        </receiver>-->
-
+        </activity> <!-- <receiver -->
+        <!-- android:name=".widget.ScheduleWidgetProvider" -->
+        <!-- android:exported="false" -->
+        <!-- android:label="Some BGC"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.appwidget.action.APPWIDGET_UPDATE" /> -->
+        <!-- </intent-filter> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.appwidget.provider" -->
+        <!-- android:resource="@xml/shedule_widget_provider" /> -->
+        <!-- </receiver> -->
         <service
             android:name=".widget.ScheduleWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />

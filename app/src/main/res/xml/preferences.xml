@@ -10,20 +10,26 @@
             android:key="dynamic_colors"
             android:summary="@string/dynamic_colors_summary"
             android:title="@string/use_dynamic_colors" />
-        <ListPreference app:iconSpaceReserved="false"
+        <Preference app:iconSpaceReserved="false"
             android:key="theme"
             android:title="@string/app_theme"
             android:summary="@string/choose_app_theme"
-            android:entries="@array/theme_entries"
-            android:entryValues="@array/theme_values"
-            android:defaultValue="system" />
+            />
+
+<!--        <ListPreference app:iconSpaceReserved="false"-->
+<!--            android:key="theme"-->
+<!--            android:title="@string/app_theme"-->
+<!--            android:summary="@string/choose_app_theme"-->
+<!--            android:entries="@array/theme_entries"-->
+<!--            android:entryValues="@array/theme_values"-->
+<!--            android:defaultValue="system" />-->
 
         <Preference
             app:iconSpaceReserved="false"
             android:key="change_act"
-            android:title="@string/configure_schedule"
-            android:summary="sos"
-            app:allowDividerAbove="true"
+            android:title="@string/schedule_settings"
+            android:summary="@string/configure_schedule"
+            app:allowDividerAbove="false"
             />
 
         <Preference
@@ -31,7 +37,7 @@
             app:key="animation"
             app:title="@string/animation"
             android:summary="@string/configure_animations"
-            app:allowDividerAbove="true"
+            app:allowDividerAbove="false"
             />
 
         <Preference
@@ -39,44 +45,9 @@
             app:key="language"
             android:title="@string/choose_language"
             />
+
     </PreferenceCategory>
 
-    <PreferenceScreen app:isPreferenceVisible="false"
-        app:key="change_schedule_screen">
-
-        <PreferenceCategory
-            android:title="@string/change_schedule"
-            app:iconSpaceReserved="false">
-
-            <Preference
-                app:iconSpaceReserved="false"
-                android:key="change_add_lesson"
-                android:title="@string/add_lessons"
-                android:summary="sos"
-                app:allowDividerAbove="true"
-                />
-
-            <Preference
-                app:iconSpaceReserved="false"
-                android:key="change_add_time"
-                android:title="@string/add_time"
-                android:summary="sos"
-                app:allowDividerAbove="true"
-                />
-
-            <Preference
-                app:iconSpaceReserved="false"
-                android:key="change_schedule"
-                android:title="@string/change_schedule"
-                android:summary="sos"
-                app:allowDividerAbove="true"
-                />
-            <Preference
-                app:iconSpaceReserved="false"
-                app:key="pref_delete_db"
-                app:title="@string/delete_db"/>
-        </PreferenceCategory>
-    </PreferenceScreen>
 
     <PreferenceScreen app:isPreferenceVisible="false"
         app:key="delete_db">

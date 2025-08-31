@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:fitsSystemWindows="true">
 
@@ -28,6 +28,7 @@
             app:contentScrim="?attr/colorSurface"
             app:expandedTitleGravity="start|center_vertical"
             app:expandedTitleMarginStart="43dp"
+            app:expandedTitleMarginEnd="30dp"
             app:expandedTitleMarginBottom="29dp"
             android:textAlignment="viewStart"
             app:expandedTitleTextAppearance="@style/ExpandedTitle"
@@ -45,6 +46,15 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 android:layout_gravity="bottom"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:elevation="20dp"
+                android:id="@+id/deleteAct"
+                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                app:icon="@drawable/outline_settings_24"
+                android:layout_gravity="end|center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>

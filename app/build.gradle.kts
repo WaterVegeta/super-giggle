@@ -61,8 +61,9 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
-    implementation ("com.github.MikeOrtiz:TouchImageView:3.0.3")
+//    implementation ("com.github.MikeOrtiz:TouchImageView:3.0.3")
     implementation ("com.github.Dimezis:BlurView:version-2.0.5")
-    implementation ("jp.wasabeef:blurry:4.0.1")
+//    implementation ("jp.wasabeef:blurry:4.0.1")
+    implementation(libs.androidx.dynamicanimation)
 //    implementation(libs.touchimageview)
 }

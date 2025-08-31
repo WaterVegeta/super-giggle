@@ -4,92 +4,102 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/alert_dialog"
-    android:padding="10dp"
+    android:padding="16dp"
     android:theme="@style/Theme.Material3.DynamicColors.DayNight"
     >
 
-
-    <TextView android:id="@+id/tvTimeAdd"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <androidx.core.widget.NestedScrollView
         app:layout_constraintTop_toTopOf="parent"
-        android:text="Add/change time"
-        style="@style/TextAppearance.Material3.DisplaySmall"
-        />
-
-    <TextView
-        android:id="@+id/tvMessage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tvTimeAdd"
-        android:text = "Choose time from the list"
-        style="@style/TextAppearance.Material3.BodyLarge"
+        android:layout_height="wrap_content">
 
-        />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginVertical="10dp"
-        android:id="@+id/addRv"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_max="400dp"
-        app:layout_constraintTop_toBottomOf="@id/tvMessage" />
-
-    <HorizontalScrollView
-        android:padding = "5dp"
-        app:layout_constraintTop_toBottomOf="@id/addRv"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
-        >
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.button.MaterialButton
-
-                android:id="@+id/add"
-                android:layout_width="wrap_content"
+            <TextView android:id="@+id/tvTimeAdd"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
-                android:text="Add"
-                app:icon="@drawable/baseline_add_24"
-                style="@style/MaterialButton.Primary.Icon"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="@string/add_change_time"
+                style="@style/TextAppearance.Material3.DisplaySmall"
                 />
-            <com.google.android.material.button.MaterialButton
+            <TextView
 
-
-                android:id="@+id/btnClear"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvMessage"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Clear lesson"
-
-                android:visibility="gone"
-                style="@style/MaterialButton.Secondary.Icon"
-                />
-            <com.google.android.material.button.MaterialButton
-
-                android:id="@+id/edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:text="Edit"
-                app:icon="@drawable/ic_edit"
-                style="@style/MaterialButton.Secondary.Icon"
-                />
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/delete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:text="Delete"
-                app:icon="@drawable/ic_delete"
-                style="@style/MaterialButton.Secondary.Icon"
+                app:layout_constraintTop_toBottomOf="@id/tvTimeAdd"
+                android:text = "@string/choose_time_from_the_list"
+                style="@style/TextAppearance.Material3.BodyLarge"
 
                 />
-        </LinearLayout>
-    </HorizontalScrollView>
+            <androidx.recyclerview.widget.RecyclerView
+
+                android:layout_marginVertical="10dp"
+                android:id="@+id/addRv"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintHeight_max="400dp"
+                app:layout_constraintTop_toBottomOf="@id/tvMessage" />
+            <HorizontalScrollView
+
+                android:padding = "5dp"
+                app:layout_constraintTop_toBottomOf="@id/addRv"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.button.MaterialButton
+
+                        android:id="@+id/add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/add"
+                        app:icon="@drawable/baseline_add_24"
+                        style="@style/MaterialButton.Primary.Icon"
+                        />
+                    <com.google.android.material.button.MaterialButton
+
+
+                        android:id="@+id/btnClear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/clear_lesson"
+
+                        android:visibility="gone"
+                        style="@style/MaterialButton.Secondary.Icon"
+                        />
+                    <com.google.android.material.button.MaterialButton
+
+                        android:id="@+id/edit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/edit"
+                        app:icon="@drawable/ic_edit"
+                        style="@style/MaterialButton.Secondary.Icon"
+                        />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/delete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/delete"
+                        app:icon="@drawable/ic_delete"
+                        style="@style/MaterialButton.Secondary.Icon"
+
+                        />
+                </LinearLayout>
+            </HorizontalScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

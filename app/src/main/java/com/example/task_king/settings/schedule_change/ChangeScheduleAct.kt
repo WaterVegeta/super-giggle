@@ -2,6 +2,7 @@ package com.example.task_king.settings.schedule_change
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -67,7 +68,6 @@ class ChangeScheduleAct : AppCompatActivity() {
         }
 
         setUpViews()
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.scheduleFlow.collect { pagerAdapter.submitList(it) }
@@ -80,6 +80,13 @@ class ChangeScheduleAct : AppCompatActivity() {
     fun setUpViews(){
         val appBar = findViewById<AppBarLayout>(R.id.app_bar)
         appBar.post { appBar.setExpanded(false, false) }
+
+
+        val deleteDb : MaterialButton = findViewById(R.id.deleteAct)
+        deleteDb.setOnClickListener {
+            val intent = Intent(this, SomeAct::class.java)
+            startActivity(intent)
+        }
 
         // Setup toolbar
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -186,10 +193,17 @@ class ChangeScheduleAct : AppCompatActivity() {
     }
 
     fun deleteTimeLesson(item: TempLessonAndTime, schedule: TempSchedule){
-        viewModel.deleteItem(item, schedule)
-        IsDataChanged.dataChanged()
+        val mDiaolog = MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.delete_this_lesson))
+            .setMessage(getString(R.string.delete_confirm))
+            .setPositiveButton(getString(R.string.delete)) { dialog, _ ->
+                viewModel.deleteItem(item, schedule)
+                IsDataChanged.dataChanged()
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .create()
 
-
+        mDiaolog.show()
     }
 
     fun lessonAddDialog(scheduleDb: TempSchedule, lessonToChange: TempLessonAndTime?, isEven: Boolean){
@@ -204,8 +218,8 @@ class ChangeScheduleAct : AppCompatActivity() {
         val editLesson : MaterialButton = dialogView.findViewById(R.id.edit)
         val deleteLesson : MaterialButton = dialogView.findViewById(R.id.delete)
 
-        title.text = "Lesson picker"
-        subTitle.text = "Add a new lesson or choose from the list"
+        title.text = getString(R.string.lesson_picker)
+        subTitle.text = getString(R.string.add_a_new_lesson_or_choose_from_the_list)
 
         if (lessonToChange != null){
             if (isEven && lessonToChange.lessonSchedeleOnEven.isNotEmpty()){
@@ -215,7 +229,6 @@ class ChangeScheduleAct : AppCompatActivity() {
         addLesson.setOnClickListener {
             addItem(null, null)
         }
-
 
         val addAdapter = AddLessonScheduleAdapter(
             addLesson = { clickedLesson ->
@@ -237,12 +250,12 @@ class ChangeScheduleAct : AppCompatActivity() {
             addAdapter.editMode = !addAdapter.editMode
             if (addAdapter.editMode){
                 addAdapter.deleteMode = false
-                title.text = "Edit mode"
-                subTitle.text = "Click on lesson to edit it"
+                title.text = getString(R.string.edit_mode)
+                subTitle.text = getString(R.string.click_on_lesson_to_edit_it)
             }
             else{
-                title.text = "Lesson picker"
-                subTitle.text = "Add a new lesson or choose from the list"
+                title.text = getString(R.string.lesson_picker)
+                subTitle.text = getString(R.string.add_a_new_lesson_or_choose_from_the_list)
             }
             addAdapter.notifyDataSetChanged()
         }
@@ -251,12 +264,12 @@ class ChangeScheduleAct : AppCompatActivity() {
             addAdapter.deleteMode = !addAdapter.deleteMode
             if (addAdapter.deleteMode){
                 addAdapter.editMode = false
-                title.text = "Delete mode"
-                subTitle.text = "Click on lesson to delete it"
+                title.text = getString(R.string.delete_mode)
+                subTitle.text = getString(R.string.click_on_lesson_to_delete_it)
             }
             else{
-                title.text = "Lesson picker"
-                subTitle.text = "Add a new lesson or choose from the list"
+                title.text = getString(R.string.lesson_picker)
+                subTitle.text = getString(R.string.add_a_new_lesson_or_choose_from_the_list)
             }
             addAdapter.notifyDataSetChanged()
         }
@@ -330,12 +343,16 @@ class ChangeScheduleAct : AppCompatActivity() {
                 imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT)
             }, 100)
         }
+
         editText.doOnTextChanged { text, start, before, count ->
-            if (!text.isNullOrEmpty()){
-                textLayout.error = null
-                textLayout.isErrorEnabled = false
+            text?.isBlank()?.let {
+                if (!it){
+                    textLayout.error = null
+                    textLayout.isErrorEnabled = false
+                }
             }
         }
+
         editText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE){
                 saveBtn.performClick()
@@ -345,7 +362,7 @@ class ChangeScheduleAct : AppCompatActivity() {
 
         saveBtn.setOnClickListener {
             val newLesson = editText.text.toString()
-            if (newLesson.isNullOrEmpty()){
+            if (newLesson.isBlank()){
                 textLayout.error = getString(R.string.write_lesson)
                 textLayout.isErrorEnabled = true
                 return@setOnClickListener
@@ -402,8 +419,8 @@ class ChangeScheduleAct : AppCompatActivity() {
             addAdapter.editMode = !addAdapter.editMode
             if (addAdapter.editMode){
                 addAdapter.deleteMode = false
-                title.text = "Edit mode"
-                subTitle.text = "Click on time to edit it"
+                title.text = getString(R.string.edit_mode)
+                subTitle.text = getString(R.string.click_on_time_to_edit_it)
             }
             else{
                 title.text = defaultTitle
@@ -416,8 +433,8 @@ class ChangeScheduleAct : AppCompatActivity() {
             addAdapter.deleteMode = !addAdapter.deleteMode
             if (addAdapter.deleteMode){
                 addAdapter.editMode = false
-                title.text = "Delete mode"
-                subTitle.text = "Click on time to delete it"
+                title.text = getString(R.string.delete_mode)
+                subTitle.text = getString(R.string.click_on_time_to_delete_it)
             }
             else{
                 title.text = defaultTitle
@@ -428,7 +445,7 @@ class ChangeScheduleAct : AppCompatActivity() {
 
         if (item.lessonStart.isNotEmpty()){
             clearItem.isVisible = true
-            clearItem.text = "Clear time"
+            clearItem.text = getString(R.string.clear_time)
             clearItem.setOnClickListener {
                 viewModel.clearTime(schedule, item)
                 alertDialog.dismiss()

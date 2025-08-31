@@ -32,10 +32,11 @@ class ChildScheduleAdapter(
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val list = getItem(position)
+        val context = holder.itemView.context
         Log.d("ChildAdapter", "list: $list")
         holder.rvLesson.text = list.lessonScheduleOnOdd
         if (list.lessonStart.isEmpty()){
-            holder.rvTime.text = "+ time"
+            holder.rvTime.text = context.getString(R.string.time)
         }else{
             val endMinute = when(list.lessonEndMinute){
                 "0"->"00"
@@ -54,7 +55,7 @@ class ChildScheduleAdapter(
         }
 
         holder.rvLessonEven.text = if (list.lessonSchedeleOnEven.isNullOrEmpty()){
-            "+ on even"
+            context.getString(R.string.on_even)
         }else{
             list.lessonSchedeleOnEven
         }

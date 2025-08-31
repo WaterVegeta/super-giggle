@@ -17,9 +17,9 @@
         android:padding="8dp">
 
         <LinearLayout
+            android:layout_marginStart="5dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="-12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/radioButton"
@@ -83,8 +83,10 @@
             </LinearLayout>
         </LinearLayout>
 
-
         <com.google.android.material.radiobutton.MaterialRadioButton
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+
             android:checked="false"
             android:button="@drawable/btn_selector"
             android:id="@+id/radioButton"

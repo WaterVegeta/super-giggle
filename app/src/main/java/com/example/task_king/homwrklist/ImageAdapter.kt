@@ -13,7 +13,7 @@ import com.example.task_king.data_base.ImageItem
 class ImageAdapter(
     val images: List<ImageItem>,
     val addImage: () -> Unit,
-    val startFullScreen: (Array<String>, Int) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    val startFullScreen: (Array<String>, Int, View) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     val IMAGE = 0
     val BUTTON = 1
 
@@ -48,7 +48,7 @@ class ImageAdapter(
 
                 val context = holder.itemView.context
                 holder.imageView.setOnClickListener {
-                    startFullScreen(images.map{ it.imageUri }.toTypedArray(), position)
+                    startFullScreen(images.map{ it.imageUri }.toTypedArray(), position, holder.imageView)
                 }
             }
 

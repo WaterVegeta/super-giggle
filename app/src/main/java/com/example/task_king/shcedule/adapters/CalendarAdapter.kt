@@ -1,7 +1,9 @@
 package com.example.task_king.shcedule.adapters
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -20,9 +22,14 @@ import com.google.android.material.color.MaterialColors
 
 class CalendarAdapter(
     private val onItemLongClick: (DataClass, Int) -> Unit,
-    private val onDone: (DataClass, Int) -> Unit
+    private val onDone: (DataClass, Int) -> Unit,
+    val context: Context
 ) : ListAdapter<DataClass, CalendarAdapter.ViewHolder>(ScheduleDiffUtill()) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+//        val layout = if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+//            R.layout.item_lesson
+//        }else{ R.layout.item_landscape}
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_lesson, parent, false)
         return ViewHolder(view)
@@ -45,7 +52,7 @@ class CalendarAdapter(
                 itemView.postDelayed({
                     onItemLongClick(getItem(position), position)
                 }, 100)
-                false
+                true
             }
 //            itemView.setOnClickListener {
 //                animateSelection(cardView)
